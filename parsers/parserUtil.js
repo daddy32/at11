@@ -71,3 +71,15 @@ module.exports.parseCookies = function(request) {
 
     return list;
 };
+
+module.exports.findMenuSme = function(che, date) {
+	var dateStr = date.format("DD.MM.YYYY");
+	$ = che;
+	
+	var denneMenu = $('.dnesne_menu, .ostatne_menu').filter(function(){
+		var nadpis = $(this).find('h2').text();
+		return nadpis.indexOf(dateStr) > -1;
+	});
+	
+	return denneMenu;
+};
