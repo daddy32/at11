@@ -10,7 +10,7 @@ module.exports.parse = function(html, date, callback) {
     
     denneMenu.first().find('.jedlo_polozka').each(function() {
         if ($(this).find('.left>b').length === 0) {
-			dayMenu.push(this);
+            dayMenu.push(this);
         }
     });
 
@@ -19,10 +19,10 @@ module.exports.parse = function(html, date, callback) {
         var label = $('.left', item).text();
         var price = $('.right', item).text();
         return { 
-			isSoup: soupPattern.test(label.trim()), 
-			text: normalize(label), 
-			price: parseFloat(price) 
-		};
+            isSoup: soupPattern.test(label.trim()), 
+            text: normalize(label), 
+            price: parseFloat(price) 
+        };
     });
     
     callback(dayMenu);
