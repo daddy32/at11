@@ -65,7 +65,7 @@ function loadMenus(container) {
 
 function getDate() {
     var date = new Date();
-    if(date.getHours() >= 15) {
+    if (date.getHours() >= 16) {
         date.setDate(date.getDate() + 1);
     }
     return date;
