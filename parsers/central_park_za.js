@@ -14,7 +14,7 @@ module.exports.parse = function(html, date, callback) {
             dayMenu.push(this);
         }
     });
-
+sdd
     //convert to menu item object
     dayMenu = dayMenu.map(function(item) {
         var label = $('.left', item).text();
