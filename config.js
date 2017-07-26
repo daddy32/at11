@@ -1,5 +1,5 @@
 module.exports = {
-    port: process.env.PORT || 83141,
+    port: process.env.PORT || 1234,
     cacheExpiration: 2 * 60 * 60 * 1000, //2h
     parserTimeout: 20 * 1000, //20s
     restaurants: [
