@@ -1,8 +1,27 @@
+at11
+==========
+
+Web application displaying daily menus of favorite restaurants in Žilina.
+
+Live application is running at [http://codemancy.com:17605/](http://codemancy.com:17605/).
+
+Currently supported restaurants:
+* Trattoria
+* Spirit
+* O2
+* Gusto
+* Kamélia
+* Central Park
+* Level 7
+* Chef restaurant
+
+Fork of at11 by Erni.
+  
+Original readme:
+
 [![Build Status](https://travis-ci.org/ERNICommunity/at11.svg?branch=master)](https://travis-ci.org/ERNICommunity/at11)
 [![Dependency Status](https://david-dm.org/ERNICommunity/at11.svg)](https://david-dm.org/ERNICommunity/at11)
 
-at11
-==========
 
 Simple web application that fetches daily lunch menus from popular restaurants near [ERNI Slovakia office](http://erni.sk).
 

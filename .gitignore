@@ -19,3 +19,4 @@ node_modules
 .idea/
 *.iml
 .vscode
+/sh.exe.stackdump
