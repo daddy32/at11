@@ -1,32 +1,55 @@
 module.exports = {
-    port: process.env.PORT || 54321,
+    port: process.env.PORT || 17606,
     cacheExpiration: 2 * 60 * 60 * 1000, //2h
     parserTimeout: 20 * 1000, //20s
     restaurants: [
     { 
         id: 1, 
-        name: 'Trattoria',
-        url: 'http://restauracie.sme.sk/restauracia/trattoria-pepe_3300-zilina_2737/denne-menu', 
-        module: 'trattoria_za' 
+        name: 'Patrónsky pivovar',
+        url: 'https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu', 
+        module: 'sme' 
     },
     { 
         id: 2, 
-        name: 'Spirit',
-        url: 'http://restauracie.sme.sk/restauracia/restauracia-spirit_6918-zilina_2737/denne-menu', 
-        module: 'chef_spirit_za' 
+        name: 'City Cantina Westend Gate',
+        url: 'https://restauracie.sme.sk/restauracia/city-cantina_5485-stare-mesto_2949/denne-menu', 
+        module: 'sme' 
     },
     { 
         id: 3, 
-        name: 'O2',
-        url: 'http://restauracie.sme.sk/restauracia/restauracia-02_2492-zilina_2737/denne-menu', 
-        module: 'chef_spirit_za' 
+        name: 'City Cantina Westend Square',
+        url: 'https://restauracie.sme.sk/restauracia/city-cantina-westend-square_8681-dubravka_2659/denne-menu', 
+        module: 'sme' 
     },
     { 
         id: 4, 
-        name: 'Gusto',
-        url: 'http://restauracie.sme.sk/restauracia/gusto_4537-zilina_2737/denne-menu', 
-        module: 'chef_spirit_za' 
+        name: 'Veg life',
+        url: 'https://restauracie.sme.sk/restauracia/veg-life-westend_7266-dubravka_2659/denne-menu', 
+        module: 'sme' 
     },
+    { 
+        id: 5, 
+        name: 'Jedáleň SAV (Doma)',
+        url: 'https://restauracie.sme.sk/restauracia/doma_8495-dubravka_2659/denne-menu', 
+        module: 'sav_doma' 
+    },
+    { 
+        id: 6, 
+        name: 'Canteen Priatelia',
+        url: 'https://www.zomato.com/sk/bratislava/canteen-priatelia-westend-karlova-ves-bratislava-iv/denn%C3%A9-menu', 
+        module: 'zomato' 
+    },
+    { 
+        id: 7, 
+        name: 'Svadby a Kari',
+        url: 'http://www.svadbykari.sk/vitajte-v-svadby-a-kari-na-patronke/', 
+        module: 'zomato' 
+    },
+	/*	
+	TODO: 
+		http://www.svadbykari.sk/vitajte-v-svadby-a-kari-na-patronke/
+			https://www.menucka.sk/denne-menu/bratislava/canteen-priatelia-westend	
+			https://www.zomato.com/sk/bratislava/canteen-priatelia-westend-karlova-ves-bratislava-iv/denn%C3%A9-menu
     { 
         id: 8, 
         name: 'Level 7',
@@ -39,16 +62,6 @@ module.exports = {
         url: 'http://restauracie.sme.sk/restauracia/chef-restaurant-bar_7274-zilina_2737/denne-menu', 
         module: 'chef_spirit_za' 
     },
-    /* NOK!
-    { 
-        id: 5, 
-        name: 'Vulcano',
-        url: 'http://www.vulcano.sk/?page_id=12', 
-        module: 'vulcano_za' 
-    },*/
-    /*
-        TODO: Tempo: http://www.dobreobedy.sk/
-    */
     { 
         id: 5, 
         name: 'Kamélia',
@@ -60,7 +73,7 @@ module.exports = {
         name: 'Central Park', 
         url: 'http://restauracie.sme.sk/restauracia/penzion-central-park_5515-zilina_2737/denne-menu', 
         module: 'central_park_za' 
-    },
+    },*/
     ],
     themes: {
         'jano': { name: 'Jano', template: '../views/index.html' },
