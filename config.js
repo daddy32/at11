@@ -43,7 +43,7 @@ module.exports = {
         id: 7, 
         name: 'Svadby a Kari',
         url: 'http://www.svadbykari.sk/vitajte-v-svadby-a-kari-na-patronke/', 
-        module: 'zomato' 
+        module: 'svadbikary' 
     },
 	/*	
 	TODO: 
