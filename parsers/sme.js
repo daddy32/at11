@@ -6,21 +6,21 @@ module.exports.parse = function(html, date, callback) {
     var dayMenu = [];
     var soupPattern = /^0[\.,]\d+\s?l/;
     var junkPattern = /Mini dezert/;
-	var global_price_pattern = /([1-9,]+) €/;
+	var global_price_pattern = /cena ponuky ([1-9,]+) €/;
 
 	var poznamka = $('.poznamka_k_menu>p').text();
 	var global_price = 0;
 	try {
-		global_price = parseFloat(poznamka.match(global_price_pattern)[0].replace(',', '.'));
+		global_price = parseFloat(poznamka.match(global_price_pattern)[1].replace(',', '.'));
 	}
 	catch(err) {
-		
+		console.log("global price not parsed");
 	}	
 	
 	/*if (poznamka !== '') {
 		console.log("Poznamka: " + poznamka);
 		console.log("global_price: " + global_price);
-	}*/	
+	}*/
     
     var denneMenu = parserUtil.findMenuSme($, date);
     
@@ -41,11 +41,13 @@ module.exports.parse = function(html, date, callback) {
         };
 		
 		if ((!result.isSoup) && 
-				(result.price === null || result.price == '' || isNaN(result.price))) {
+				(result.price === null || result.price == '' || isNaN(result.price)) &&
+				(global_price != 0)
+				) {
 			result.price = global_price;
 		} else {
-			console.log("result.price: " + result.price);
-			console.log("result.isSoup: " + result.isSoup);
+			/*console.log("result.price: " + result.price);
+			console.log("result.isSoup: " + result.isSoup);*/
 		}
 		
 		return result;

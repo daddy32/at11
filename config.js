@@ -13,13 +13,13 @@ module.exports = {
         id: 2, 
         name: 'City Cantina Westend Gate',
         url: 'https://restauracie.sme.sk/restauracia/city-cantina_5485-stare-mesto_2949/denne-menu', 
-        module: 'sme' 
+        module: 'cantina' 
     },
     { 
         id: 3, 
         name: 'City Cantina Westend Square',
         url: 'https://restauracie.sme.sk/restauracia/city-cantina-westend-square_8681-dubravka_2659/denne-menu', 
-        module: 'sme' 
+        module: 'cantina' 
     },
     { 
         id: 4, 
