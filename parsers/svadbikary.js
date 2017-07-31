@@ -25,7 +25,6 @@ module.exports.parse = function(html, date, callback) {
 	var arrayLength = myStringArray.length;
 	
 	for (var i = 0; i < arrayLength; i++) {
-		console.log(myStringArray[i]);
 		lineText = myStringArray[i].trim();
 		if (lineText != '') {
 			dayMenu.push({ 

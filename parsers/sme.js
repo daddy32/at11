@@ -14,14 +14,9 @@ module.exports.parse = function(html, date, callback) {
 		global_price = parseFloat(poznamka.match(global_price_pattern)[1].replace(',', '.'));
 	}
 	catch(err) {
-		console.log("global price not parsed");
+		//console.log("global price not parsed");
 	}	
 	
-	/*if (poznamka !== '') {
-		console.log("Poznamka: " + poznamka);
-		console.log("global_price: " + global_price);
-	}*/
-    
     var denneMenu = parserUtil.findMenuSme($, date);
     
     denneMenu.first().find('.jedlo_polozka').each(function() {
@@ -45,10 +40,7 @@ module.exports.parse = function(html, date, callback) {
 				(global_price != 0)
 				) {
 			result.price = global_price;
-		} else {
-			/*console.log("result.price: " + result.price);
-			console.log("result.isSoup: " + result.isSoup);*/
-		}
+		} 
 		
 		return result;
     });

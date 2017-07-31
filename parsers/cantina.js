@@ -18,7 +18,7 @@ module.exports.parse = function(html, date, callback) {
 				item.price = pricenum;
 			}	
 			catch(err) {
-				console.log("price not parsed");
+				//console.log("price not parsed");
 			}	
 			
             item.text = normalize(item.text);
