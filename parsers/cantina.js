@@ -4,6 +4,7 @@ module.exports.parse = function(html, date, callback) {
     var max_soup_index = 1;
 	var index = 0;
 	var junkPattern = /POLIEVKY: /;
+	var junkPattern2 = /\/ alergény.*/;
 	var pricePattern = /([0-9]+\.\s*[0-9]+)\s*€/
 	
 	parent_parser.parse(html, date, function(menuItems) {
@@ -31,8 +32,9 @@ module.exports.parse = function(html, date, callback) {
 		return capitalizeFirstLetter(
 			(	
 				str.replace(/\*.*$/, '')
-				.replace(junkPattern, '')
 				.replace(pricePattern, '')
+				.replace(junkPattern, '')
+				.replace(junkPattern2, '')
 				.replace(': /', ': ')
 				.replace(/^\//, '')
 				.trim()
