@@ -44,7 +44,7 @@ global.String.prototype.removeItemNumbering = global.String.prototype.removeItem
     return this.trim()
       .replace(/^\W\s+/, '')
       .replace(/^[\w\d] *[\)\.,]+[AB]?\s*/, '')
-      .replace(/[A-DZŠM]:/, '')
+      .replace(/^[A-DZŠM]:/, '')
       .trim();
 };
 
