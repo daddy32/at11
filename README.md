@@ -1,7 +1,7 @@
 at11
 ==========
 
-Web application displaying daily menus of favorite restaurants in Žilina.
+Web application displaying daily menus of favorite restaurants at Patrónka, Bratislava.
 
 Live application is running at [http://patronka.codemancy.com/](http://patronka.codemancy.com/).
 
