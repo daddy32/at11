@@ -8,13 +8,19 @@ module.exports.parse = function(html, date, callback) {
     var junkPattern 	= /Zmena:/;
 	var junkPattern2 	= /Menu na[^:]*:/;
 	var junkPattern3 	= /\/a.*/;
+	var langSeparator	= '___';
+	var langSeparator2	= '---';
     
     var denneMenu = $('#secondary .cff-text');
 	var menuText = denneMenu.html();	
 	
-	if (menuText.indexOf('___') >= 0) {
-		menuText = menuText.substr(0, menuText.indexOf('___')); 
+	if (menuText.indexOf(langSeparator) >= 0) {
+		menuText = menuText.substr(0, menuText.indexOf(langSeparator)); 
 	}
+	
+	if (menuText.indexOf(langSeparator2) >= 0) {
+		menuText = menuText.substr(0, menuText.indexOf(langSeparator2)); 
+	}	
 	
 	menuText = menuText           
 		.replace(junkPattern, '')

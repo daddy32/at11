@@ -5,8 +5,6 @@ module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
   var dayMenu = [];
 
-  console.log('A');
-
   $('#daily-menu-container').find('.tmi-group').each(function() {
     var $this = $(this);
 
@@ -15,11 +13,8 @@ module.exports.parse = function(html, date, callback) {
 
     if (day === date.format('dddd')) {
       $this.children('.tmi-daily').each(function() {
-        console.log(this.text());
         var text = $(this).find('.tmi-name').text().trim();
         var price = parseFloat($(this).find('.tmi-price').text().replace(/,/, '.'));
-        console.log(text);
-        console.log(price);
 
         if (isNaN(price)) { //price probably directly in text, extract it
           text = text.replace(/\d[\.,]\d{2}$/, function(match) {

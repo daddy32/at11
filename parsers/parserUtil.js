@@ -41,7 +41,11 @@ global.String.prototype.capitalizeFirstLetter = global.String.prototype.capitali
 };
 
 global.String.prototype.removeItemNumbering = global.String.prototype.removeItemNumbering || function() {
-    return this.trim().replace(/^\W\s+/, '').replace(/^[\w\d] *[\)\.,]+[AB]?\s*/, '').trim();
+    return this.trim()
+      .replace(/^\W\s+/, '')
+      .replace(/^[\w\d] *[\)\.,]+[AB]?\s*/, '')
+      .replace(/[A-DZŠM]:/, '')
+      .trim();
 };
 
 module.exports.parseTheme = function(req) {
@@ -75,11 +79,11 @@ module.exports.parseCookies = function(request) {
 module.exports.findMenuSme = function(che, date) {
     var dateStr = date.format("DD.MM.YYYY");
     $ = che;
-    
+
     var denneMenu = $('.dnesne_menu, .ostatne_menu').filter(function(){
         var nadpis = $(this).find('h2').text();
         return nadpis.indexOf(dateStr) > -1;
     });
-    
+
     return denneMenu;
 };
