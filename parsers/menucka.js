@@ -1,10 +1,7 @@
 var cheerio = require('cheerio');
 require('./parserUtil');
-console.log('menucka mumu1');
 
 module.exports.parse = function(html, date, callback) {
-  console.log('menucka mumu2');
-
   var $ = cheerio.load(html);
   var dayMenuItemsProto = [];
   var dayMenuItems = [];
@@ -20,7 +17,6 @@ module.exports.parse = function(html, date, callback) {
 
   denneMenu.find('div').each(function() {
       text = $(this).text();
-      console.log(text);
       if ((!(!text || 0 === text.trim().length)) &&
         !junkPattern.test(text.toLowerCase()) &&
         !junkPattern2.test(text) &&
@@ -34,10 +30,7 @@ module.exports.parse = function(html, date, callback) {
     item = dayMenuItemsProto[i*2];
     nextItem = dayMenuItemsProto[i*2 + 1];
     var label = $(item).text();
-    console.log('label: ' + label);
-
     var price = $(nextItem).text();
-    console.log('price: ' + price);
 
     dayMenuItems.push({
         isSoup: (i <= max_soup_index),
