@@ -8,6 +8,8 @@ module.exports.parse = function(html, date, callback) {
   var junkPattern = /denné menu/;
   var junkPattern2 = /A:\s*[0-9]+/
   var junkPattern3 = /A:\s*$/
+  var junkPattern4 = /POLIEVKA:$/
+  var junkPattern5 = /MINUTKA:$/
   var max_soup_index = 1;
 
   var denneMenu = $('#restaurant .row').filter(function(){
@@ -17,18 +19,22 @@ module.exports.parse = function(html, date, callback) {
 
   denneMenu.find('div').each(function() {
       text = $(this).text();
+      //console.log('text: ' + text);
       if ((!(!text || 0 === text.trim().length)) &&
         !junkPattern.test(text.toLowerCase()) &&
-        !junkPattern2.test(text) &&
-        !junkPattern3.test(text)
+        !junkPattern4.test(text) &&
+        !junkPattern5.test(text)
       ){
         dayMenuItemsProto.push(this);
-      }
+        // console.log(' - including');
+      } /*else {
+        console.log(' - NOT including');
+      }*/
   });
 
-  for (var i = 0; i < dayMenuItemsProto.length / 2; i++) {
-    item = dayMenuItemsProto[i*2];
-    nextItem = dayMenuItemsProto[i*2 + 1];
+  for (var i = 0; i < dayMenuItemsProto.length / 3; i++) {
+    item = dayMenuItemsProto[i*3];
+    nextItem = dayMenuItemsProto[i*3 + 2];
     var label = $(item).text();
     var price = $(nextItem).text();
 
