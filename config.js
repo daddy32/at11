@@ -43,7 +43,7 @@ module.exports = {
         id: 7,
         name: 'Veg life',
         url: 'https://restauracie.sme.sk/restauracia/veg-life-westend_7266-dubravka_2659/denne-menu',
-        module: 'sme'
+        module: 'veg_life'
     },
 	/*
 	TODO:
