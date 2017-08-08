@@ -6,6 +6,7 @@ module.exports.parse = function(html, date, callback) {
   var dayMenu = [];
   var soupPattern = /^0[\.,]\d+\s?l/;
   var junkPattern = /Mini dezert/;
+  var junkPattern2 = /\([0-9, ]*\)/;
 
   var denneMenu = parserUtil.findMenuSme($, date);
 
@@ -29,7 +30,9 @@ module.exports.parse = function(html, date, callback) {
   callback(dayMenu);
 
   function normalize(str) {
-    return str.normalizeWhitespace()
+    return str
+      .normalizeWhitespace()
+      .replace(junkPattern2, '')
       .replace(soupPattern, '')
       .removeMetrics()
       .correctCommaSpacing()
