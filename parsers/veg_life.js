@@ -10,7 +10,7 @@ module.exports.parse = function(html, date, callback) {
     var price = NaN;
 
     var dayMenu = menuItems.map(function(item) {
-      item.isSoup =soupPattern.test(item.text);
+      item.isSoup = soupPattern.test(item.text);
       try {
         var priceMatch = item.text.match(pricePattern)
         var pricenum = parseFloat(priceMatch[1].replace(/\s+/, ''));
