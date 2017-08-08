@@ -47,7 +47,8 @@ module.exports.parse = function(html, date, callback) {
   callback(dayMenu);
 
   function normalize(str) {
-    return str.normalizeWhitespace()
+    return str
+      .normalizeWhitespace()
       //.replace(soupPattern, '')
       .removeMetrics()
       .correctCommaSpacing()

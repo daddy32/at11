@@ -25,7 +25,7 @@ module.exports = {
         id: 4,
         name: 'Patrónsky pivovar',
         url: 'https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu',
-        module: 'sme'
+        module: 'sav_doma'
     },
     {
         id: 5,
@@ -45,10 +45,12 @@ module.exports = {
         url: 'https://restauracie.sme.sk/restauracia/veg-life-westend_7266-dubravka_2659/denne-menu',
         module: 'veg_life'
     },
-	/*
-	TODO:
-      https://www.bemiservis.sk/bemi/
-  */
+    {
+        id: 8,
+        name: 'Restaurant BEMI',
+        url: 'https://www.bemiservis.sk/bemi/',
+        module: 'bemiservis'
+    },
     ],
     themes: {
         'jano': { name: 'Jano', template: '../views/index.html' },

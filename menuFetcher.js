@@ -105,6 +105,7 @@ module.exports.fetchMenu = function(url, date, postParams, parseCallback, doneCa
                 {
                     clearTimeout(timer);
                     doneCallback(err);
+                    console.error("Error for %s: %s", url, error);
                 }
             }
             else
