@@ -11,7 +11,7 @@ module.exports.parse = function(html, date, callback) {
     var junkPattern = /2 polievky|Dezert|Týždenné menu/
 
     var denneMenu = $('.entry-content');
-    
+
     denneMenu.first().find('p').each(function() {
         if ($(this).find('.left>b').length === 0 && !(junkPattern.test($(this).text()))) {
             dayMenu.push(this);
@@ -22,13 +22,13 @@ module.exports.parse = function(html, date, callback) {
     dayMenu = dayMenu.map(function(item) {
         var label = $('p', item).text();
         var price = '0'; // $('.right', item).text();
-        return { 
-            isSoup: soupPattern.test(label.trim()), 
-            text: normalize(label), 
-            price: parseFloat(price) 
+        return {
+            isSoup: soupPattern.test(label.trim()),
+            text: normalize(label),
+            price: parseFloat(price)
         };
     });
-    
+
     callback(dayMenu);
 
     function normalize(str) {
