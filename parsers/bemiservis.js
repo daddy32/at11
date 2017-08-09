@@ -5,19 +5,19 @@ module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
   var dayMenu = [];
   var soupPattern = /olievka/;
-  var junkPattern = /\&nbsp/;
+  var junkPattern = /^\s*$/;
   var pricePattern = /(\d+,\d+)\s*eur/;
 
-  console.log(date);
   var n = date._d.getDay();
-  console.log('day: ' + n);
-
   dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
-  console.log(dayMenuElement.html());
 
   dayMenuElement.find('p').each(function() {
     var text = $(this).text();
     var price = NaN;
+
+    if ((junkPattern.test(text))) {
+      return;
+    }
 
     try {
       var priceMatch = text.match(pricePattern)
@@ -27,13 +27,11 @@ module.exports.parse = function(html, date, callback) {
       console.log("price not parsed");
     }
 
-    if (!(junkPattern.test(text))) {
-      dayMenu.push({
-        isSoup: false,
-        text: normalize(text),
-        price: price
-      });
-    }
+    dayMenu.push({
+      isSoup: false,
+      text: normalize(text),
+      price: price
+    });
   });
 
   callback(dayMenu);
