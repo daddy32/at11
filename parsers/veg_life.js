@@ -1,14 +1,11 @@
 var parent_parser = require('./sme');
 
 module.exports.parse = function(html, date, callback) {
-  var index = 0;
   var soupPattern = /Polievka: /;
   var junkPattern = /\/ alergény.*/;
   var pricePattern = /([0-9]+\.\s*[0-9]+)\s*€/
 
   parent_parser.parse(html, date, function(menuItems) {
-    var price = NaN;
-
     var dayMenu = menuItems.map(function(item) {
       item.isSoup = soupPattern.test(item.text);
       try {

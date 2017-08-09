@@ -78,7 +78,7 @@ module.exports.parseCookies = function(request) {
 
 module.exports.findMenuSme = function(che, date) {
     var dateStr = date.format("DD.MM.YYYY");
-    $ = che;
+    var $ = che;
 
     var denneMenu = $('.dnesne_menu, .ostatne_menu').filter(function(){
         var nadpis = $(this).find('h2').text();

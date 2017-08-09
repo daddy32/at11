@@ -4,12 +4,11 @@ require('./parserUtil');
 module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
   var dayMenu = [];
-  var soupPattern = /olievka/;
   var junkPattern = /^\s*$/;
   var pricePattern = /(\d+,\d+)\s*eur/;
 
   var n = date._d.getDay();
-  dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
+  var dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
 
   dayMenuElement.find('p').each(function() {
     var text = $(this).text();
@@ -24,7 +23,7 @@ module.exports.parse = function(html, date, callback) {
       var pricenum = parseFloat(priceMatch[1].replace(/\s+/, '').replace(',', '.'));
       price = pricenum;
     } catch (err) {
-      console.log("price not parsed");
+      //console.log("price not parsed");
     }
 
     dayMenu.push({

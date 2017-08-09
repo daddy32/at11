@@ -12,10 +12,14 @@
     "nonew": true,
     "undef": true,
     "unused": true,
-    "esversion": 6,    
+    "esversion": 6,
 //enviroments
     "node": true,
     "browser": true,
     "nonstandard": true,
-    "jquery": true
+    "jquery": true,
+
+    "asi" : true,
+// Ignored Warnings
+    "-W013": true
 }

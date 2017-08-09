@@ -1,5 +1,4 @@
 var cheerio = require('cheerio');
-var parserUtil = require('./parserUtil');
 
 module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
@@ -26,12 +25,12 @@ module.exports.parse = function(html, date, callback) {
     .replace(junkPattern, '')
     .replace(junkPattern2, '');
 
-  myStringArray = menuText.split('<br>');
+  var myStringArray = menuText.split('<br>');
   var arrayLength = myStringArray.length;
 
   for (var i = 0; i < arrayLength; i++) {
-    lineText = myStringArray[i].trim();
-    if (lineText != '') {
+    var lineText = myStringArray[i].trim();
+    if (lineText !== '') {
       dayMenu.push({
         isSoup: soupPattern.test(lineText),
         text: normalize(lineText),

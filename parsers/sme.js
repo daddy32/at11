@@ -35,8 +35,8 @@ module.exports.parse = function(html, date, callback) {
     };
 
     if ((!result.isSoup) &&
-      (result.price === null || result.price == '' || isNaN(result.price)) &&
-      (global_price != 0)
+      (result.price === null || result.price === '' || isNaN(result.price)) &&
+      (global_price !== 0)
     ) {
       result.price = global_price;
     }

@@ -5,8 +5,6 @@ module.exports.parse = function(html, date, callback) {
   var index = 0;
 
   parent_parser.parse(html, date, function(menuItems) {
-    var price = NaN;
-
     var dayMenu = menuItems.map(function(item) {
       //console.log(item.text);
       item.isSoup = index++ <= max_soup_index;

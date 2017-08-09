@@ -6,8 +6,6 @@ module.exports.parse = function(html, date, callback) {
   var dayMenuItemsProto = [];
   var dayMenuItems = [];
   var junkPattern = /denné menu/;
-  var junkPattern2 = /A:\s*[0-9]+/
-  var junkPattern3 = /A:\s*$/
   var junkPattern4 = /POLIEVKA/
   var junkPattern5 = /MINUTKA/
   var max_soup_index = 1;
@@ -18,7 +16,7 @@ module.exports.parse = function(html, date, callback) {
   });
 
   denneMenu.find('div').each(function() {
-    text = $(this).text();
+    var text = $(this).text();
     //console.log('text: ' + text);
     if ((!(!text || 0 === text.trim().length)) &&
       !junkPattern.test(text.toLowerCase()) &&
@@ -33,8 +31,8 @@ module.exports.parse = function(html, date, callback) {
   });
 
   for (var i = 0; i < dayMenuItemsProto.length / 3; i++) {
-    item = dayMenuItemsProto[i * 3];
-    nextItem = dayMenuItemsProto[i * 3 + 2];
+    var item = dayMenuItemsProto[i * 3];
+    var nextItem = dayMenuItemsProto[i * 3 + 2];
     var label = $(item).text();
     var price = $(nextItem).text();
 
@@ -54,5 +52,5 @@ module.exports.parse = function(html, date, callback) {
       .replace(/A\s(\d\s?[\.,]?\s?)+$/, '')
       .correctCommaSpacing()
       .normalizeWhitespace();
-  };
+  }
 }

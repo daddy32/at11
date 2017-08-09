@@ -1,4 +1,4 @@
-var parent_parser = require('./sme');
+var parentParser = require('./sme');
 
 module.exports.parse = function(html, date, callback) {
   var max_soup_index = 1;
@@ -7,13 +7,11 @@ module.exports.parse = function(html, date, callback) {
   var junkPattern2 = /\/ alergény.*/;
   var pricePattern = /([0-9]+\.\s*[0-9]+)\s*€/
 
-  parent_parser.parse(html, date, function(menuItems) {
-    var price = NaN;
-
+  parentParser.parse(html, date, function(menuItems) {
     var dayMenu = menuItems.map(function(item) {
       item.isSoup = index++ <= max_soup_index;
       try {
-        var priceMatch = item.text.match(pricePattern)
+        var priceMatch = item.text.match(pricePattern);
         var pricenum = parseFloat(priceMatch[1].replace(/\s+/, ''));
         item.price = pricenum;
       } catch (err) {
