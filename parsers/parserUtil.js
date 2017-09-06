@@ -33,7 +33,7 @@ global.String.prototype.correctCommaSpacing = global.String.prototype.correctCom
 
 global.String.prototype.removeMetrics = global.String.prototype.removeMetrics || function() {
     //after metrics removal there might be whitespaces left at the ends so trim it afterwards
-    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,\.]\d[\doO]*)? *[lLgG]\)?\.?\s*/g, ' ').trim();
+    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,\.]\d[\doO]*)? *[lLgG]\)?\.?\s*\/?/g, ' ').trim();
 };
 
 global.String.prototype.capitalizeFirstLetter = global.String.prototype.capitalizeFirstLetter || function() {

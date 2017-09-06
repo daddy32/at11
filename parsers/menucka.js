@@ -6,9 +6,14 @@ module.exports.parse = function(html, date, callback) {
   var dayMenuItemsProto = [];
   var dayMenuItems = [];
   var junkPattern = /denné menu/;
-  var junkPattern4 = /POLIEVKA/
-  var junkPattern5 = /MINUTKA/
+  var polievkPattern = /POLIEVKY: /;
+  var junkPattern4 = /POLIEVKA/;
+  var junkPattern5 = /MINUTKA/;
+  var pricePattern = /[0-9]+[,.]*[0-9]+\s+€/;
+  var alergPattern = /\/*\s*A[\s:](\d\s?[\.,]?\s?)+$/;
+  var alergPattern2 = /\/\s+alergény\s+(\d\s?[\.,]?\s?)*/;
   var max_soup_index = 1;
+  var index = 0;
 
   var denneMenu = $('#restaurant .row').filter(function() {
     var nadpis = $(this).find('.day-title').text();
@@ -17,40 +22,48 @@ module.exports.parse = function(html, date, callback) {
 
   denneMenu.find('div').each(function() {
     var text = $(this).text();
-    //console.log('text: ' + text);
     if ((!(!text || 0 === text.trim().length)) &&
       !junkPattern.test(text.toLowerCase()) &&
       !junkPattern4.test(text.trim()) &&
       !junkPattern5.test(text.trim())
     ) {
       dayMenuItemsProto.push(this);
-      //console.log(' - including');
     } else {
-      //console.log(' - NOT including');
     }
   });
 
-  for (var i = 0; i < dayMenuItemsProto.length / 3; i++) {
-    var item = dayMenuItemsProto[i * 3];
-    var nextItem = dayMenuItemsProto[i * 3 + 2];
-    var label = $(item).text();
-    var price = $(nextItem).text();
+  var label = '';
+  for (var i = 0; i < dayMenuItemsProto.length; i++) {
+    var item = dayMenuItemsProto[i];
+    var currentlabel = $(item).text();
 
-    dayMenuItems.push({
-      isSoup: (i <= max_soup_index),
-      text: normalize(label),
-      price: parseFloat(price.replace(',', '.'))
-    });
+    if (pricePattern.test(currentlabel)) {
+      dayMenuItems.push({
+        isSoup: (index++ <= max_soup_index),
+        text: normalize(label),
+        price: parseFloat(currentlabel.replace(',', '.'))
+      });
+      label = '';
+    } else {
+      label += normalize(currentlabel);
+    }
   }
 
   callback(dayMenuItems);
 
   function normalize(str) {
-    return str
+    var result = str
       .removeItemNumbering()
       .removeMetrics()
-      .replace(/A\s(\d\s?[\.,]?\s?)+$/, '')
+      .replace(alergPattern, '')
+      .replace(alergPattern2, '')
+      .replace(polievkPattern, '')
       .correctCommaSpacing()
-      .normalizeWhitespace();
+      .normalizeWhitespace()
+      .toLowerCase()
+      .capitalizeFirstLetter()
+    ;
+    console.log('normalize("' + str + '") = "' + result + '"');
+    return result;
   }
 }
