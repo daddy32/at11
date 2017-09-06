@@ -63,7 +63,7 @@ module.exports.parse = function(html, date, callback) {
       .toLowerCase()
       .capitalizeFirstLetter()
     ;
-    console.log('normalize("' + str + '") = "' + result + '"');
+    //console.log('normalize("' + str + '") = "' + result + '"');
     return result;
   }
 }
