@@ -4,16 +4,16 @@ module.exports = {
     parserTimeout: 20 * 1000, //20s
     restaurants: [
     {
-        id: 1,
-        name: 'City Cantina Westend Square',
-        url: 'https://menucka.sk/denne-menu/bratislava/city-cantina-westend-square',
-        module: 'menucka'
+          id: 1,
+          name: 'City Cantina Westend Square',
+          url: 'https://restauracie.sme.sk/restauracia/city-cantina-westend-square_8681-dubravka_2659/denne-menu',
+          module: 'cantina'
     },
     {
         id: 2,
         name: 'City Cantina Westend Gate',
-        url: 'https://menucka.sk/denne-menu/bratislava/city-cantina-westend-gate',
-        module: 'menucka'
+        url: 'https://restauracie.sme.sk/restauracia/city-cantina_5485-stare-mesto_2949/denne-menu',
+        module: 'cantina'
     },
     {
         id: 3,
@@ -42,14 +42,26 @@ module.exports = {
     {
         id: 7,
         name: 'Veg life',
-        url: 'https://restauracie.sme.sk/restauracia/veg-life-westend_7266-dubravka_2659/denne-menu',
-        module: 'veg_life'
+        url: 'https://menucka.sk/denne-menu/bratislava/veg-life-westend',
+        module: 'menucka'
     },
     {
         id: 8,
         name: 'Restaurant BEMI',
         url: 'https://www.bemiservis.sk/bemi/',
         module: 'bemiservis'
+    },
+    {
+        id: 9,
+        name: 'City Cantina Westend Square (alt zdroj)',
+        url: 'https://menucka.sk/denne-menu/bratislava/city-cantina-westend-square',
+        module: 'menucka'
+    },
+    {
+        id: 10,
+        name: 'City Cantina Westend Gate (alt zdroj)',
+        url: 'https://menucka.sk/denne-menu/bratislava/city-cantina-westend-gate',
+        module: 'menucka'
     },
     ],
     themes: {
