@@ -3,7 +3,7 @@ at11
 
 Web application displaying daily menus of favorite restaurants at Patrónka, Bratislava.
 
-Live application is running at [http://patronka.codemancy.com/](http://patronka.codemancy.com/).
+Live application is running at [https://patronka.herokuapp.com/](https://patronka.herokuapp.com/).
 
 Installation instructions:
 ---
