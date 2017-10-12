@@ -3,7 +3,7 @@ at11
 
 Web application displaying daily menus of favorite restaurants in Žilina.
 
-Live application is running at [http://codemancy.com:17605/](http://codemancy.com:17605/).
+Live application is running at [https://zilinaham.herokuapp.com/](https://zilinaham.herokuapp.com/).
 
 Currently supported restaurants:
 * Trattoria
@@ -16,7 +16,7 @@ Currently supported restaurants:
 * Chef restaurant
 
 Fork of at11 by Erni.
-  
+
 Original readme:
 
 [![Build Status](https://travis-ci.org/ERNICommunity/at11.svg?branch=master)](https://travis-ci.org/ERNICommunity/at11)
