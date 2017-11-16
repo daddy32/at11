@@ -9,9 +9,11 @@ module.exports.parse = function(html, date, callback) {
   var polievkPattern = /POLIEVKY: /;
   var junkPattern4 = /POLIEVKA/;
   var junkPattern5 = /MINUTKA/;
+  var junkPattern6 = /^[A-Z]\s/;
   var pricePattern = /[0-9]+[,.]*[0-9]+\s+€/;
   var alergPattern = /\/*\s*A[\s:](\d\s?[\.,]?\s?)+$/;
   var alergPattern2 = /\/\s+alergény\s+(\d\s?[\.,]?\s?)*/;
+  var alergPattern3 = /\/*\s*\((\d\s?[\.,]?\s?)+\)\s*/;
   var max_soup_index = 1;
   var index = 0;
 
@@ -57,7 +59,9 @@ module.exports.parse = function(html, date, callback) {
       .removeMetrics()
       .replace(alergPattern, '')
       .replace(alergPattern2, '')
+      .replace(alergPattern3, '')
       .replace(polievkPattern, '')
+      .replace(junkPattern6, '')
       .correctCommaSpacing()
       .normalizeWhitespace()
       .toLowerCase()
