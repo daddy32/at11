@@ -4,7 +4,7 @@ module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
   var dayMenu = [];
   var soupPattern = /olievka/;
-  var junkPattern = /Zmena:/;
+  var junkPattern = /^-/;
   var junkPattern2 = /Menu na[^:]*:/;
   var junkPattern3 = /\/a.*/;
   var langSeparator = '___';
@@ -51,6 +51,8 @@ module.exports.parse = function(html, date, callback) {
       .replace(junkPattern3, '')
       .removeMetrics()
       .correctCommaSpacing()
-      .removeItemNumbering();
+      .removeItemNumbering()
+      .replace(junkPattern, '')
+      ;
   }
 };
