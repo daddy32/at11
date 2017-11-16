@@ -6,6 +6,7 @@ module.exports.parse = function(html, date, callback) {
   var dayMenu = [];
   var junkPattern = /^\s*$/;
   var pricePattern = /(\d+,\d+)\s*eur/;
+  var alergPattern = /\/*\s*\/(\s*\d\s?[\.,]?\s?)+\/\s*/;
 
   var n = date._d.getDay();
   var dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
@@ -38,6 +39,7 @@ module.exports.parse = function(html, date, callback) {
   function normalize(str) {
     return str
       .replace(pricePattern, '')
+      .replace(alergPattern, '')
       .normalizeWhitespace()
       .removeItemNumbering()
       .removeMetrics()
