@@ -1,8 +1,18 @@
+/* TODO:
+  http://livingrestaurant.net/denne-menu/
+  http://www.vulcano.sk/menu/denne-menu.html
+  // xor:
+  url: 'https://restauracie.sme.sk/restauracia/vulcano_4536-zilina_2737/denne-menu',
+  http://www.trezorzilina.sk/ponuka/tyzdenne-menu
+  Tempo: http://www.dobreobedy.sk/
+*/
+
 module.exports = {
   port: process.env.PORT || 17605,
   cacheExpiration: 2 * 60 * 60 * 1000, //2h
   parserTimeout: 20 * 1000, //20s
-  restaurants: [{
+  restaurants: [
+    {
       id: 1,
       name: 'Trattoria',
       url: 'http://restauracie.sme.sk/restauracia/trattoria-pepe_3300-zilina_2737/denne-menu',
@@ -38,16 +48,6 @@ module.exports = {
       url: 'http://restauracie.sme.sk/restauracia/chef-restaurant-bar_7274-zilina_2737/denne-menu',
       module: 'chef_spirit_za'
     },
-    /* NOK!
-    {
-        id: 5,
-        name: 'Vulcano',
-        url: 'http://www.vulcano.sk/?page_id=12',
-        module: 'vulcano_za'
-    },*/
-    /*
-        TODO: Tempo: http://www.dobreobedy.sk/
-    */
     {
       id: 5,
       name: 'Kamélia',
@@ -60,6 +60,18 @@ module.exports = {
       url: 'http://restauracie.sme.sk/restauracia/penzion-central-park_5515-zilina_2737/denne-menu',
       module: 'central_park_za'
     },
+    {
+      id: 6,
+      name: 'Na Bráne',
+      url: 'https://restauracie.sme.sk/restauracia/restauracia-na-brane_2508-zilina_2737/denne-menu',
+      module: 'na_brane_za'
+    },
+    /*{
+        id: 5,
+        name: 'Vulcano',
+        url: 'http://www.vulcano.sk/?page_id=12',
+        module: 'vulcano_za'
+    },*/
   ],
   themes: {
     'jano': {
