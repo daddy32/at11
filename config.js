@@ -5,6 +5,7 @@
   url: 'https://restauracie.sme.sk/restauracia/vulcano_4536-zilina_2737/denne-menu',
   http://www.trezorzilina.sk/ponuka/tyzdenne-menu
   Tempo: http://www.dobreobedy.sk/
+  Mamma mia: https://www.auparkzilina.sk/obsah/obedove-menu
 */
 
 module.exports = {
@@ -66,6 +67,14 @@ module.exports = {
       url: 'https://restauracie.sme.sk/restauracia/restauracia-na-brane_2508-zilina_2737/denne-menu',
       module: 'na_brane_za'
     },
+    {
+      id: 7,
+      name: 'Crazy Culinary',      
+      //url: 'https://menucka.sk/denne-menu/bratislava/canteen-priatelia-westend',
+      url: 'https://menucka.sk/denne-menu/zilina/crazy-culinary-bistro',
+      module: 'menucka'
+    },
+    
     /*{
         id: 5,
         name: 'Vulcano',
