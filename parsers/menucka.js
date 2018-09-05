@@ -10,7 +10,6 @@ module.exports.parse = function(html, date, callback) {
   var junkPattern = /denné menu/;
   var junkPattern4 = /POLIEVKA/;
   var junkPattern5 = /MINUTKA/;
-  //var junkPattern5b = /HLAVNÉ JEDLO/; 
   var junkPattern5c = /JEDLO EXTRA/; 
   var junkPattern6 = /^[A-Z]\s/;
   var alergPattern = /\/*\s*A[\s:](\d\s?[\.,]?\s?)+$/;
@@ -32,24 +31,17 @@ module.exports.parse = function(html, date, callback) {
     return nadpis.indexOf('(dnes)') > -1;
   });
 
-  console.log('Menu items: ');
   denneMenu.find('>div').not('.price').not('.col-xs-12').each(function() {
     dayMenuItemsProto.push(this);
   });
-  console.log(dayMenuItemsProto);
 
-  console.log('Prices: ');
   denneMenu.find('>div.price').each(function() {
     pricesProto.push(this);
   });
-  console.log(pricesProto);
 
   for (var i = 0; i < dayMenuItemsProto.length; i++) {
     var currentlabel = $(dayMenuItemsProto[i]).text();
     var currentPrice = $(pricesProto[i]).text();
-    console.log('Label: ' + currentlabel);
-    console.log('Price: ' + currentPrice);
-    
 
     if (!(!currentlabel || 0 === currentlabel.trim().length) &&
       !junkPattern.test(currentlabel.toLowerCase()) &&
@@ -82,7 +74,6 @@ module.exports.parse = function(html, date, callback) {
       .toLowerCase()
       .capitalizeFirstLetter()
     ;
-    //console.log('normalize("' + str + '") = "' + result + '"');
     return result;
   }
 }

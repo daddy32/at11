@@ -26,22 +26,28 @@ module.exports = {
       module: 'chef_spirit_za'
     },
     {
-      id: 3,
-      name: 'O2',
-      url: 'http://restauracie.sme.sk/restauracia/restauracia-02_2492-zilina_2737/denne-menu',
-      module: 'chef_spirit_za'
-    },
-    {
       id: 4,
       name: 'Gusto',
       url: 'http://restauracie.sme.sk/restauracia/gusto_4537-zilina_2737/denne-menu',
       module: 'chef_spirit_za'
     },
     {
+      id: 7,
+      name: 'Crazy Culinary',      
+      url: 'https://menucka.sk/denne-menu/zilina/crazy-culinary-bistro',
+      module: 'menucka'
+    },    
+    {
       id: 8,
       name: 'Level 7',
       url: 'http://restauracie.sme.sk/restauracia/level-7_4546-zilina_2737/denne-menu',
       module: 'trattoria_za'
+    },
+    {
+      id: 6,
+      name: 'Na Bráne',
+      url: 'https://restauracie.sme.sk/restauracia/restauracia-na-brane_2508-zilina_2737/denne-menu',
+      module: 'na_brane_za'
     },
     {
       id: 9,
@@ -62,17 +68,10 @@ module.exports = {
       module: 'central_park_za'
     },
     {
-      id: 6,
-      name: 'Na Bráne',
-      url: 'https://restauracie.sme.sk/restauracia/restauracia-na-brane_2508-zilina_2737/denne-menu',
-      module: 'na_brane_za'
-    },
-    {
-      id: 7,
-      name: 'Crazy Culinary',      
-      //url: 'https://menucka.sk/denne-menu/bratislava/canteen-priatelia-westend',
-      url: 'https://menucka.sk/denne-menu/zilina/crazy-culinary-bistro',
-      module: 'menucka'
+      id: 3,
+      name: 'O2',
+      url: 'http://restauracie.sme.sk/restauracia/restauracia-02_2492-zilina_2737/denne-menu',
+      module: 'chef_spirit_za'
     },
     
     /*{
