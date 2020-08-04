@@ -40,6 +40,10 @@
     {
       "name": "Andrej Mandli",
       "email": "andrej.mandli@erni.sk"
+    },
+    {
+      "name": "Daddy32",
+      "email": "daddy@autistici.org"
     }
   ],
   "keywords": [
@@ -51,10 +55,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/at11/at11.git"
+    "url": "https://github.com/daddy32/at11"
   },
   "bugs": {
-    "url": "https://github.com/at11/at11/issues"
+    "url": "https://github.com/daddy32/at11/issues"
   },
   "engines": {
     "node": "4.2.x"
