@@ -61,7 +61,8 @@
     "url": "https://github.com/daddy32/at11/issues"
   },
   "engines": {
-    "node": "4.2.x"
+    "node": "12.18.x",
+    "npm": "6.14.x"
   },
   "license": "SEE LICENSE IN LICENSE",
   "main": "app.js"
