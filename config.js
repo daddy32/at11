@@ -39,27 +39,32 @@ module.exports = {
         url: 'http://restauracie.sme.sk/restauracia/chef-restaurant-bar_7274-zilina_2737/denne-menu',
         module: 'chef_spirit_za'
     },
-    /* NOK!
     {
-        id: 5,
-        name: 'Vulcano',
-        url: 'http://www.vulcano.sk/?page_id=12',
-        module: 'vulcano_za'
-    },*/
+        id: 6,
+        name: 'Central Park',
+        url: 'http://restauracie.sme.sk/restauracia/penzion-central-park_5515-zilina_2737/denne-menu',
+        module: 'central_park_za'
+    },
     /*
         TODO: Tempo: http://www.dobreobedy.sk/
     */
     {
-        id: 5,
-        name: 'Kamélia',
-        url: 'http://restauracie.sme.sk/restauracia/penzion-kamelia_2004-zilina_2737/denne-menu',
-        module: 'kamelia_za'
+        id: 10,
+        name: 'Mamma Mia (link)',
+        url: 'https://www.auparkzilina.sk/obsah/obedove-menu#mamma-mia',
+        module: 'aupark_za' // TODO: Create parser
     },
     {
-        id: 10,
-        name: 'Central Park',
-        url: 'http://restauracie.sme.sk/restauracia/penzion-central-park_5515-zilina_2737/denne-menu',
-        module: 'central_park_za'
+        id: 11,
+        name: 'Vulcano (link)',
+        url: 'http://www.vulcano.sk/menu/denne-menu.html',
+        module: 'vulcano_za' // TODO: Create parser
+    },
+    {
+        id: 12,
+        name: 'Kamélia (link)',
+        url: 'https://www.penzionkamelia.sk/menu-dna-restauracia/',
+        module: 'kamelia_za' // TODO: Update parser
     },
     ],
     themes: {
