@@ -6,9 +6,11 @@ Web application displaying daily menus of favorite restaurants in Žilina.
 Live application is running at [http://codemancy.com:17605/](http://codemancy.com:17605/).
 
 Currently supported restaurants:
-* Trattoria
+
+* ~~Trattoria~~
+* Mamma mia
 * Spirit
-* O2
+* ~~O2~~
 * Gusto
 * Kamélia
 * Central Park
@@ -16,7 +18,7 @@ Currently supported restaurants:
 * Chef restaurant
 
 Fork of at11 by Erni.
-  
+
 Original readme:
 
 [![Build Status](https://travis-ci.org/ERNICommunity/at11.svg?branch=master)](https://travis-ci.org/ERNICommunity/at11)
