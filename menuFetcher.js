@@ -4,6 +4,8 @@ var config = require('./config');
 var charset = require('charset');
 var iconv = require('iconv-lite');
 
+var USER_AGENT = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0';
+
 module.exports.fetchMenu = function(url, date, postParams, parseCallback, doneCallback) {
     var cached = cache.get(date + ":" + url);
     if (cached && !process.env.AT11_NO_CACHE)
@@ -36,7 +38,10 @@ module.exports.fetchMenu = function(url, date, postParams, parseCallback, doneCa
             method: postParams ? "POST" : "GET",
             form: postParams,
             encoding: 'binary',
-            timeout: 10 * 1000 // 10s timeout for request
+            timeout: 10 * 1000, // 10s timeout for request
+            headers: {
+              'User-Agent': USER_AGENT,
+            }
         };
         request(options, function(error, response, body) {
             if (!error && response.statusCode === 200)
@@ -100,10 +105,12 @@ module.exports.fetchMenu = function(url, date, postParams, parseCallback, doneCa
                 {
                     clearTimeout(timer);
                     doneCallback(err);
+                    console.error("Error for %s: %s", url, error);
                 }
             }
             else
             {
+                console.error("Error for %s: %s", url, error);
                 doneCallback(error || new Error("Response code " + response.statusCode));
             }
         });

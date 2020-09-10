@@ -33,7 +33,7 @@ global.String.prototype.correctCommaSpacing = global.String.prototype.correctCom
 
 global.String.prototype.removeMetrics = global.String.prototype.removeMetrics || function() {
     //after metrics removal there might be whitespaces left at the ends so trim it afterwards
-    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,\.]\d[\doO]*)? *[lLgG]\)?\.?\s*/g, ' ').trim();
+    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,\.]\d[\doO]*)? *[lLgG]\)?\.?\s*\/?/g, ' ').trim();
 };
 
 global.String.prototype.capitalizeFirstLetter = global.String.prototype.capitalizeFirstLetter || function() {
@@ -41,7 +41,11 @@ global.String.prototype.capitalizeFirstLetter = global.String.prototype.capitali
 };
 
 global.String.prototype.removeItemNumbering = global.String.prototype.removeItemNumbering || function() {
-    return this.trim().replace(/^\W\s+/, '').replace(/^[\w\d] *[\)\.,]+[AB]?\s*/, '').trim();
+    return this.trim()
+      .replace(/^\W\s+/, '')
+      .replace(/^[\w\d] *[\)\.,]+[AB]?\s*/, '')
+      .replace(/^[A-DZŠM]:/, '')
+      .trim();
 };
 
 module.exports.parseTheme = function(req) {
@@ -74,12 +78,12 @@ module.exports.parseCookies = function(request) {
 
 module.exports.findMenuSme = function(che, date) {
     var dateStr = date.format("DD.MM.YYYY");
-    $ = che;
-    
+    var $ = che;
+
     var denneMenu = $('.dnesne_menu, .ostatne_menu').filter(function(){
         var nadpis = $(this).find('h2').text();
         return nadpis.indexOf(dateStr) > -1;
     });
-    
+
     return denneMenu;
 };
