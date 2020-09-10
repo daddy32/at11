@@ -1,0 +1,11 @@
+<Proxy *>
+Order deny,allow
+Allow from all
+</Proxy>
+
+SSLProxyEngine On
+ProxyRequests On
+ProxyPreserveHost On
+ProxyPass /stats !
+ProxyPass / http://127.0.0.1:17606/
+ProxyPassReverse / http://127.0.0.1:17606/
