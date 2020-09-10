@@ -4,23 +4,33 @@ var parserUtil = require('./parserUtil');
 module.exports.parse = function(html, date, callback) {
   var $ = cheerio.load(html);
   var dayMenu = [];
-  var soupPattern = /0,[1-9]*$/;
-  var junkPattern = /2 polievky|Dezert|Týždenné menu/;
+  var index = 0;
+  var max_soup_index = 0;
+  var junkPattern = /Mini dezert/;
+  var junkPattern2 = /\([0-9, ]*\)/;
+  var junkPattern3 = /[\d,]+\s*–*\s*$/;
 
   var denneMenu = parserUtil.findMenuSme($, date);
+
+  var restaurantName = $('.res_page .nazov-restauracie h1').text();
+  if (restaurantName.toLowerCase().includes('chef') || restaurantName.toLowerCase().includes('02')) {
+    max_soup_index = 1;
+  } else {
+    max_soup_index = 2;      
+  }
 
   denneMenu.first().find('.jedlo_polozka').each(function() {
     if ($(this).find('.left>b').length === 0 && !(junkPattern.test($(this).text()))) {
       dayMenu.push(this);
     }
   });
-sdd
+
   //convert to menu item object
   dayMenu = dayMenu.map(function(item) {
     var label = $('.left', item).text();
     var price = $('.right', item).text();
     return {
-      isSoup: soupPattern.test(label.trim()),
+      isSoup: index++ <= max_soup_index,
       text: normalize(label),
       price: parseFloat(price)
     };
@@ -29,8 +39,10 @@ sdd
   callback(dayMenu);
 
   function normalize(str) {
-    return str.normalizeWhitespace()
-      .replace(soupPattern, '')
+    return str
+      .replace(junkPattern2, '')
+      .replace(junkPattern3, '')
+      .normalizeWhitespace()
       .removeMetrics()
       .correctCommaSpacing()
       .removeItemNumbering();

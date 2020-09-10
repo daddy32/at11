@@ -7,6 +7,7 @@ Live application is running at [https://patronka.herokuapp.com/](https://patronk
 
 Installation instructions:
 ---
+
 This is a [Node.js](http://nodejs.org). powered application, so first you need to have Node.js up and running. You can get node.js installers [from here](https://nodejs.org/en/download/).
 1. Download sources as zip or with git:
 git clone -b patronka_parsers https://github.com/daddy32/at11.git
@@ -18,6 +19,7 @@ git clone -b patronka_parsers https://github.com/daddy32/at11.git
 
 Currently supported restaurants:
 ---
+
 * City Cantina Westend Square
 * City Cantina Westend Gate
 * Svadby a Kari

@@ -20,4 +20,4 @@ node_modules
 *.iml
 .vscode
 /sh.exe.stackdump
-/npm-debug.log.389449040
+/apache_config.txt

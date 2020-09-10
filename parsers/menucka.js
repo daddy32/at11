@@ -10,8 +10,8 @@ module.exports.parse = function(html, date, callback) {
   var junkPattern = /denné menu/;
   var junkPattern4 = /POLIEVKA/;
   var junkPattern5 = /MINUTKA/;
-  //var junkPattern5b = /HLAVNÉ JEDLO/; 
-  var junkPattern5c = /JEDLO EXTRA/; 
+  //var junkPattern5b = /HLAVNÉ JEDLO/;
+  var junkPattern5c = /JEDLO EXTRA/;
   var junkPattern6 = /^[A-Z]\s/;
   var alergPattern = /\/*\s*A[\s:](\d\s?[\.,]?\s?)+$/;
   var alergPattern2 = /\/\s+alergény\s+(\d\s?[\.,]?\s?)*/;
@@ -22,10 +22,10 @@ module.exports.parse = function(html, date, callback) {
   var restaurantName = $('a.name').text();
   if (restaurantName.toLowerCase().includes('crazy culinary') || restaurantName.toLowerCase().includes('veg life')) {
     max_soup_index = 0;
-  } else if (restaurantName.toLowerCase().includes('priatelia')) {    
+  } else if (restaurantName.toLowerCase().includes('priatelia')) {
     max_soup_index = 3;
   } else {
-    max_soup_index = 1;      
+    max_soup_index = 1;
   }
 
   // NOTE: Pozor, tu berieme vzdy dnesne menu ('(dnes)') a ignorujeme date parameter fcie.
@@ -51,7 +51,7 @@ module.exports.parse = function(html, date, callback) {
     var currentPrice = $(pricesProto[i]).text();
     console.log('Label: ' + currentlabel);
     console.log('Price: ' + currentPrice);
-    
+
 
     if (!(!currentlabel || 0 === currentlabel.trim().length) &&
       !junkPattern.test(currentlabel.toLowerCase()) &&

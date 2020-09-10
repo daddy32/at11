@@ -63,6 +63,8 @@ module.exports = {
 
 /*
 TODO: Nove restauracie vo Westend Plazza:
+    - foodseason
+        - https://www.foodseason.sk/#obedove
     - Quan Ngon - Vietnamese Cuisine
         - Bez menu online?
         - https://www.westend.sk/kto-u-nas-sidli/quanngon/
