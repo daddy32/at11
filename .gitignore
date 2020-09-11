@@ -18,6 +18,5 @@ node_modules
 /nbproject/private/
 .idea/
 *.iml
-.vscode
-/sh.exe.stackdump
-/apache_config.txt
+dist
+/node_modules/**
