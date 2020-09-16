@@ -7,6 +7,7 @@ import { Priatelia } from "./parsers/patronka/priatelia";
 import { VegLife } from "./parsers/patronka/veglife";
 import { PatronskyPivovar } from "./parsers/patronka/patronskypivovar";
 import { Kari } from "./parsers/patronka/kari";
+import { SavDoma } from "./parsers/patronka/savdoma";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -49,14 +50,18 @@ export class Config implements IConfig {
             },
             {
                 id: 4, name: "Jedáleň SAV (Doma)",
-                urlFactory: _ => "https://www.restauracia-doma.sk/tyzdenne-menu/",
-                parser: new PatronskyPivovar() // TODO: Parser
-                // Alternativny web: http://www.stravovanie.sav.sk/site/doma
+                urlFactory: (date: Date) => {
+                    console.log('date: ' + date);
+                    var targetDayName = format(date, "EEEE", { locale: sk }).replace("š", "s");
+                    return "https://www.restauracia-doma.sk/" + targetDayName
+                },
+                parser: new SavDoma()
+                // Alternativny web: http://www.stravovanie.sav.sk/site/doma, pokus o parser je v savdoma_alt.ts
             },
             {
                 id: 5, name: "Svadby a Kari",
                 urlFactory: _ => "http://www.svadbykari.sk/denne-menu/",
-                parser: new Kari() // TODO: parser
+                parser: new Kari()
             },
             {
                 id: 6, name: "Restaurant BEMI",
@@ -71,6 +76,11 @@ export class Config implements IConfig {
             {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "http://bigger.sk/lamacska#menu",
+                parser: new PatronskyPivovar() // TODO: parser
+            },
+            {
+                id: 9, name: "Lunch Break Westend Plazza",
+                urlFactory: _ => "http://www.lunch-break.sk/menu-westend-plazza/",
                 parser: new PatronskyPivovar() // TODO: parser
             },
         ]],

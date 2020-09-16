@@ -56,6 +56,10 @@ app.get("/:location?", (req, res) => {
             id: location + "-" + x.id,
             name: x.name,
             url: x.urlFactory(new Date())
+            //!! BUG. Niekde inde mame implementovanu logiku na "preskocenie" na dalsi den, pokial je prekrocena ista hodina.
+            // Tato logika tu nie je duplikovana.
+            // Q: kde?
+            // A: script.js; 15:00
         })),
         appInsightsKey: config.appInsightsInstrumentationKey
     });
