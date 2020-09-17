@@ -9,7 +9,8 @@ export class VegLife extends Menucka implements IParser {
         if (menuItems.length > 0) {
             menuItems.forEach(item=> {
                 if (/^\d/.test(item.text)) { // meals start with numbers
-                    item.text = item.text.removeItemNumbering();
+                    item.text = item.text.removeAlergens()
+                    .removeMetrics().removeItemNumbering();
                 } else {
                     item.isSoup = true;
                     item.text = item.text.replace(/^polievka:?\s*/i, "");
