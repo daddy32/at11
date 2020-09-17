@@ -2,8 +2,6 @@ import cheerio from "cheerio";
 
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
-import { format } from "date-fns";
-import { sk } from "date-fns/locale";
 
 export class Kari implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
