@@ -83,14 +83,17 @@ export class Config implements IConfig {
                 urlFactory: _ => "http://www.lunch-break.sk/menu-westend-plazza/",
                 parser: new PatronskyPivovar() // TODO: parser
             },
+            {
+                id: 9, name: "Jedáleň MDV SR (link, pdf)",
+                urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
+                parser: new PatronskyPivovar() // TODO: parser
+            },
         ]],
     ])
 }
 
 /*
 TODO: Nove restauracie vo Westend Plazza:
-    - foodseason
-        - https://www.foodseason.sk/#obedove
     - Quan Ngon - Vietnamese Cuisine
         - Bez menu online?
         - https://www.westend.sk/kto-u-nas-sidli/quanngon/
@@ -98,13 +101,6 @@ TODO: Nove restauracie vo Westend Plazza:
     - Greek Style
         - Bez menu online?
         - https://www.westend.sk/kto-u-nas-sidli/greekstyle/
-    - Thali - 100% Veggie
-        - Bez menu online? Resp maju v pdf formate; spolocne pre vsetky prevadzky?
-        - http://www.thali.sk/najdi-nas/
-    - Bigger - the best snack in the world
-        - http://bigger.sk/lamacska
-        - Menu (na cely tyzden rovnake) tu: http://bigger.sk/lamacska#menu
-            (div.menu-list)
     - Sushi Time
         - Nemaju denne menu (vzdy to iste v ponuke)?
         - https://www.sushitime.sk/sk/menu/
@@ -118,5 +114,8 @@ TODO: Nove restauracie vo Westend Plazza:
     - Anatolia Kebab
         - Nemaju denne menu (vzdy to iste v ponuke)?
         - http://www.anatolia.sk/
+    - Thali - 100% Veggie
+        - Bez menu online? Resp maju v pdf formate; spolocne pre vsetky prevadzky?
+        - http://www.thali.sk/najdi-nas/
 TODO: Zvazit pridanie zoznamu liniek na neparsovane restauracie
 */
