@@ -10,15 +10,15 @@ export class SavDoma implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        console.log("Parsing SAV.");
-        console.log("   date:" + date);
+        //console.log("Parsing SAV.");
+        //console.log("   date:" + date);
         var foundElements = $(".section-inner .mt-price .mt-border");
-        console.log("   foundElements: " + foundElements.length);
+        //console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
             var text = node.text().trim().toLowerCase()
-            console.log("       text:" + text);
+            //console.log("       text:" + text);
 
             dayMenu.push({
                 isSoup: i === 0,

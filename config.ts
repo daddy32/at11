@@ -8,6 +8,7 @@ import { VegLife } from "./parsers/patronka/veglife";
 import { PatronskyPivovar } from "./parsers/patronka/patronskypivovar";
 import { Kari } from "./parsers/patronka/kari";
 import { SavDoma } from "./parsers/patronka/savdoma";
+import { Bigger } from "./parsers/patronka/bigger";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -76,7 +77,7 @@ export class Config implements IConfig {
             {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "http://bigger.sk/lamacska#menu",
-                parser: new PatronskyPivovar() // TODO: parser
+                parser: new Bigger()
             },
             {
                 id: 9, name: "Lunch Break Westend Plazza",
@@ -84,7 +85,7 @@ export class Config implements IConfig {
                 parser: new PatronskyPivovar() // TODO: parser
             },
             {
-                id: 9, name: "Jedáleň MDV SR (link, pdf)",
+                id: 10, name: "Jedáleň MDV SR (link, pdf)",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
                 parser: new PatronskyPivovar() // TODO: parser
             },
