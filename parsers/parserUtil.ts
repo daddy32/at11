@@ -6,6 +6,7 @@ declare global {
         normalizeWhitespace: () => string
         removeMetrics: () => string;
         removeAlergens: () => string;
+        correctCommaSpacing: () => string;
         capitalizeFirstLetter: () => string;
         removeItemNumbering: () => string;
     }
@@ -40,6 +41,10 @@ String.prototype.normalizeWhitespace = function() {
     // also single spaces are replaced as there are different charcodes for space (32 vs. 160)
     // and we need to be consistent because of comparisons in tests
     return this.trim().replace(/\s+/g, " ");
+};
+
+String.prototype.correctCommaSpacing = function() {
+    return this.replace(/(\S) *(,|\.) *(\S)/g, '$1$2 $3');
 };
 
 String.prototype.removeMetrics = function() {

@@ -10,6 +10,7 @@ import { Kari } from "./parsers/patronka/kari";
 import { SavDoma } from "./parsers/patronka/savdoma";
 import { Bigger } from "./parsers/patronka/bigger";
 import { Foodseason } from "./parsers/patronka/foodseason";
+import { Bemi } from "./parsers/patronka/bemi";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -68,12 +69,12 @@ export class Config implements IConfig {
             {
                 id: 6, name: "Restaurant BEMI",
                 urlFactory: _ => "https://bemiservis.sk/bemi/",
-                parser: new PatronskyPivovar() // TODO: parser
+                parser: new Bemi()
             },
             {
                 id: 7, name: "Food Season",
                 urlFactory: _ => "https://www.foodseason.sk/#obedove",
-                parser: new Foodseason() // TODO: parser
+                parser: new Foodseason()
             },
             {
                 id: 8, name: "Bigger",
