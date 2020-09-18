@@ -88,7 +88,7 @@ function initialHide(cont) {
 function getDateCompound() {
     var date = new Date();
     var desc = "dnes";
-    if (date.getHours() >= 15) {
+    if (date.getHours() >= 16) {
         date.setDate(date.getDate() + 1);
         desc = "zajtra";
     }

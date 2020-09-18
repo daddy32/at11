@@ -9,6 +9,7 @@ import { PatronskyPivovar } from "./parsers/patronka/patronskypivovar";
 import { Kari } from "./parsers/patronka/kari";
 import { SavDoma } from "./parsers/patronka/savdoma";
 import { Bigger } from "./parsers/patronka/bigger";
+import { Foodseason } from "./parsers/patronka/foodseason";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -72,7 +73,7 @@ export class Config implements IConfig {
             {
                 id: 7, name: "Food Season",
                 urlFactory: _ => "https://www.foodseason.sk/#obedove",
-                parser: new PatronskyPivovar() // TODO: parser
+                parser: new Foodseason() // TODO: parser
             },
             {
                 id: 8, name: "Bigger",
