@@ -11,6 +11,7 @@ import { SavDoma } from "./parsers/patronka/savdoma";
 import { Bigger } from "./parsers/patronka/bigger";
 import { Foodseason } from "./parsers/patronka/foodseason";
 import { Bemi } from "./parsers/patronka/bemi";
+import { LunchBreak } from "./parsers/patronka/lunchbreak";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -54,7 +55,7 @@ export class Config implements IConfig {
             {
                 id: 4, name: "Jedáleň SAV (Doma)",
                 urlFactory: (date: Date) => {
-                    console.log('date: ' + date);
+                    //console.log('date: ' + date);
                     var targetDayName = format(date, "EEEE", { locale: sk }).replace("š", "s");
                     return "https://www.restauracia-doma.sk/" + targetDayName
                 },
@@ -84,7 +85,7 @@ export class Config implements IConfig {
             {
                 id: 9, name: "Lunch Break Westend Plazza",
                 urlFactory: _ => "http://www.lunch-break.sk/menu-westend-plazza/",
-                parser: new PatronskyPivovar() // TODO: parser
+                parser: new LunchBreak()
             },
             {
                 id: 10, name: "Jedáleň MDV SR (link, pdf)",
