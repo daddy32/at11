@@ -11,8 +11,10 @@ export class Kari implements IParser {
         //console.log("Parsing Kari.");
         var elements = $(".cff-wrapper .cff-item .cff-post-text .cff-text");
         //console.log("   elements found: " + elements.length);
-        elements.each((i, elem) => {
-            const node = $(elem);
+
+        // Showing only first element
+        if (elements.length>0) {
+            const node = $(elements[0]);
             const text = node.text().trim();
             //console.log(text);
 
@@ -21,7 +23,7 @@ export class Kari implements IParser {
                 text: normalize(text),
                 price: NaN
             });
-        });
+        }
 
         doneCallback(dayMenu);
 
