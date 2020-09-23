@@ -11,8 +11,9 @@ export class Bemi implements IParser {
         const dayMenu = new Array<IMenuItem>();
 
         var junkPattern = /^\s*$/;
+        var junkPattern2 = /^MENU\s*\d:\s*/;
         var pricePattern = /(\d+,\d+)\s*e/;
-        var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/;
+        var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
 
         var n = date.getDay();
         var dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
@@ -30,7 +31,7 @@ export class Bemi implements IParser {
             var pricenum = parseFloat(priceMatch[1].replace(/\s+/, '').replace(',', '.'));
             price = pricenum;
           } catch (err) {
-            console.log("price not parsed");
+            console.warn("price not parsed");
           }
 
           dayMenu.push({
@@ -43,13 +44,17 @@ export class Bemi implements IParser {
         doneCallback(dayMenu);
 
         function normalize(str: string) {
-            return str
-              .replace(pricePattern, '')
+          //console.log(str);
+          var result = str
               .replace(alergPattern, '')
+              .replace(pricePattern, '')
+              .replace(junkPattern2, '')
               .normalizeWhitespace()
               .removeItemNumbering()
               .removeMetrics()
               .correctCommaSpacing();
-          }
+          //console.log(' -> ', result);
+          return result;
+        };
     }
  }
