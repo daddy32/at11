@@ -12,7 +12,7 @@ export class LunchBreak implements IParser {
 
         var junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
         var pricePattern = /(\d+,\d+)\s*e/;
-        var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/;
+        var alergPattern = /\/*\s*[\/\(](\s*\d\s?[.,]?\s?)+[\/\)]\s*/g;
         var soupPattern = /olievka/;
 
         var targetDayName = format(date, "EEEE", { locale: sk });
@@ -27,7 +27,7 @@ export class LunchBreak implements IParser {
           }
 
           var tdElements = rowElement.children('td');
-          console.log('i: ', i, ' Element count:', tdElements.length);
+          //console.log('i: ', i, ' Element count:', tdElements.length);
 
           if (tdElements.length < 6) {
             continue;
@@ -38,8 +38,8 @@ export class LunchBreak implements IParser {
 
           var text = $(tdElements.get(3)).text();
           var price = parseFloat($(tdElements.get(5)).text().replace(',', '.'));
-          console.log('text: ', text);
-          console.log('price: ', price);
+          //console.log('text: ', text);
+          //console.log('price: ', price);
 
           dayMenu.push({
             isSoup: soupPattern.test($(tdElements.get(1)).text()),
@@ -54,9 +54,9 @@ export class LunchBreak implements IParser {
 
         function normalize(str: string) {
             return str
+              .replace(alergPattern, '')
               .replace(junkPattern, '')
               .replace(pricePattern, '')
-              .replace(alergPattern, '')
               .normalizeWhitespace()
               .removeItemNumbering()
               .removeMetrics()
