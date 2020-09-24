@@ -12,7 +12,7 @@ export class LunchBreak implements IParser {
 
         var junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
         var pricePattern = /(\d+,\d+)\s*e/;
-        var alergPattern = /\/*\s*[\/\(](\s*\d\s?[.,]?\s?)+[\/\)]\s*/g;
+        var alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
         var soupPattern = /olievka/;
 
         var targetDayName = format(date, "EEEE", { locale: sk });
