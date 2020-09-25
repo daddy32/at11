@@ -12,13 +12,13 @@ export class Bemi implements IParser {
 
         var junkPattern = /^\s*$/;
         var junkPattern2 = /^MENU\s*\d:\s*/;
-        var pricePattern = /(\d+,\d+)\s*e/;
+        var pricePattern = /(\d+,\d+)\s*[e€]/i;
         var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
 
         var n = date.getDay();
         var dayMenuElement = $('#ktmain .entry-content .tab-content>div:nth-of-type(' + n + ')');
 
-        dayMenuElement.find('p').each(function() {
+        dayMenuElement.find('p, li').each(function() {
           var text = $(this).text();
           var price = NaN;
 
