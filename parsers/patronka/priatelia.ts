@@ -6,7 +6,7 @@ export class Priatelia extends Menucka implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItems = super.parseBase(html, date);
         const junkPatternMeal  = /\/\s*A:/
-        const junkPatternSoup = /\/\s*A\s*:(\d+\s*,*)+.*/
+        const junkPatternSoup = /\/\s*A\s*:[-,\s]*(\d+\s*,*)+.*/g
         const junkPattern3 = /facebook|POLIEVKA K/i
 
         if (menuItems.length > 0) {
@@ -14,7 +14,9 @@ export class Priatelia extends Menucka implements IParser {
                 //console.log(item.text);
                 if (i==0) {
                     item.isSoup = true;
-                    item.text = item.text.replace(junkPatternSoup, '');
+                    item.text = item.text
+                        .replace(junkPatternSoup, '')
+                        ;
                 }
 
                 if (junkPattern3.test(item.text)) {
