@@ -11,7 +11,7 @@ export class Bemi implements IParser {
         const dayMenu = new Array<IMenuItem>();
 
         var junkPattern = /^\s*$/;
-        var junkPattern2 = /^MENU\s*\d:\s*/;
+        var junkPattern2 = /^MENU\s*\d[:,]\s*/g;
         var pricePattern = /(\d+,\d+)\s*[e€]/i;
         var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
 
