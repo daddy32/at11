@@ -66,6 +66,12 @@ module.exports = {
         url: 'https://www.penzionkamelia.sk/menu-dna-restauracia/',
         module: 'kamelia_za' // TODO: Update parser
     },
+    {
+        id: 13,
+        name: 'Na Bráne',
+        url: 'https://restauracie.sme.sk/restauracia/Restauracia-Na-brane_2508-zilina_2737/denne-menu',
+        module: 'sme' // TODO: Parser cleanup
+    },
     ],
     themes: {
         'jano': { name: 'Jano', template: '../views/index.html' },

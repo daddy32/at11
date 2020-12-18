@@ -7,14 +7,14 @@ module.exports.parse = function(html, date, callback) {
     var index = 0;
     var max_soup_index = 0;
     var junkPattern = /Mini dezert/;
-    
+
     var denneMenu = parserUtil.findMenuSme($, date);
-    
-    var restaurantName = $('.res_page .nazov-restauracie h1').text();    
+
+    var restaurantName = $('.res_page .nazov-restauracie h1').text();
     if (restaurantName.toLowerCase().includes('chef') || restaurantName.toLowerCase().includes('02')) {
         max_soup_index = 1;
     }
-    
+
     denneMenu.first().find('.jedlo_polozka').each(function() {
         if ($(this).find('.left>b').length === 0 && !(junkPattern.test($(this).text()))) {
             dayMenu.push(this);
@@ -25,13 +25,13 @@ module.exports.parse = function(html, date, callback) {
     dayMenu = dayMenu.map(function(item) {
         var label = $('.left', item).text();
         var price = $('.right', item).text();
-        return { 
-            isSoup: index++ <= max_soup_index,  
-            text: normalize(label), 
-            price: parseFloat(price) 
+        return {
+            isSoup: index++ <= max_soup_index,
+            text: normalize(label),
+            price: parseFloat(price)
         };
     });
-    
+
     callback(dayMenu);
 
     function normalize(str) {
