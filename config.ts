@@ -37,11 +37,11 @@ export class Config implements IConfig {
     public readonly parserTimeout = 15 * 1000; // 15s
     public readonly restaurants = new Map<string, ReadonlyArray<{ id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>([
         ["Patrónka", [
-            {
+            /*{
                 id: 1, name: "Canteen Priatelia",
                 urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/canteen-priatelia-westend",
                 parser: new Priatelia()
-            },
+            },*/
             {
                 id: 2, name: "Veg Life",
                 urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/veg-life-westend",
@@ -67,11 +67,11 @@ export class Config implements IConfig {
                 urlFactory: _ => "http://www.svadbykari.sk/denne-menu/",
                 parser: new Kari()
             },
-            {
+            /*{
                 id: 6, name: "Restaurant BEMI",
-                urlFactory: _ => "https://bemiservis.sk/bemi/",
+                urlFactory: _ => "https://bemiservis.sk/denne-menu/",
                 parser: new Bemi()
-            },
+            },*/
             {
                 id: 7, name: "Food Season",
                 urlFactory: _ => "https://www.foodseason.sk/#obedove",
