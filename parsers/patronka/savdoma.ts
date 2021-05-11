@@ -9,18 +9,23 @@ export class SavDoma implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
+
+        var menuItemSelector = "div.mt div.mt-i-c";
+        var itemTextSelector = ">div:nth-of-type(1)";
+        var itemPriceSelector = ">div:nth-of-type(2)";
+
         var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
         var junkPattern = /^\d\s*\.*\s*/;
 
         //console.log("Parsing SAV.");
         //console.log("   date:" + date);
-        var foundElements = $(".section-inner .mt-price .mt-border");
+        var foundElements = $(menuItemSelector);
         //console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
-            var text = node.find('>div:nth-of-type(1)').text().trim().toLowerCase();
-            var price = parseFloat(node.find('>div:nth-of-type(2)').text().replace(',', '.').replace('€',''));
+            var text = node.find(itemTextSelector).text().trim().toLowerCase();
+            var price = parseFloat(node.find(itemPriceSelector).text().replace(',', '.').replace('€',''));
             //console.log("       text:" + text);
             //console.log("       price:" + price);
 
