@@ -36,7 +36,12 @@ export class LunchBreak implements IParser {
             break;
           }
 
-          var text = $(tdElements.get(3)).text();
+          var text = normalize($(tdElements.get(3)).text());
+          if (text === '') {
+            text = normalize($(tdElements.get(1)).text())
+              .toLowerCase()
+              .capitalizeFirstLetter();
+          }
           var price = parseFloat($(tdElements.get(5)).text().replace(',', '.'));
           //console.log('text: ', text);
           //console.log('price: ', price);
