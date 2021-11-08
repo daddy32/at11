@@ -7,11 +7,12 @@ export class VegLife extends Menucka implements IParser {
         const menuItems = super.parseBase(html, date);
         const junkPattern = /\(*([BVP],*)+[\s()]+|\(*([BVP],*)+[\s()]*$/g
         const junkPattern2 = /Uvedené ceny|Nájdete nás|Pri osobnej|Objednajte si/
+        const polievkaPattern = /[Pp]olievka/
 
         if (menuItems.length > 0) {
             menuItems.forEach((item, i) => {
                 //console.log(item.text);
-                if (i==0) {
+                if (polievkaPattern.test(item.text)) {
                     item.isSoup = true;
                     item.text = item.text.replace(/polievka:?\s*/i, "");
                 }

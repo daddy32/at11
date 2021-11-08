@@ -50,6 +50,7 @@ export class Config implements IConfig {
             {
                 id: 3, name: "Patrónsky pivovar",
                 urlFactory: _ => "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu",
+                // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
                 parser: new PatronskyPivovar()
             },
             {
