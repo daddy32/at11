@@ -6,8 +6,7 @@ RUN apt-get update && apt-get upgrade -y && \
     npm
 WORKDIR /usr/yourapplication-name
 COPY package.json .
-RUN npm install -g tsc \
-    && npm install -g typescript
+RUN npm ci
+RUN npm run build
 COPY . .
-RUN tsc
 CMD ["node", "./dist/server.js"]
