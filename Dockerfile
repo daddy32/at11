@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM ubuntu:latest
 WORKDIR /usr/yourapplication-name
 COPY package.json .
 RUN npm install
