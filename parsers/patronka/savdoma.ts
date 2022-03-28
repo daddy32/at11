@@ -28,6 +28,7 @@ export class SavDoma implements IParser {
             var price = parseFloat(node.find(itemPriceSelector).text().replace(',', '.').replace('€',''));
             //console.log("       text:" + text);
             //console.log("       price:" + price);
+            // TODO: drop "empty" items, such as "//" (original text: "4. 0g // 0€")
 
             dayMenu.push({
                 isSoup: i === 0,
