@@ -12,22 +12,22 @@ export class SavDoma implements IParser {
 
         console.log("Parsing SAV.");
         console.log("   date:" + date);
-        var dayElements = $(".content_main table table td.day");
+        const dayElements = $(".content_main table table td.day");
         console.log("   dayelements found: " + dayElements.length);
 
-        var targetDayName = format(date, "EEEE", { locale: sk });
+        let targetDayName = format(date, "EEEE", { locale: sk });
         targetDayName = targetDayName.substring(1, targetDayName.length - 1);
         console.log("       targetDayName:" + targetDayName);
 
         dayElements.each((i, elem) => {
             const node = $(elem);
-            var text = node.text().trim().toLowerCase()
+            let text = node.text().trim().toLowerCase();
             text = text.substring(1, text.length - 2);
             console.log("       text:" + text);
 
             if (text === targetDayName) {
                 console.log("       Found!");
-                var currentNode = node.parent().next();
+                let currentNode = node.parent().next();
                 do {
                     console.log(currentNode.text());
                     console.log("-----");

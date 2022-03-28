@@ -10,12 +10,12 @@ export class Foodseason implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        var dayElements = $("h3.av-special-heading-tag");
-        var targetDayName = format(date, "EEEE", { locale: sk });
+        const dayElements = $("h3.av-special-heading-tag");
+        const targetDayName = format(date, "EEEE", { locale: sk });
 
         dayElements.each((i, elem) => {
             const node = $(elem);
-            var text = node.text().trim().toLowerCase()
+            let text = node.text().trim().toLowerCase();
             text = text.substring(0, text.length - 1);
 
             if (text === targetDayName) {
@@ -30,12 +30,12 @@ export class Foodseason implements IParser {
         doneCallback(dayMenu);
 
         function extractItems(element: Cheerio, areSoups: boolean): Array<IMenuItem> {
-            var result = new Array<IMenuItem>();
+            const result = new Array<IMenuItem>();
 
-            element.find('li .av-catalogue-title-container').each((k, soupElem) => {
+            element.find("li .av-catalogue-title-container").each((k, soupElem) => {
                 const soupNode = $(soupElem);
-                const title = soupNode.find('.av-catalogue-title').text();
-                const price = parseFloat(soupNode.find('.av-catalogue-price').text());
+                const title = soupNode.find(".av-catalogue-title").text();
+                const price = parseFloat(soupNode.find(".av-catalogue-price").text());
 
                 result.push({
                     isSoup: areSoups,

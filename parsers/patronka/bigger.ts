@@ -12,21 +12,21 @@ export class Bigger implements IParser {
         const junkPattern = /hranolky|polievka|Podľa dennej ponuky/i;
         const junkPattern2 = /[A-Z]\d*:/g;
         const soupCandidatesPattern = ".menu-list__item-desc .desc__content";
-        const mainCoursesPattern = ".menu-list__item h4.menu-list__item-title"
+        const mainCoursesPattern = ".menu-list__item h4.menu-list__item-title";
 
         //console.log("Parsing Bigger.");
         //console.log("   date:" + date);
 
-        var targetDayName = format(date, "EEEE", { locale: sk })
+        const targetDayName = format(date, "EEEE", { locale: sk });
         //console.log("   targetDayName:" + targetDayName);
 
         // TODO: Polievka
-        var soupCandidates = $(soupCandidatesPattern);
+        const soupCandidates = $(soupCandidatesPattern);
         //console.log("   soupCandidates: " + soupCandidates.length);
 
         soupCandidates.each((i, elem) => {
             const node = $(elem);
-            var text = node.text().trim();
+            let text = node.text().trim();
             //console.log("       text:" + text);
 
             if (text.toLowerCase().startsWith(targetDayName)) {
@@ -40,22 +40,22 @@ export class Bigger implements IParser {
             }
         });
 
-        var foundElements = $(mainCoursesPattern);
+        const foundElements = $(mainCoursesPattern);
         //console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
-            var text = node.text().trim();//.toLowerCase()
+            const text = node.text().trim();//.toLowerCase()
             //console.log("       text:" + text);
 
             if (!(junkPattern.test(text))) {
-                var descNode = node.next();
-                var descText = descNode.text();
+                const descNode = node.next();
+                const descText = descNode.text();
                 //console.log("       desc:" + descText);
 
                 dayMenu.push({
                     isSoup: false,
-                    text: normalize(text) + ' <small>(' + normalize(descText) + ')</small>',
+                    text: normalize(text) + " <small>(" + normalize(descText) + ")</small>",
                     price: NaN
                 });
             }
@@ -66,7 +66,7 @@ export class Bigger implements IParser {
         function normalize(str: string) {
             return str.removeAlergens()
                 .removeMetrics()
-                .replace(junkPattern2, '')
+                .replace(junkPattern2, "")
                 .trim()
                 .capitalizeFirstLetter();
         }

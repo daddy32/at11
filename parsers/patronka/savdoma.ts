@@ -10,22 +10,22 @@ export class SavDoma implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        var menuItemSelector = "div.mt div.mt-i-c";
-        var itemTextSelector = ">div:nth-of-type(1)";
-        var itemPriceSelector = ">div:nth-of-type(2)";
+        const menuItemSelector = "div.mt div.mt-i-c";
+        const itemTextSelector = ">div:nth-of-type(1)";
+        const itemPriceSelector = ">div:nth-of-type(2)";
 
-        var alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
-        var junkPattern = /^\d\s*\.*\s*/;
+        const alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
+        const junkPattern = /^\d\s*\.*\s*/;
 
         //console.log("Parsing SAV.");
         //console.log("   date:" + date);
-        var foundElements = $(menuItemSelector);
+        const foundElements = $(menuItemSelector);
         //console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
-            var text = node.find(itemTextSelector).text().trim().toLowerCase();
-            var price = parseFloat(node.find(itemPriceSelector).text().replace(',', '.').replace('€',''));
+            const text = node.find(itemTextSelector).text().trim().toLowerCase();
+            const price = parseFloat(node.find(itemPriceSelector).text().replace(",", ".").replace("€",""));
             //console.log("       text:" + text);
             //console.log("       price:" + price);
             // TODO: drop "empty" items, such as "//" (original text: "4. 0g // 0€")
@@ -41,8 +41,8 @@ export class SavDoma implements IParser {
 
         function normalize(str: string) {
             return str
-                .replace(alergPattern, '')
-                .replace(junkPattern, '')
+                .replace(alergPattern, "")
+                .replace(junkPattern, "")
                 .removeMetrics()
                 .capitalizeFirstLetter();
         }

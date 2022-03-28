@@ -9,7 +9,7 @@ export class Kari implements IParser {
         const dayMenu = new Array<IMenuItem>();
 
         //console.log("Parsing Kari.");
-        var elements = $(".cff-wrapper .cff-item .cff-post-text .cff-text");
+        const elements = $(".cff-wrapper .cff-item .cff-post-text .cff-text");
         //console.log("   elements found: " + elements.length);
 
         // Showing only first element

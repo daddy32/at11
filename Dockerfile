@@ -4,10 +4,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y nodejs \
     npm
-WORKDIR /usr/yourapplication-name
+#WORKDIR /usr/yourapplication-name
 COPY package.json .
 RUN npm install
-RUN npm ci
+#RUN npm ci
 RUN npm run build
 COPY . .
 CMD ["node", "./dist/server.js"]

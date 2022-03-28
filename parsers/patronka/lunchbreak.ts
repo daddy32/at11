@@ -10,15 +10,15 @@ export class LunchBreak implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        var junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
-        var pricePattern = /(\d+,\d+)\s*e/;
-        var alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
-        var soupPattern = /olievka/;
+        const junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
+        const pricePattern = /(\d+,\d+)\s*e/;
+        const alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
+        const soupPattern = /olievka/;
 
-        var targetDayName = format(date, "EEEE", { locale: sk });
-        var dayMenuElement = $('td:contains(\'' + targetDayName.substr(1) + '\')');
-        var rowElement = dayMenuElement.parent();
-        var i = 0;
+        const targetDayName = format(date, "EEEE", { locale: sk });
+        const dayMenuElement = $("td:contains('" + targetDayName.substr(1) + "')");
+        let rowElement = dayMenuElement.parent();
+        let i = 0;
 
         do {
           i += 1;
@@ -26,7 +26,7 @@ export class LunchBreak implements IParser {
             break;
           }
 
-          var tdElements = rowElement.children('td');
+          const tdElements = rowElement.children("td");
           //console.log('i: ', i, ' Element count:', tdElements.length);
 
           if (tdElements.length < 6) {
@@ -36,13 +36,13 @@ export class LunchBreak implements IParser {
             break;
           }
 
-          var text = normalize($(tdElements.get(3)).text());
-          if (text === '') {
+          let text = normalize($(tdElements.get(3)).text());
+          if (text === "") {
             text = normalize($(tdElements.get(1)).text())
               .toLowerCase()
               .capitalizeFirstLetter();
           }
-          var price = parseFloat($(tdElements.get(5)).text().replace(',', '.'));
+          const price = parseFloat($(tdElements.get(5)).text().replace(",", "."));
           //console.log('text: ', text);
           //console.log('price: ', price);
 
@@ -53,15 +53,15 @@ export class LunchBreak implements IParser {
           });
 
           rowElement = rowElement.next();
-        } while (rowElement)
+        } while (rowElement);
 
         doneCallback(dayMenu);
 
         function normalize(str: string) {
             return str
-              .replace(alergPattern, '')
-              .replace(junkPattern, '')
-              .replace(pricePattern, '')
+              .replace(alergPattern, "")
+              .replace(junkPattern, "")
+              .replace(pricePattern, "")
               .normalizeWhitespace()
               .removeItemNumbering()
               .removeMetrics()

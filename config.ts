@@ -57,8 +57,8 @@ export class Config implements IConfig {
                 id: 4, name: "Jedáleň SAV (Doma)",
                 urlFactory: (date: Date) => {
                     //console.log('date: ' + date);
-                    var targetDayName = format(date, "EEEE", { locale: sk }).replace("š", "s");
-                    return "https://www.restauracia-doma.sk/" + targetDayName
+                    const targetDayName = format(date, "EEEE", { locale: sk }).replace("š", "s");
+                    return "https://www.restauracia-doma.sk/" + targetDayName;
                 },
                 parser: new SavDoma()
                 // Alternativny web: http://www.stravovanie.sav.sk/site/doma, pokus o parser je v savdoma_alt.ts
@@ -92,8 +92,8 @@ export class Config implements IConfig {
                 id: 10, name: "Jedáleň MDV SR (link, pdf)",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
                 parser: new PatronskyPivovar() // TODO: parser
-            },
-        ]],
+            }
+        ]]
     ])
 }
 

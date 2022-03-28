@@ -44,7 +44,7 @@ String.prototype.normalizeWhitespace = function() {
 };
 
 String.prototype.correctCommaSpacing = function() {
-    return this.replace(/(\S) *(,|\.) *(\S)/g, '$1$2 $3');
+    return this.replace(/(\S) *(,|\.) *(\S)/g, "$1$2 $3");
 };
 
 String.prototype.removeMetrics = function() {
