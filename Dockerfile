@@ -7,7 +7,6 @@ RUN apt-get update && apt-get upgrade -y && \
 WORKDIR /usr/yourapplication-name
 COPY package.json .
 RUN npm install -g tsc \
-    && npm install -g concurrently \
     && npm install -g typescript
 COPY . .
 RUN tsc
