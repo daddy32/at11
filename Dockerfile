@@ -11,6 +11,8 @@ COPY . .
 run curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN npm install
 #RUN npm ci
+RUN npm install @types/locate-path
+RUN npm install cli-boxes
 RUN npm run build
 RUN npm start
 CMD ["node", "./dist/server.js"]
