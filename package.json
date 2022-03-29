@@ -3,6 +3,7 @@
     "description": "Daily lunch menu application",
     "version": "2.0.0",
     "dependencies": {
+        "@types/locate-path": "^4.0.0",
         "applicationinsights": "^1.8.2",
         "axios": "^0.19.2",
         "cheerio": "^0.22.0",
