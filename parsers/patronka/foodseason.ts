@@ -35,7 +35,9 @@ export class Foodseason implements IParser {
             element.find("li .av-catalogue-title-container").each((k, soupElem) => {
                 const soupNode = $(soupElem);
                 const title = soupNode.find(".av-catalogue-title").text();
-                const price = parseFloat(soupNode.find(".av-catalogue-price").text());
+                const text = soupNode.find(".av-catalogue-price").text();
+                const price = parseFloat(text.replace(",", "."));
+                //console.info(`title: ${title}; text: ${text}; price: ${price}; `);
 
                 result.push({
                     isSoup: areSoups,
