@@ -26,15 +26,16 @@ export class SavDoma implements IParser {
             const node = $(elem);
             const text = node.find(itemTextSelector).text().trim().toLowerCase();
             const price = parseFloat(node.find(itemPriceSelector).text().replace(",", ".").replace("€",""));
-            //console.log("       text:" + text);
-            //console.log("       price:" + price);
-            // TODO: drop "empty" items, such as "//" (original text: "4. 0g // 0€")
+            // console.log("       text:" + text);
+            // console.log("       price:" + price);
 
-            dayMenu.push({
-                isSoup: i === 0,
-                text: normalize(text),
-                price: price
-            });
+            if (!text.includes("0g //")) { // Not empty
+                dayMenu.push({
+                    isSoup: i === 0,
+                    text: normalize(text),
+                    price: price
+                });
+            }
         });
 
         doneCallback(dayMenu);

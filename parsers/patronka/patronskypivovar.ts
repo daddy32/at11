@@ -12,7 +12,7 @@ export class PatronskyPivovar extends Sme implements IParser {
             menuItems.forEach(item=> {
                 const result = parsePrice(item.text);
                 item.price = result.price;
-                item.text = result.text.replace(/^.*\|\s+/, "").replace(/\(obsahuje:/, "");
+                item.text = result.text.replace(/^.*\|\s+/, "").replace(/\(obsahuje:/, "").removeAlergens();
             });
         }
 
