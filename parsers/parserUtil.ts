@@ -26,7 +26,7 @@ export function parsePrice(item: string): { price: number, text: string} {
 }
 
 export function getDateRegex(date: Date): RegExp {
-   return new RegExp(`0?${date.getDate()}\\.\\s?0?${date.getMonth() + 1}\\.\\s?${date.getFullYear()}`);
+   return new RegExp(`0?${date.getDate()}[.\\s]{1}\\s?0?${date.getMonth() + 1}[.\\s]{1}\\s?${date.getFullYear()}`);
 }
 
 const accentPairs: {[key: string]: string} = { a: "á", e: "é", i: "í", o: "ó", u: "ú", y: "ý", t: "ť", l: "ľ" };
@@ -52,7 +52,7 @@ String.prototype.removeMetrics = function() {
 };
 
 String.prototype.removeAlergens = function() {
-    return this.replace(/\s*[\s(\d,)]+$/g, "");
+    return this.replace(/\s*[\s(\d,)]+$|\/[A-Z0-9,\s]*\//g, "");
 };
 
 String.prototype.capitalizeFirstLetter = function() {
