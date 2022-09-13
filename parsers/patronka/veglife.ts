@@ -6,7 +6,7 @@ export class VegLife extends Menucka implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItems = super.parseBase(html, date);
         const junkPattern = /\(*([BVP],*)+[\s()]+|\(*([BVP],*)+[\s()]*$/g;
-        const junkPattern2 = /Uvedené ceny|Nájdete nás|Pri osobnej|Objednajte si/;
+        const junkPattern2 = /Uvedené ceny|Nájdete nás|Pri osobnej|Objednajte si|wolt|veglife.sk|bistro/;
         const polievkaPattern = /[Pp]olievka/;
 
         if (menuItems.length > 0) {
