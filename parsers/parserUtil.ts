@@ -52,7 +52,7 @@ String.prototype.removeMetrics = function() {
 };
 
 String.prototype.removeAlergens = function() {
-    return this.replace(/\s*[\s(\d,)]+$|\/[A-Z0-9,\s]*\//g, "");
+    return this.replace(/\s*[\s(\d,)]+$|\/[A-Z0-9,\s]*\/{0,1}/g, "");
 };
 
 String.prototype.capitalizeFirstLetter = function() {
