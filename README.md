@@ -4,7 +4,7 @@
 at11
 ==========
 
-Web application displaying daily menus of favorite restaurants at Patrónka, Bratislava.
+Web application displaying daily menus of favorite restaurants at Patr�nka, Bratislava.
 
 Live application is running at [https://patronka.herokuapp.com/](https://patronka.herokuapp.com/).
 

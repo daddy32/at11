@@ -22,7 +22,7 @@ export interface IConfig {
     readonly cacheExpiration: number;
     readonly requestTimeout: number;
     readonly parserTimeout: number;
-    readonly restaurants: Map<string, ReadonlyArray<{ id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>;
+    readonly restaurants: ReadonlyMap<string, ReadonlyArray<{id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>;
 }
 
 /* eslint-disable max-len */

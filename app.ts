@@ -12,7 +12,8 @@ import { formatDistance, parse, isValid } from "date-fns";
 console.debug("Initializing...");
 const config = new Config();
 const cache =  new NodeCache({
-    checkperiod: (config.cacheExpiration / 2)
+    checkperiod: (config.cacheExpiration / 2),
+    useClones: false
 });
 const menuFetcher = new MenuFetcher(config, cache);
 
@@ -24,7 +25,7 @@ if (config.appInsightsInstrumentationKey) {
 const actions = new Map<string, ((date: Date, done: (result: IMenuResult) => void) => void)>();
 for (const location of config.restaurants.keys()) {
     for (const restaurant of config.restaurants.get(location)) {
-        console.log("Processing:", restaurant);
+        console.log(`Processing: ${location}/${restaurant.id} - ${restaurant.name}`);
         try {
             const id = location + "-" + restaurant.id;
             if (actions.has(id)) {
@@ -51,15 +52,11 @@ app.get("/:location?", (req, res) => {
     res.setHeader("Content-Language", "sk");
     const location = req.params.location || config.restaurants.keys().next().value; // use first location if not specified
     res.render(__dirname + "/../views/index.html", {
-        locations: Array.from(config.restaurants.keys()).map(k => ({ name: k, selected: k === location })),
-        restaurants: (config.restaurants.get(location) || []).map(x => ({
+        locations: [...config.restaurants.keys()].map(k => ({ name: k, selected: k === location })),
+        restaurants: config.restaurants.get(location).map(x => ({
             id: location + "-" + x.id,
             name: x.name,
             url: x.urlFactory(new Date())
-            //!! BUG. Niekde inde mame implementovanu logiku na "preskocenie" na dalsi den, pokial je prekrocena ista hodina.
-            // Tato logika tu nie je duplikovana.
-            // Q: kde?
-            // A: script.js; 15:00
         })),
         appInsightsKey: config.appInsightsInstrumentationKey
     });
@@ -87,12 +84,6 @@ app.get("/menu/:id", (req, res) => {
         }
     });
 });
-app.listen(config.port, function(err) {
-  if (err) {
-      throw err;
-  }
-  const host = this.address().address;
-  const port = this.address().port;
-
-  console.info("Done, listening on http://%s:%s", host, port);
+const server = app.listen(config.port, () => {
+  console.info("Done, listening on", server.address());
 });

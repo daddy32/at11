@@ -20,3 +20,7 @@ node_modules
 *.iml
 dist
 /node_modules/**
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
+/.vs/at11_patronka/v16/.suo

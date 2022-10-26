@@ -7,7 +7,7 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '12.15.x'
+    versionSpec: '16.13.x'
   displayName: 'Install Node.js'
 
 - script: |
@@ -38,6 +38,7 @@ steps:
       static/**/*
       views/**/*
       node_modules/**/*
+      package.json
     TargetFolder: '$(Build.BinariesDirectory)'
 
 - task: ArchiveFiles@2
