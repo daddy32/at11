@@ -29,7 +29,7 @@ export class Foodseason implements IParser {
 
         doneCallback(dayMenu);
 
-        function extractItems(element: Cheerio, areSoups: boolean): Array<IMenuItem> {
+        function extractItems(element: cheerio.Cheerio, areSoups: boolean): Array<IMenuItem> {
             const result = new Array<IMenuItem>();
 
             element.find("li .av-catalogue-title-container").each((k, soupElem) => {

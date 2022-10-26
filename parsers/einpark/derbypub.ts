@@ -23,7 +23,7 @@ export class DerbyPub implements IParser {
 
         doneCallback(dayMenu);
 
-        function parseDailyMenu(table: Cheerio) {
+        function parseDailyMenu(table: cheerio.Cheerio) {
             const rows = table.find("tr");
             rows.each((index: number, elem: any) => {
                 if (index === 0) {
@@ -34,13 +34,13 @@ export class DerbyPub implements IParser {
             });
         }
 
-        function parseSoup(row: CheerioElement): IMenuItem {
+        function parseSoup(row: cheerio.Element): IMenuItem {
             const cells = $(row).find("td");
             const text = cells.eq(2).text().trim();
             return { isSoup: true, text: normalize(text), price: NaN };
         }
 
-        function parseOther(row: CheerioElement): IMenuItem {
+        function parseOther(row: cheerio.Element): IMenuItem {
             const cells = $(row).find("td");
             const text = cells.eq(2).text().trim();
             const price = parseFloat(cells.eq(4).text().replace(",", "."));

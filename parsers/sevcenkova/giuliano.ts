@@ -32,7 +32,7 @@ export class Giuliano implements IParser {
         doneCallback(dayMenu);
     }
 
-    private parseMeals(cell: Cheerio): IMenuItem[] {
+    private parseMeals(cell: cheerio.Cheerio): IMenuItem[] {
         const items = new Array<IMenuItem>();
         cell.text().split("\n").map((str: string) => str.trim()).filter((str: string | any[]) => str.length > 0).forEach((str: string, i: number) => {
             if (i === 0 ) {
@@ -47,7 +47,7 @@ export class Giuliano implements IParser {
         return items;
     }
 
-    private parsePrices(cell: Cheerio): number[] {
+    private parsePrices(cell: cheerio.Cheerio): number[] {
         const items = new Array<number>();
         cell.text().split("\n").map((str: string) => str.trim()).filter((str: string | any[]) => str.length > 0).forEach((str: string, i: any) => {
             if (str === "Špeciálna ponuka:") {
