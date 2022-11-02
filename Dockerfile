@@ -1,18 +1,35 @@
-FROM ubuntu:latest
+FROM node:16.13.2 as builder
 ENV TZ=Europe/Kiev
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y nodejs \
-    npm \
-    curl dirmngr apt-transport-https lsb-release ca-certificates
-#WORKDIR /usr/yourapplication-name
-#COPY package.json .
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm ci
+
 COPY . .
-run curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN npm install
-#RUN npm ci
-RUN npm install @types/locate-path
-RUN npm install cli-boxes
+
 RUN npm run build
-RUN npm start
-CMD ["node", "./dist/server.js"]
+RUN ls -la /usr/src/app/*
+
+FROM node:16.13.2-slim
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm ci --production
+
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/static ./static
+COPY --from=builder /usr/src/app/views ./views
+
+RUN ls -la /usr/src/app/*
+
+EXPOSE 54321
+CMD ["node", "./dist/app.js"]
