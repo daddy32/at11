@@ -60,6 +60,32 @@
             </div>
         </nav>
     </header>
+    <h1>Pozor! Zmena adresy.</h1>
+    <div>Aktuálny hosting končí, stránka bude presťahovaná na nový. Aktualizujte si prosím svoje bookmarky a dajte vedieť aj kolegom.</div>
+    <div>Nová adresa: <b><a href="https://patronka.cloud.kozej.com/">https://patronka.cloud.kozej.com/</a></b>. <span id="redirect-message">Presmerovávam o <span id="countdown">0</span> sekúnd...</span></div>
+    <script type="text/javascript">
+        console.log(window.location);
+
+    // Total seconds to wait
+    var seconds = 10;
+
+    function countdown() {
+        seconds = seconds - 1;
+        if (seconds < 0) {
+            window.location = "https://patronka.cloud.kozej.com/";
+        } else {
+            document.getElementById("countdown").innerHTML = seconds;
+            window.setTimeout("countdown()", 1000);
+        }
+    }
+
+    if (window.location == "https://patronka.cloud.kozej.com/") {
+        document.getElementById("redirect-message").innerHTML = "Momentálne ste na správnej adrese.";
+    } else {
+        countdown();
+    }
+
+    </script>
 
     <main>
         <div id="container">
