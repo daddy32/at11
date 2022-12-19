@@ -1,12 +1,9 @@
-[![Build Status](https://dev.azure.com/jannescivera/at11/_apis/build/status/ERNICommunity.at11?branchName=master)](https://dev.azure.com/jannescivera/at11/_build/latest?definitionId=1&branchName=master)
-[![Dependency Status](https://david-dm.org/ERNICommunity/at11.svg)](https://david-dm.org/ERNICommunity/at11)
-
 at11
 ==========
 
 Web application displaying daily menus of favorite restaurants at Patr�nka, Bratislava.
 
-Live application is running at [https://patronka.herokuapp.com/](https://patronka.herokuapp.com/).
+Live application is running at [https://patronka.cloud.kozej.com/](https://patronka.cloud.kozej.com/).
 
 
 Fork of at11 by Erni.
