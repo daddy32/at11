@@ -279,6 +279,9 @@ article ul li.error {
 article ul li.error:before {
     display: none;
 }
+article ul li small {
+    font-weight: lighter;
+}
 article ul a {
     color: #E9843E;
 }
