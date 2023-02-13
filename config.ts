@@ -48,12 +48,6 @@ export class Config implements IConfig {
                 parser: new VegLife()
             },
             {
-                id: 3, name: "Patrónsky pivovar",
-                urlFactory: _ => "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu",
-                // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
-                parser: new PatronskyPivovar()
-            },
-            {
                 id: 4, name: "Jedáleň SAV (Doma)",
                 urlFactory: (date: Date) => {
                     //console.log('date: ' + date);
@@ -65,7 +59,7 @@ export class Config implements IConfig {
             },
             {
                 id: 5, name: "Svadby a Kari",
-                urlFactory: _ => "http://www.svadbykari.sk/denne-menu/",
+                urlFactory: _ => "https://restauracie.sme.sk/restauracia/svadby-a-kari-patronka_10341-stare-mesto_2949/denne-menu",
                 parser: new Kari()
             },
             /*{
@@ -92,7 +86,13 @@ export class Config implements IConfig {
                 id: 10, name: "Jedáleň MDV SR (link, pdf)",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
                 parser: new PatronskyPivovar() // TODO: parser
-            }
+            },
+            {
+                id: 3, name: "Patrónsky pivovar",
+                urlFactory: _ => "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu",
+                // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
+                parser: new PatronskyPivovar()
+            },
         ]]
     ])
 }
