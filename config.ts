@@ -67,11 +67,11 @@ export class Config implements IConfig {
                 urlFactory: _ => "https://bemiservis.sk/denne-menu/",
                 parser: new Bemi()
             },*/
-            {
+            /*{
                 id: 7, name: "Food Season",
                 urlFactory: _ => "https://www.foodseason.sk/#obedove",
                 parser: new Foodseason()
-            },
+            },*/
             {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "http://bigger.sk/lamacska#menu",
