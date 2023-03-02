@@ -7,7 +7,7 @@ export class Kari extends Sme implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItemsOrig = super.parseBase(html, date);
         var menuItemsFinal: IMenuItem[] = [];
-        const junkPattern = /^^\d+.*\d+.*$/;
+        const junkPattern = /(\d+\.*){1,}/;
         var seenSoup = false;
 
         menuItemsOrig.forEach(item=> {
