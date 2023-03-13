@@ -1,7 +1,7 @@
 at11
 ==========
 
-Web application displaying daily menus of favorite restaurants at Patr�nka, Bratislava.
+Web application displaying daily menus of favorite restaurants at Patrónka, Bratislava.
 
 Live application is running at [https://patronka.cloud.kozej.com/](https://patronka.cloud.kozej.com/).
 
