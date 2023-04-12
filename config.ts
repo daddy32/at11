@@ -74,7 +74,7 @@ export class Config implements IConfig {
             },*/
             {
                 id: 8, name: "Bigger",
-                urlFactory: _ => "http://bigger.sk/lamacska#menu",
+                urlFactory: _ => "http://bigger.sk/denne-menu/",
                 parser: new Bigger()
             },
             {
