@@ -11,47 +11,26 @@ export class Bigger implements IParser {
         const dayMenu = new Array<IMenuItem>();
         const junkPattern = /hranolky|polievka|Podľa dennej ponuky/i;
         const junkPattern2 = /[A-Z]\d*:/g;
-        const soupCandidatesPattern = ".menu-list__item-desc .desc__content";
-        const mainCoursesPattern = ".menu-list__item h4.menu-list__item-title";
+        const mainCoursesPattern = "section .elementor-widget-container p strong";
 
-        //console.log("Parsing Bigger.");
-        //console.log("   date:" + date);
-
-        const targetDayName = format(date, "EEEE", { locale: sk });
-        //console.log("   targetDayName:" + targetDayName);
-
-        // TODO: Polievka
-        const soupCandidates = $(soupCandidatesPattern);
-        //console.log("   soupCandidates: " + soupCandidates.length);
-
-        soupCandidates.each((i, elem) => {
-            const node = $(elem);
-            let text = node.text().trim();
-            //console.log("       text:" + text);
-
-            if (text.toLowerCase().startsWith(targetDayName)) {
-                //console.log("           hit");
-                text = text.substring(targetDayName.length + 2);
-                dayMenu.push({
-                    isSoup: true,
-                    text: normalize(text),
-                    price: NaN
-                });
-            }
-        });
+        // console.log("Parsing Bigger.");
+        // console.log("   date:" + date);
 
         const foundElements = $(mainCoursesPattern);
-        //console.log("   foundElements: " + foundElements.length);
+        // console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
             const text = node.text().trim();//.toLowerCase()
-            //console.log("       text:" + text);
+            // console.log("       text:" + text);
 
             if (!(junkPattern.test(text))) {
-                const descNode = node.next();
-                const descText = descNode.text();
-                //console.log("       desc:" + descText);
+                const textNodes = node.parent().contents().filter(function() {
+                    return this.nodeType === 3 && $(this).parent().is('p');
+                });
+
+                const descText = textNodes.text().trim();
+                // console.log(`       desc: "${descText}"`);
 
                 dayMenu.push({
                     isSoup: false,
