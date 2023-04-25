@@ -11,23 +11,45 @@ export class LunchBreak implements IParser {
         const dayMenu = new Array<IMenuItem>();
 
         const junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
+        const dropJunk = /^[—–\s]+$/g
         const pricePattern = /(\d+,\d+)\s*e/;
         const alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
         const soupPattern = /olievka/;
 
         const targetDayName = format(date, "EEEE", { locale: sk });
-        const dayMenuElement = $("td:contains('" + targetDayName.substr(1) + "')");
+        const selector = "td:contains('" + targetDayName.substring(2) + "')"
+        var dayMenuElement = $(selector);
+        // console.log("dayMenuElement: ")
+        // console.log(dayMenuElement.text())
+        // console.log(dayMenuElement.length)
+        if (dayMenuElement.length < 1) {
+          console.error(`No dayMenuElement found! Selector: "${selector}". Trying by date...`)
+          const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
+          const selectorDate = `td:contains("${targetDayDate}")`
+          console.log(` selectorDate: ${selectorDate}`)
+          var dayMenuElement = $(selector);
+          if (dayMenuElement.length >= 1) {
+            // console.log(` Found!`)
+          } else {
+            console.error(` Not found!`)
+            return
+          }
+        }
         let rowElement = dayMenuElement.parent();
         let i = 0;
 
         do {
+
           i += 1;
           if (i>10) {
             break;
           }
 
           const tdElements = rowElement.children("td");
-          //console.log('i: ', i, ' Element count:', tdElements.length);
+          // console.log('i: ', i, ' Element count:', tdElements.length);
+          //console.log(`rowElement: ${rowElement.text()}`)
+          // console.log(rowElement)
+          // console.log(rowElement.text())
 
           if (tdElements.length < 6) {
             continue;
@@ -37,14 +59,20 @@ export class LunchBreak implements IParser {
           }
 
           let text = normalize($(tdElements.get(3)).text());
+
+          if (text.match(dropJunk)) {
+            // console.log('dropJunk')
+            continue
+          } 
+
           if (text === "") {
             text = normalize($(tdElements.get(1)).text())
               .toLowerCase()
               .capitalizeFirstLetter();
           }
           const price = parseFloat($(tdElements.get(5)).text().replace(",", "."));
-          //console.log('text: ', text);
-          //console.log('price: ', price);
+          // console.log('text: ', text);
+          // console.log('price: ', price);
 
           dayMenu.push({
             isSoup: soupPattern.test($(tdElements.get(1)).text()),
