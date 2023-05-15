@@ -11,7 +11,7 @@ export class Bigger implements IParser {
         const dayMenu = new Array<IMenuItem>();
         const junkPattern = /hranolky|polievka|Podľa dennej ponuky/i;
         const junkPattern2 = /[A-Z]\d*:/g;
-        const mainCoursesPattern = "section .elementor-widget-container p strong";
+        const mainCoursesPattern = "section .elementor-col-100 .elementor-widget-container p strong";
 
         // console.log("Parsing Bigger.");
         // console.log("   date:" + date);
