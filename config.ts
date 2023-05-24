@@ -93,6 +93,12 @@ export class Config implements IConfig {
                 // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
                 parser: new PatronskyPivovar()
             },
+            {
+                id: 11, name: "Fajne jedlo (link)",
+                urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
+                // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
+                parser: new PatronskyPivovar() // TODO: Parser? Je tam len obrazok a docx... Mozno embed obrazku? Zaberie ale vela miesta...
+            },
         ]]
     ])
 }
