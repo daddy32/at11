@@ -25,9 +25,11 @@ export class Bigger implements IParser {
             // console.log("       text:" + text);
 
             if (!(junkPattern.test(text))) {
-                const textNodes = node.parent().contents().filter(function() {
-                    return this.nodeType === 3 && $(this).parent().is('p');
-                });
+                var textNodes = extractDescNodes(node.parent());
+                if (textNodes.length == 0 || textNodes.text().trim() == "") {
+                    // console.log("   Desc nodes not found, trying again.")
+                    textNodes = extractDescNodes(node.parent().add(node.parent().next('p')));
+                }
 
                 const descText = textNodes.text().trim();
                 // console.log(`       desc: "${descText}"`);
@@ -42,7 +44,13 @@ export class Bigger implements IParser {
 
         doneCallback(dayMenu);
 
-        function normalize(str: string) {
+        function extractDescNodes(parent: cheerio.Cheerio) {
+            return parent.contents().filter(function() {
+                return this.nodeType === 3 && $(this).parent().is('p');
+            });
+        }
+
+        function normalize(str: string): string {
             return str.removeAlergens()
                 .removeMetrics()
                 .replace(junkPattern2, "")
