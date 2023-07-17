@@ -11,7 +11,9 @@ export class Bigger implements IParser {
         const dayMenu = new Array<IMenuItem>();
         const junkPattern = /hranolky|polievka|Podľa dennej ponuky/i;
         const junkPattern2 = /[A-Z]\d*:/g;
-        const mainCoursesPattern = "section .elementor-col-100 .elementor-widget-container p strong";
+        const mainCoursesPattern =
+            "section .elementor-top-column[data-settings]   .elementor-widget-container p strong, " +
+            "section .elementor-col-100                     .elementor-widget-container p strong";
 
         // console.log("Parsing Bigger.");
         // console.log("   date:" + date);
@@ -24,11 +26,17 @@ export class Bigger implements IParser {
             const text = node.text().trim();//.toLowerCase()
             // console.log("       text:" + text);
 
-            if (!(junkPattern.test(text))) {
+            if (!(junkPattern.test(text)) && text !== '') {
                 var textNodes = extractDescNodes(node.parent());
                 if (textNodes.length == 0 || textNodes.text().trim() == "") {
-                    // console.log("   Desc nodes not found, trying again.")
+                    // console.log("           Desc nodes not found, trying again.")
                     textNodes = extractDescNodes(node.parent().add(node.parent().next('p')));
+                    if (textNodes.length == 0 || textNodes.text().trim() == "") {
+                        // console.log("               Desc nodes still not found, trying yet again.")
+                        const secondP = node.parent().parent().parent().next('div').find('p');
+                        // console.log(secondP);
+                        textNodes = extractDescNodes(secondP);
+                    }
                 }
 
                 const descText = textNodes.text().trim();
@@ -39,7 +47,10 @@ export class Bigger implements IParser {
                     text: normalize(text) + " <small>(" + normalize(descText) + ")</small>",
                     price: NaN
                 });
+            } else {
+                // console.log(`           => junk.`);
             }
+            // console.log(`----------------------------`)
         });
 
         doneCallback(dayMenu);
