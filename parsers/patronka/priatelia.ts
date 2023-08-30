@@ -5,7 +5,7 @@ import { Menucka } from "../menucka";
 export class Priatelia extends Menucka implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItems = super.parseBase(html, date);
-        const junkPatternMeal  = /\/\s*A:/;
+        const junkPatternMeal  = /A:|\s:/g;
         const junkPatternSoup = /\/\s*A\s*:[-,\s]*(\d+\s*,*)+.*/g;
         const junkPattern3 = /facebook|POLIEVKA K/i;
 

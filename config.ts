@@ -37,11 +37,11 @@ export class Config implements IConfig {
     public readonly parserTimeout = 15 * 1000; // 15s
     public readonly restaurants = new Map<string, ReadonlyArray<{ id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>([
         ["Patrónka", [
-            /*{
+            {
                 id: 1, name: "Canteen Priatelia",
                 urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/canteen-priatelia-westend",
                 parser: new Priatelia()
-            },*/
+            },
             {
                 id: 2, name: "Veg Life",
                 urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/veg-life-westend",
@@ -96,7 +96,6 @@ export class Config implements IConfig {
             {
                 id: 11, name: "Fajne jedlo (link)",
                 urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
-                // alternative source: https://www.patronskypivovar.sk/#dailymenu-patronsky
                 parser: new PatronskyPivovar() // TODO: Parser? Je tam len obrazok a docx... Mozno embed obrazku? Zaberie ale vela miesta...
             },
         ]]
@@ -105,6 +104,7 @@ export class Config implements IConfig {
 
 /*
 TODO: Nove restauracie vo Westend Plazza:
+    - Olive - https://oliveyouwestend.ikelp.com/
     - Quan Ngon - Vietnamese Cuisine
         - Bez menu online?
         - https://www.westend.sk/kto-u-nas-sidli/quanngon/
