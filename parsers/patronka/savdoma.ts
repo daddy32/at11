@@ -16,11 +16,12 @@ export class SavDoma implements IParser {
 
         const alergPattern = /\/*\s*\/(\s*\d\s?[.,]?\s?)+\/\s*/g;
         const junkPattern = /^\d\s*\.*\s*/;
+        const junkPattern2 = /0g \/\/|0,33l \/\//;
 
-        //console.log("Parsing SAV.");
-        //console.log("   date:" + date);
+        // console.log("Parsing SAV.");
+        // console.log("   date:" + date);
         const foundElements = $(menuItemSelector);
-        //console.log("   foundElements: " + foundElements.length);
+        // console.log("   foundElements: " + foundElements.length);
 
         foundElements.each((i, elem) => {
             const node = $(elem);
@@ -29,7 +30,10 @@ export class SavDoma implements IParser {
             // console.log("       text:" + text);
             // console.log("       price:" + price);
 
-            if (!text.includes("0g //")) { // Not empty
+            if (junkPattern2.test(text)) {
+                // console.log("           Junk");
+                return;
+            } else {
                 dayMenu.push({
                     isSoup: i === 0,
                     text: normalize(text),
