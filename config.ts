@@ -9,8 +9,8 @@ import { PatronskyPivovar } from "./parsers/patronka/patronskypivovar";
 import { Kari } from "./parsers/patronka/kari";
 import { SavDoma } from "./parsers/patronka/savdoma";
 import { Bigger } from "./parsers/patronka/bigger";
-import { Foodseason } from "./parsers/patronka/foodseason";
-import { Bemi } from "./parsers/patronka/bemi";
+// import { Foodseason } from "./parsers/patronka/foodseason";
+// import { Bemi } from "./parsers/patronka/bemi";
 import { LunchBreak } from "./parsers/patronka/lunchbreak";
 
 export interface IConfig {
@@ -62,16 +62,6 @@ export class Config implements IConfig {
                 urlFactory: _ => "https://restauracie.sme.sk/restauracia/svadby-a-kari-patronka_10341-stare-mesto_2949/denne-menu",
                 parser: new Kari()
             },
-            /*{
-                id: 6, name: "Restaurant BEMI",
-                urlFactory: _ => "https://bemiservis.sk/denne-menu/",
-                parser: new Bemi()
-            },*/
-            /*{
-                id: 7, name: "Food Season",
-                urlFactory: _ => "https://www.foodseason.sk/#obedove",
-                parser: new Foodseason()
-            },*/
             {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "http://bigger.sk/denne-menu/",
@@ -104,29 +94,44 @@ export class Config implements IConfig {
 
 /*
 TODO: Nove restauracie vo Westend Plazza:
-    - Olive - https://oliveyouwestend.ikelp.com/
+    - Olive you - https://oliveyouwestend.ikelp.com/
     - Quan Ngon - Vietnamese Cuisine
         - Bez menu online?
         - https://www.westend.sk/kto-u-nas-sidli/quanngon/
         - https://menucka.sk/ulica/Quan%20Ngon,%20Lama%C4%8Dsk%C3%A1%20cesta,%20Karlova%20Ves,%20Slovensko
-    - Greek Style
-        - Bez menu online?
-        - https://www.westend.sk/kto-u-nas-sidli/greekstyle/
     - Sushi Time
         - Nemaju denne menu (vzdy to iste v ponuke)?
         - https://www.sushitime.sk/sk/menu/
-    - Sajado
-        - Nemaju denne menu (vzdy to iste v ponuke)?
-        - http://www.sajado.sk/-menu-expres-westend
-        - https://restauracie.sme.sk/restauracia/restauracia-sajado_3833-bratislava_2983/denne-menu
     - fresh garden salads
         - Nemaju denne menu (vzdy to iste v ponuke)?
         - http://www.freshgarden.sk/sk/menu/
     - Anatolia Kebab
         - Nemaju denne menu (vzdy to iste v ponuke)?
         - http://www.anatolia.sk/
+    TODO: Zvazit pridanie zoznamu liniek na neparsovane restauracie
+*/
+
+/*
+    Pravdepodobne uz neexistujuce restauracie:
+            {
+                id: 6, name: "Restaurant BEMI",
+                urlFactory: _ => "https://bemiservis.sk/denne-menu/",
+                parser: new Bemi()
+            },
+            {
+                id: 7, name: "Food Season",
+                urlFactory: _ => "https://www.foodseason.sk/#obedove",
+                parser: new Foodseason()
+            },
     - Thali - 100% Veggie
         - Bez menu online? Resp maju v pdf formate; spolocne pre vsetky prevadzky?
         - http://www.thali.sk/najdi-nas/
-TODO: Zvazit pridanie zoznamu liniek na neparsovane restauracie
+    - Greek Style
+        - Bez menu online?
+        - https://www.westend.sk/kto-u-nas-sidli/greekstyle/
+    - Sajado
+        - Nemaju denne menu (vzdy to iste v ponuke)?
+        - http://www.sajado.sk/-menu-expres-westend
+        - https://restauracie.sme.sk/restauracia/restauracia-sajado_3833-bratislava_2983/denne-menu
+
 */
