@@ -14,7 +14,7 @@ export class Kari extends Sme implements IParser {
 
         menuItemsOrig.forEach(item=> {
             // console.log("       text:" + item.text);
-            if ((junkPattern.test(item.text))) {
+            if (junkPattern.test(item.text)) {
                 // console.log("           Junk");
                 return;
             }

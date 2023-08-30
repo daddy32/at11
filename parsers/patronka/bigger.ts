@@ -23,7 +23,7 @@ export class Bigger implements IParser {
 
         foundElements.each((i, elem) => {
             const node = $(elem);
-            const text = node.text().trim();//.toLowerCase()
+            var text = node.text().trim();//.toLowerCase()
             // console.log("       text:" + text);
 
             if (!(junkPattern.test(text)) && text !== '') {
@@ -40,13 +40,19 @@ export class Bigger implements IParser {
                 }
 
                 const descText = textNodes.text().trim();
+                text = normalize(text)
+                // console.log(`       text: "${text}"`);
                 // console.log(`       desc: "${descText}"`);
 
-                dayMenu.push({
-                    isSoup: false,
-                    text: normalize(text) + " <small>(" + normalize(descText) + ")</small>",
-                    price: NaN
-                });
+                if (text!=='') {
+                    dayMenu.push({
+                        isSoup: false,
+                        text: text + " <small>(" + normalize(descText) + ")</small>",
+                        price: NaN
+                    });
+                } else {
+                    // console.log(`           Empty text => skipping.`);
+                }
             } else {
                 // console.log(`           => junk.`);
             }
