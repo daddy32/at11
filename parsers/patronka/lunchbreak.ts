@@ -11,7 +11,7 @@ export class LunchBreak implements IParser {
         const dayMenu = new Array<IMenuItem>();
 
         const junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
-        const dropJunk = /^[—–\s]+$/g
+        const dropJunk = /^[——–\-\s]+$/g
         const pricePattern = /(\d+,\d+)\s*e/;
         const alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
         const soupPattern = /olievka/;
@@ -63,7 +63,7 @@ export class LunchBreak implements IParser {
           if (text.match(dropJunk)) {
             // console.log('dropJunk')
             continue
-          } 
+          }
 
           if (text === "") {
             text = normalize($(tdElements.get(1)).text())
