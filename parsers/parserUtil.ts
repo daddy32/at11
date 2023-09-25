@@ -48,7 +48,7 @@ String.prototype.correctCommaSpacing = function() {
 };
 
 String.prototype.removeMetrics = function() {
-    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,.]\d[\doO]*)? *[lLgG]\)?\.?\s*/g, " ").trim();
+    return this.replace(/\s*\(?(?:\d+\/)?( ?\d[\doO\s]*)+ *(?:[,.]\d[\doO]*)? *[lLgG]+\)?\.?\s*/g, " ").trim();
 };
 
 String.prototype.removeAlergens = function() {

@@ -11,7 +11,7 @@ export class Priatelia extends Menucka implements IParser {
 
         if (menuItems.length > 0) {
             menuItems.forEach((item, i) => {
-                //console.log(item.text);
+                // console.log(item.text, '   => ');
                 if (i==0) {
                     item.isSoup = true;
                     item.text = item.text
@@ -29,7 +29,7 @@ export class Priatelia extends Menucka implements IParser {
                         .removeItemNumbering()
                         .replace(junkPatternMeal, "");
                 }
-                //console.log('   => ', item.text);
+                // console.log(item.text);
             });
         }
 
