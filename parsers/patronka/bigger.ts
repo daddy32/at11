@@ -28,18 +28,21 @@ export class Bigger implements IParser {
 
             if (!(junkPattern.test(text)) && text !== '') {
                 var textNodes = extractDescNodes(node.parent());
-                if (textNodes.length == 0 || textNodes.text().trim() == "") {
+                if (textNodes.length == 0 || textNodes == "" || normalize(textNodes) == normalize(text)) {
                     // console.log("           Desc nodes not found, trying again.")
                     textNodes = extractDescNodes(node.parent().add(node.parent().next('p')));
-                    if (textNodes.length == 0 || textNodes.text().trim() == "") {
-                        // console.log("               Desc nodes still not found, trying yet again.")
-                        const secondP = node.parent().parent().parent().next('div').find('p');
-                        // console.log(secondP);
-                        textNodes = extractDescNodes(secondP);
-                    }
+                }
+                if (textNodes.length == 0 || textNodes == "" || normalize(textNodes) == normalize(text)) {
+                    // console.log("           Desc nodes still not found, trying yet again.")
+                    const secondP = node.parent().parent().parent().next('div').find('p');
+                    // console.log(secondP);
+                    textNodes = extractDescNodes(secondP);
+                }
+                if (textNodes.length == 0 || textNodes == "" || normalize(textNodes) == normalize(text)) {
+                    console.warn("           Desc nodes not found.")
                 }
 
-                const descText = textNodes.text().trim();
+                const descText = normalize(textNodes);
                 text = normalize(text)
                 // console.log(`       text: "${text}"`);
                 // console.log(`       desc: "${descText}"`);
@@ -61,11 +64,29 @@ export class Bigger implements IParser {
 
         doneCallback(dayMenu);
 
-        function extractDescNodes(parent: cheerio.Cheerio) {
-            return parent.contents().filter(function() {
+
+        function extractDescNodes(parent: cheerio.Cheerio): string {
+            // Check if there's a span inside the <p> tag and get its text
+            const spanText = parent.find('span').text().trim();
+
+            if (spanText) {
+                return spanText;
+            }
+
+            // For the original structure
+            const textNodes = parent.contents().filter(function() {
                 return this.nodeType === 3 && $(this).parent().is('p');
             });
+
+            let resultText = "";
+            textNodes.each(function() {
+                resultText += $(this).text();
+            });
+
+            return resultText.trim();
         }
+
+
 
         function normalize(str: string): string {
             return str.removeAlergens()
