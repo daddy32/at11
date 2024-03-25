@@ -10,90 +10,104 @@ export class LunchBreak implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        const junkPattern = /\s*\+\s*Polievka\s*:.*$|\(-\)/g;
-        const dropJunk = /^[——–\-\s]+$/g
-        const pricePattern = /(\d+,\d+)\s*e/;
-        const alergPattern = /\/*\s*[/(](\s*\d\s?[.,]?\s?)+[/)]\s*/g;
-        const soupPattern = /olievka/;
+        const junkPattern = /^\s*\/*\s*|(\+\s*Polievka\s*:.*)/g
+        const dropJunk = /\s*MENU\s*$|^$/g
+        const pricePattern = /(\d+,\d+)\s*[e€]/i;
+        const alergPattern = /\/*\s*[\/(](\s*\d\s?[.,]?\s?)+[\/)]\s*/g;
+        const soupPattern = /POLIEVKA/;
 
         const targetDayName = format(date, "EEEE", { locale: sk });
-        const selector = "td:contains('" + targetDayName.substring(2) + "')"
+        const selector = "h5:contains('" + targetDayName.substring(2) + "')"
         var dayMenuElement = $(selector);
         // console.log("dayMenuElement: ")
+        // console.log(dayMenuElement)
         // console.log(dayMenuElement.text())
         // console.log(dayMenuElement.length)
         if (dayMenuElement.length < 1) {
           console.error(`No dayMenuElement found! Selector: "${selector}". Trying by date...`)
           const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
-          const selectorDate = `td:contains("${targetDayDate}")`
+          const selectorDate = `h5:contains("${targetDayDate}")`
           console.log(` selectorDate: ${selectorDate}`)
           var dayMenuElement = $(selector);
           if (dayMenuElement.length >= 1) {
-            // console.log(` Found!`)
+            console.log(` Found!`)
           } else {
             console.error(` Not found!`)
             return
           }
         }
-        let rowElement = dayMenuElement.parent();
-        let i = 0;
 
-        do {
+        let parentElement = dayMenuElement.parent();
+        // console.log("parentElement:")
+        // console.log(parentElement)
 
-          i += 1;
-          if (i>10) {
-            break;
+        var text = ""
+        var prevText = ""
+        var price = NaN;
+
+        parentElement.find("div>p").each(function() {
+          prevText = text;
+          text = $(this).text();
+          if (!text.trim()) {
+            return;
+          }
+          // console.log(`text: ${text}`);
+          if (dropJunk.test(text)) {
+            // console.log("\tdropJunk");
+            // console.log("------------------------");
+            return;
+          } else {
+            // console.log("\tdropJunk not matched");
           }
 
-          const tdElements = rowElement.children("td");
-          // console.log('i: ', i, ' Element count:', tdElements.length);
-          //console.log(`rowElement: ${rowElement.text()}`)
-          // console.log(rowElement)
-          // console.log(rowElement.text())
-
-          if (tdElements.length < 6) {
-            continue;
-          }
-          if ((i > 1) && ($(tdElements.get(0)).text().length > 0 )) {
-            break;
-          }
-
-          let text = normalize($(tdElements.get(3)).text());
-
-          if (text.match(dropJunk)) {
-            // console.log('dropJunk')
-            continue
+          if (prevText.match(soupPattern)) {
+            // console.log("\tsoupPattern matched on prevText");
+            text.split("/").forEach(function (item) {
+              dayMenu.push({
+                isSoup: true,
+                text: normalize(item),
+                price: NaN
+              });
+            });
+            // console.log("------------------------");
+            return;
           }
 
-          if (text === "") {
-            text = normalize($(tdElements.get(1)).text())
-              .toLowerCase()
-              .capitalizeFirstLetter();
+          const priceMatch = text.match(pricePattern);
+          if (priceMatch) {
+            // console.log("\tpricePattern matched");
+            try {
+              const pricenum = parseFloat(priceMatch[1].replace(/\s+/, "").replace(",", "."));
+              price = pricenum;
+              text = normalize(prevText);
+              // console.log(`text: ${text}`)
+              // console.log(`price: ${price}`)
+              dayMenu.push({
+                isSoup: false,
+                text: text,
+                price: price
+              });
+            } catch (err) {
+              // console.warn("\t\tprice not parsed");
+            }
+          } else {
+            // console.log("\tpricePattern not matched");
           }
-          const price = parseFloat($(tdElements.get(5)).text().replace(",", "."));
-          // console.log('text: ', text);
-          // console.log('price: ', price);
-
-          dayMenu.push({
-            isSoup: soupPattern.test($(tdElements.get(1)).text()),
-            text: normalize(text),
-            price: price
-          });
-
-          rowElement = rowElement.next();
-        } while (rowElement);
+          // console.log("------------------------");
+        });
 
         doneCallback(dayMenu);
 
         function normalize(str: string) {
             return str
               .replace(alergPattern, "")
-              .replace(junkPattern, "")
               .replace(pricePattern, "")
               .normalizeWhitespace()
               .removeItemNumbering()
               .removeMetrics()
-              .correctCommaSpacing();
+              .correctCommaSpacing()
+              .replace(junkPattern, "")
+              ;
           }
     }
  }
