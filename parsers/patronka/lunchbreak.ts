@@ -27,10 +27,10 @@ export class LunchBreak implements IParser {
           console.error(`No dayMenuElement found! Selector: "${selector}". Trying by date...`)
           const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
           const selectorDate = `h5:contains("${targetDayDate}")`
-          console.log(` selectorDate: ${selectorDate}`)
+          // console.log(` selectorDate: ${selectorDate}`)
           var dayMenuElement = $(selector);
           if (dayMenuElement.length >= 1) {
-            console.log(` Found!`)
+            // console.log(` Found!`)
           } else {
             console.error(` Not found!`)
             return
@@ -51,7 +51,7 @@ export class LunchBreak implements IParser {
           if (!text.trim()) {
             return;
           }
-          // console.log(`text: ${text}`);
+          // console.log(`text: "${text}"`);
           if (dropJunk.test(text)) {
             // console.log("\tdropJunk");
             // console.log("------------------------");
@@ -80,8 +80,13 @@ export class LunchBreak implements IParser {
               const pricenum = parseFloat(priceMatch[1].replace(/\s+/, "").replace(",", "."));
               price = pricenum;
               text = normalize(prevText);
-              // console.log(`text: ${text}`)
-              // console.log(`price: ${price}`)
+              // console.log(`text: "${text}"`)
+              // console.log(`price: "${price}"`)
+              if (text.length == 0) {
+                // console.log(`\tEmpty text, dropping.`);
+                // console.log("------------------------");
+                return;
+              }
               dayMenu.push({
                 isSoup: false,
                 text: text,

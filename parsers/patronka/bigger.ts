@@ -9,7 +9,7 @@ export class Bigger implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
-        const junkPattern = /hranolky|polievka|Podľa dennej ponuky/i;
+        const junkPattern = /hranolky|polievka|Podľa dennej ponuky|^\d[^–]*–$/i;
         const junkPattern2 = /[A-Z]\d*:/g;
         const mainCoursesPattern =
             "section .elementor-top-column[data-settings]   .elementor-widget-container p strong, " +
@@ -24,7 +24,7 @@ export class Bigger implements IParser {
         foundElements.each((i, elem) => {
             const node = $(elem);
             var text = node.text().trim();//.toLowerCase()
-            // console.log("       text:" + text);
+            // console.log(`       text: "${text}"`);
 
             if (!(junkPattern.test(text)) && text !== '') {
                 var textNodes = extractDescNodes(node.parent());
