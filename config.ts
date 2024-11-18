@@ -12,6 +12,7 @@ import { Bigger } from "./parsers/patronka/bigger";
 // import { Foodseason } from "./parsers/patronka/foodseason";
 // import { Bemi } from "./parsers/patronka/bemi";
 import { LunchBreak } from "./parsers/patronka/lunchbreak";
+import { Dummy } from "./parsers/patronka/dummy";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -73,9 +74,9 @@ export class Config implements IConfig {
                 parser: new LunchBreak()
             },
             {
-                id: 10, name: "Jedáleň MDV SR (link, pdf)",
+                id: 10, name: "Jedáleň MDV SR (link)",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
-                parser: new PatronskyPivovar() // TODO: parser
+                parser: new Dummy() // TODO: parser
             },
             {
                 id: 3, name: "Patrónsky pivovar",
@@ -86,7 +87,7 @@ export class Config implements IConfig {
             {
                 id: 11, name: "Fajne jedlo (link)",
                 urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
-                parser: new PatronskyPivovar() // TODO: Parser? Je tam len obrazok a docx... Mozno embed obrazku? Zaberie ale vela miesta...
+                parser: new Dummy() // TODO: Parser? Je tam len obrazok a docx... Mozno embed obrazku? Zaberie ale vela miesta...
             },
         ]]
     ])
