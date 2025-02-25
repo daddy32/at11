@@ -23,7 +23,12 @@ export interface IConfig {
     readonly cacheExpiration: number;
     readonly requestTimeout: number;
     readonly parserTimeout: number;
-    readonly restaurants: ReadonlyMap<string, ReadonlyArray<{id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>;
+    readonly restaurants: ReadonlyMap<string, ReadonlyArray<{
+        id: number,
+        name: string,
+        urlFactory: (date: Date) => string,
+        parser: IParser
+    }>>;
 }
 
 /* eslint-disable max-len */
@@ -36,7 +41,12 @@ export class Config implements IConfig {
     public readonly cacheExpiration = 2 * 60 * 60; // 2h
     public readonly requestTimeout = 15 * 1000; // 15s
     public readonly parserTimeout = 15 * 1000; // 15s
-    public readonly restaurants = new Map<string, ReadonlyArray<{ id: number, name: string, urlFactory: (date: Date) => string, parser: IParser}>>([
+    public readonly restaurants = new Map<string, ReadonlyArray<{
+         id: number,
+         name: string,
+         urlFactory: (date: Date) => string,
+         parser: IParser
+    }>>([
         ["Patrónka", [
             {
                 id: 1, name: "Canteen Priatelia",
@@ -65,8 +75,26 @@ export class Config implements IConfig {
             },
             {
                 id: 8, name: "Bigger",
-                urlFactory: _ => "http://bigger.sk/denne-menu/",
-                parser: new Bigger()
+                urlFactory: _ => "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=2d9fcc59-e13a-4152-b6cb-d587e182dd1c&restaurant_uid=c5622c60-4cca-4961-acb4-a9c2a9a61006",
+                parser: new Dummy() // TODO: parser
+                // parser: new Bigger()
+                // TODO: Potrebujeme prerobit na POST request. Vid fetchCartData v Bigger.ts
+                /*
+                const url = "https://www.foodbooking.com/api/cart/init";
+
+                const payload = {
+                    "#": null,
+                    "company_uid": "2d9fcc59-e13a-4152-b6cb-d587e182dd1c",
+                    "restaurant_uid": "c5622c60-4cca-4961-acb4-a9c2a9a61006",
+                    "payload": {
+                        "language_code": "en",
+                        "init": 1,
+                        "source": "website",
+                        "reference": null
+                    },
+                    "tracker": "aQXpqo6F91yN7dnx"
+                };
+                */
             },
             {
                 id: 9, name: "Lunch Break Westend Plazza",
