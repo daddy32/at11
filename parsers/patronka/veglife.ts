@@ -10,6 +10,7 @@ export class VegLife extends Menucka implements IParser {
         const polievkaPattern = /[Pp]olievka/;
 
         if (menuItems.length > 0) {
+            var prev_text = ""
             menuItems.forEach((item, i) => {
                 //console.log(item.text);
                 if (polievkaPattern.test(item.text)) {
@@ -26,6 +27,11 @@ export class VegLife extends Menucka implements IParser {
                         .removeMetrics()
                         .removeItemNumbering();
                 }
+                if (item.text == prev_text) {
+                    item.text = "";
+                }
+
+                prev_text = item.text;
                 //console.log(item.text);
             });
         }
