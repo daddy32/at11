@@ -3,6 +3,7 @@
 This file records architectural and implementation decisions made during the project lifecycle.
 
 ## Initial Decisions
+
 * TypeScript Selection
   - Decision: Use TypeScript as the primary development language
   - Rationale: Type safety, better maintainability, and modern JavaScript features

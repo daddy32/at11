@@ -3,6 +3,7 @@
 This file tracks the project's progress using a task list format.
 
 ## Completed Tasks
+
 * Initial project setup from original at11 fork
 * Implemented TypeScript-based architecture
 * Created parser system for restaurant menu fetching
@@ -11,10 +12,12 @@ This file tracks the project's progress using a task list format.
 * Created parsers for multiple restaurants in Patrónka area
 
 ## Current Tasks
+
 * Memory Bank initialization and documentation
 * Understanding and documenting current project architecture
 
 ## Next Steps
+
 * Review and potentially update existing restaurant parsers
 * Evaluate current test coverage
 * Consider performance optimizations for menu fetching
