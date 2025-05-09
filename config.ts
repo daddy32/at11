@@ -76,25 +76,7 @@ export class Config implements IConfig {
             {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=2d9fcc59-e13a-4152-b6cb-d587e182dd1c&restaurant_uid=c5622c60-4cca-4961-acb4-a9c2a9a61006",
-                parser: new Dummy() // TODO: parser
-                // parser: new Bigger()
-                // TODO: Potrebujeme prerobit na POST request. Vid fetchCartData v Bigger.ts
-                /*
-                const url = "https://www.foodbooking.com/api/cart/init";
-
-                const payload = {
-                    "#": null,
-                    "company_uid": "2d9fcc59-e13a-4152-b6cb-d587e182dd1c",
-                    "restaurant_uid": "c5622c60-4cca-4961-acb4-a9c2a9a61006",
-                    "payload": {
-                        "language_code": "en",
-                        "init": 1,
-                        "source": "website",
-                        "reference": null
-                    },
-                    "tracker": "aQXpqo6F91yN7dnx"
-                };
-                */
+                parser: new Bigger()
             },
             {
                 id: 9, name: "Lunch Break Westend Plazza",
