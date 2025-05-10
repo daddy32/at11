@@ -1,3 +1,5 @@
+import type { Cheerio, CheerioAPI } from "cheerio";
+import type { Element } from "domhandler";
 import cheerio from "cheerio";
 
 import { IMenuItem } from "./IMenuItem";
@@ -11,8 +13,8 @@ export abstract class Menucka {
 
         const dayMenu = new Array<IMenuItem>();
 
-        let currentDay: cheerio.Cheerio;
-        let nextDay: cheerio.Cheerio;
+        let currentDay: Cheerio<Element>;
+        let nextDay: Cheerio<Element>;
         $(".day-title").each((i, elem) => {
             const node =  $(elem);
             if (currentDay) {

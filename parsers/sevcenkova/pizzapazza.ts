@@ -1,3 +1,5 @@
+import type { Cheerio } from "cheerio";
+import type { Element } from "domhandler";
 import cheerio from "cheerio";
 
 import { IMenuItem } from "../IMenuItem";
@@ -21,7 +23,7 @@ export class PizzaPazza implements IParser {
 
         doneCallback(dayMenu);
 
-        function parseItems(item: cheerio.Cheerio) {
+        function parseItems(item: Cheerio<Element>) {
             item.find("table tr").each((i: number, elem: any) => {
                 const $this = $(elem);
                 const nameCellText = $this.children("td").eq(1).text().trim();

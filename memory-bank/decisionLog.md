@@ -38,3 +38,52 @@ This file records architectural and implementation decisions made during the pro
 
 [2025-05-09 13:50:24] - Initial Memory Bank creation and documentation of existing architectural decisions
 [2025-05-10 14:22:00] - Added recent decisions regarding web scraping and logging improvements
+
+## 2025-10-05 14:29 - Cheerio Library Upgrade Analysis
+
+### Decision
+Need to upgrade Cheerio from v0.22.0 to v1.0.0 to address a high-severity ReDoS vulnerability.
+
+### Impact Analysis
+1. Wide usage found across parser modules:
+   - Core HTML parsing functionality using `cheerio.load(html)`
+   - Extensive use of jQuery-style selectors
+   - Type definitions from `@types/cheerio`
+   - Mixed import styles (`import cheerio` vs `import * as cheerio`)
+
+### Required Changes
+1. Dependency Updates:
+   ```diff
+   - "cheerio": "^0.22.0"
+   + "cheerio": "^1.0.0"
+   - "@types/cheerio": "^0.22.31"
+   + "@types/cheerio": "^1.0.0"
+   ```
+
+### Upgrade Plan
+1. Sequential Testing Phases:
+   - Update dependencies
+   - Run existing test suite
+   - Test each parser individually
+   - Monitor system behavior in staging
+   - Deploy to production with rollback plan
+
+### Risk Assessment
+1. Potential Issues:
+   - HTML parsing behavior changes
+   - Type definition updates may require code changes
+   - Selector compatibility issues
+   - Integration impact on menu parsing accuracy
+
+### Implementation Strategy
+1. Staged Approach:
+   - Create test branch
+   - Update dependencies
+   - Verify parser functionality
+   - Address any type/selector issues
+   - Comprehensive testing before deployment
+
+### Rationale
+- Critical security vulnerability needs to be addressed
+- Cheerio 1.0.0 maintains core API compatibility
+- Testing strategy minimizes risk of breaking changes

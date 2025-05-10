@@ -1,3 +1,5 @@
+import type { Cheerio } from "cheerio";
+import type { Element } from "domhandler";
 import cheerio from "cheerio";
 
 import { IMenuItem } from "../IMenuItem";
@@ -37,7 +39,7 @@ export class Itb implements IParser {
 
         doneCallback(dayMenu);
 
-        function parseMeal(tablerow: cheerio.Cheerio): IMenuItem {
+        function parseMeal(tablerow: Cheerio<Element>): IMenuItem {
             if (tablerow.find("li").length === 0) {
                 return null;
             }
@@ -46,7 +48,7 @@ export class Itb implements IParser {
             }
             const menuItem: IMenuItem = { price: NaN, isSoup: false, text: "" };
             menuItem.isSoup = /polievka/i.test(tablerow.children("h3").text());
-            const textParts = (tablerow.find("li").children("span").eq(1)[0] as cheerio.TagElement).children;
+            const textParts = (tablerow.find("li").children("span").eq(1)[0] as Element).children;
             const mergedText = textParts.length > 1 ? $(textParts[0]).text() + "," + $(textParts[2]).text() : $(textParts[0]).text();
             if (mergedText.trim() === "()") { // empty meal
                 return null;
