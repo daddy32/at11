@@ -5,7 +5,10 @@ import puppeteer from "puppeteer";
 // Returns: { cookies: string, tracker: string }
 export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, tracker: string }> {
     const url = "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=2d9fcc59-e13a-4152-b6cb-d587e182dd1c&restaurant_uid=c5622c60-4cca-4961-acb4-a9c2a9a61006";
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     let tracker = "";
@@ -174,19 +177,22 @@ const junkPattern2 = /[A-Z]\d*:/g;
 function normalize(str: string): string {
     if (!str) return "";
 
+    console.log("[Bigger parser debug] Normalizing string:", str);
+
     // 1. Remove leading number and dash (e.g., "6 – ")
     // let s = str.replace(/^\s*\d+\s*[–-]\s*/, "");
 
     // 3. Replace all-uppercase dish name (with dashes, diacritics, spaces, unicode) before first parenthesis or end with Title Case
     let s = str.replace(
-        /([\p{Lu}\-’' ]+)(?=\s*\(|\s*$)/u,
-        (m) =>
-            m
+        /^(\s*\d+\s*[–-]\s*)([^\d(]+?)(?=(\s*[Aa]:|\s*\(|\d|$))/u,
+        (_, prefix, name) => {
+            const normalized = name
                 .toLocaleLowerCase("sk")
                 .replace(/(^|\s|-|’|')[\p{Ll}]/gu, (c) =>
                     c.toLocaleUpperCase("sk")
-                )
-                .trim()
+                );
+            return prefix + normalized;
+        }
     );
 
     // 4. Remove unmatched extra opening or closing parenthesis after dish name
@@ -204,10 +210,10 @@ function normalize(str: string): string {
         .trim()
         .capitalizeFirstLetter?.();
 
-    console.log("[Bigger parser debug] Normalizing string:", s);
     // 2. Remove extra parenthesis after dish name (e.g., "((..." -> "(")
     s = s.replace(/\s*\(\s*$/g, "");
-    console.log("[Bigger parser debug] After removing extra parenthesis:", s);
+
+    console.log("[Bigger parser debug] Normalized string:", s);
 
     return s
 }
