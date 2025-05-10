@@ -24,4 +24,17 @@ This file records architectural and implementation decisions made during the pro
   - Rationale: Well-established testing framework with good TypeScript integration
   - Implementation: Test directory with sample data and TypeScript test files
 
+## Recent Decisions
+
+* Advanced Web Scraping Implementation
+  - Decision: Integrate Puppeteer for complex menu fetching
+  - Rationale: Some restaurant websites require JavaScript execution and session management
+  - Implementation: Implemented in bigger.ts with session cookie handling and API interaction
+
+* Enhanced Debug Logging
+  - Decision: Add comprehensive debug logging throughout parser system
+  - Rationale: Improve troubleshooting and maintenance capabilities
+  - Implementation: Console logging with clear prefixes and detailed state information
+
 [2025-05-09 13:50:24] - Initial Memory Bank creation and documentation of existing architectural decisions
+[2025-05-10 14:22:00] - Added recent decisions regarding web scraping and logging improvements

@@ -20,13 +20,13 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
             const method = req.method();
             const postData = req.postData();
             if (method === "POST" && postData) {
-                console.log("[Puppeteer] Intercepted request:", url);
-                console.log("[Puppeteer] Payload:", postData);
+                // console.log("[Puppeteer] Intercepted request:", url);
+                // console.log("[Puppeteer] Payload:", postData);
                 try {
                     const parsed = JSON.parse(postData);
                     if (parsed.tracker) {
                         tracker = parsed.tracker;
-                        console.log("[Puppeteer] Found tracker in payload:", tracker);
+                        // console.log("[Puppeteer] Found tracker in payload:", tracker);
                     }
                 } catch (e) {
                     console.log("[Puppeteer] Failed to parse payload as JSON");
@@ -107,8 +107,8 @@ async function fetchCartDataWithCookies(cookies: string, tracker: string): Promi
         headers["Cookie"] = cookies;
     }
 
-    console.log("[Bigger parser debug] API request headers:", headers);
-    console.log("[Bigger parser debug] API request payload:", JSON.stringify(payload));
+    // console.log("[Bigger parser debug] API request headers:", headers);
+    // console.log("[Bigger parser debug] API request payload:", JSON.stringify(payload));
 
     const response = await fetch(url, {
         method: "POST",
@@ -162,7 +162,7 @@ export class Bigger implements IParser {
                 }
             }
 
-            console.log("[Bigger parser debug] Parsed menu items:", menu);
+            // console.log("[Bigger parser debug] Parsed menu items:", menu);
             doneCallback(menu);
         } catch (error) {
             console.error("[Bigger parser debug] Failed to fetch or parse Bigger menu:", error);
@@ -177,7 +177,7 @@ const junkPattern2 = /[A-Z]\d*:/g;
 function normalize(str: string): string {
     if (!str) return "";
 
-    console.log("[Bigger parser debug] Normalizing string:", str);
+    // console.log("[Bigger parser debug] Normalizing string:", str);
 
     // 1. Remove leading number and dash (e.g., "6 – ")
     // let s = str.replace(/^\s*\d+\s*[–-]\s*/, "");
@@ -213,7 +213,7 @@ function normalize(str: string): string {
     // 2. Remove extra parenthesis after dish name (e.g., "((..." -> "(")
     s = s.replace(/\s*\(\s*$/g, "");
 
-    console.log("[Bigger parser debug] Normalized string:", s);
+    // console.log("[Bigger parser debug] Normalized string:", s);
 
     return s
 }
