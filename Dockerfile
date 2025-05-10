@@ -40,6 +40,20 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    libglib2.0-0 \
+    libxshmfence1 \
+    libu2f-udev \
+    libvpx7 \
+    libxss1 \
+    libxtst6 \
+    libpci3 \
+    libwayland-client0 \
+    libwayland-cursor0 \
+    libwayland-egl1 \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libatspi2.0-0 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
