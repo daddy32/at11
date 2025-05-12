@@ -64,7 +64,9 @@ export class MenuFetcher {
             if (e) {
                 console.error("Error for %s: %s", url, e);
             }
-            doneCallbacks.forEach(dc => dc(e, m));
+            if (doneCallbacks) {
+                doneCallbacks.forEach(dc => dc(e, m));
+            }
         };
 
         Axios.get<string>(url, {

@@ -1,4 +1,4 @@
-FROM node:20 as builder
+FROM node:24-slim as builder
 ENV TZ=Europe/Kiev
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 RUN ls -la /usr/src/app/*
 
-FROM node:20-slim
+FROM node:24-slim
 
 # Ensure consistent npm version
 RUN npm install -g npm@11.3.0

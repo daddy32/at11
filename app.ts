@@ -5,7 +5,13 @@ import NodeCache from "node-cache";
 
 import { Config } from "./config";
 import { MenuFetcher, IMenuResult } from "./menuFetcher";
-import { isError } from "util";
+/**
+ * Node.js 20+ does not export isError from "util".
+ * Custom type guard for Error objects.
+ */
+function isError(value: unknown): value is Error {
+    return value instanceof Error;
+}
 import { sk } from "date-fns/locale";
 import { formatDistance, parse, isValid } from "date-fns";
 
