@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+Dockerfile
+docker_build.sh
+docker_run.sh
+.git
+.gitignore
+memory-bank
+test
+*.md
+*.log

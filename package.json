@@ -18,10 +18,10 @@
         "@types/hbs": "^4.0.1",
         "@types/mocha": "^10.0.0",
         "@types/node": "^18.7.23",
-        "@typescript-eslint/eslint-plugin": "^5.38.1",
-        "@typescript-eslint/parser": "^5.38.1",
-        "eslint": "^8.24.0",
-        "eslint-plugin-import": "^2.26.0",
+        "@typescript-eslint/eslint-plugin": "^7.0.0",
+        "@typescript-eslint/parser": "^7.0.0",
+        "eslint": "^8.56.0",
+        "eslint-plugin-import": "^2.29.0",
         "eslint-plugin-prefer-arrow": "^1.2.3",
         "mocha": "^10.0.0",
         "typescript": "^5.4.5"
@@ -85,5 +85,9 @@
         "node": ">=18.0.0"
     },
     "license": "Unlicense",
-    "main": "app.js"
+    "main": "app.js",
+    "overrides": {
+        "rimraf": "^5.0.0",
+        "glob": "^10.0.0"
+    }
 }

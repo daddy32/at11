@@ -24,7 +24,7 @@ export class LunchBreak implements IParser {
         // console.log(dayMenuElement.text())
         // console.log(dayMenuElement.length)
         if (dayMenuElement.length < 1) {
-          console.error(`No dayMenuElement found! Selector: "${selector}". Trying by date...`)
+          console.error(`LunchBreak: No dayMenuElement found! Selector: "${selector}". Trying by date...`)
           const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
           const selectorDate = `h5:contains("${targetDayDate}")`
           // console.log(` selectorDate: ${selectorDate}`)
