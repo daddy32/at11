@@ -87,3 +87,53 @@ Need to upgrade Cheerio from v0.22.0 to v1.0.0 to address a high-severity ReDoS 
 - Critical security vulnerability needs to be addressed
 - Cheerio 1.0.0 maintains core API compatibility
 - Testing strategy minimizes risk of breaking changes
+
+## 2025-10-05 23:34 - Punycode Deprecation Resolution
+
+### Decision
+Implement comprehensive solution to address Node.js punycode module deprecation warning and modernize URL handling.
+
+### Rationale
+1. Node.js DEP0040 warning indicates punycode module is deprecated
+2. Current Node.js version (16.13.x) is outdated
+3. URL handling needs modernization for international character support
+4. Existing URL sanitization can be enhanced with modern URL API
+
+### Implementation Strategy
+1. Node.js Update:
+   - Upgrade to Node.js 18+ for modern URL handling
+   - Update package.json engine requirements
+
+2. Dependency Updates:
+   - Update axios to v1.6.0+
+   - Upgrade node-fetch to v3.0.0+
+   - Ensure all dependencies use modern URL handling
+
+3. URL Handling Improvements:
+   - Enhance sanitizeUrl with URL API
+   - Add URL validation functionality
+   - Update menuFetcher.ts with validation checks
+
+### Risk Assessment
+1. Potential Impact:
+   - URL parsing behavior changes
+   - International character handling differences
+   - Integration with external services (e.g., scraper API)
+
+2. Mitigation:
+   - Comprehensive URL testing suite
+   - Staged deployment approach
+   - Rollback plan if issues arise
+
+### Success Criteria
+- No punycode deprecation warnings
+- Proper handling of international characters
+- All parsers functioning correctly
+- No regression in existing functionality
+[2025-05-12 11:24:38] - Decision: Standardize all Cheerio imports to `import * as cheerio from "cheerio";` after upgrading to Cheerio 1.x.
+Rationale: Cheerio 1.x uses ESM/CJS dual exports, and default import is not compatible with CommonJS output.
+Implementation Details: All parser files updated. Future upgrades must check import style and module type for all dependencies.
+
+[2025-05-12 11:24:38] - Decision: Downgrade node-fetch to 2.x for CommonJS compatibility.
+Rationale: node-fetch 3.x+ is ESM-only and breaks with require/dynamic import in CJS projects.
+Implementation Details: package.json set to node-fetch 2.6.9. If migrating to ESM in the future, node-fetch 3.x+ can be used.

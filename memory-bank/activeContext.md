@@ -1,14 +1,21 @@
 # Active Context
 
+This file tracks the project's current status, including recent changes, current goals, and open questions.
+2025-05-10 23:34 - Focused on punycode deprecation resolution
+
 ## Current Focus
-[2025-10-05 18:28] - Planning Cheerio library upgrade from v0.22.0 to v1.0.0 to address high-severity ReDoS vulnerability.
+- Addressing Node.js punycode module deprecation (DEP0040)
+- Planning Node.js version upgrade to 18+
+- Modernizing URL handling across the application
 
 ## Recent Changes
-- Created detailed implementation plan in cheerio-upgrade-plan.md
-- Documented architectural decision and impact analysis in decisionLog.md
-- Analyzed current Cheerio usage across all parser modules
+- Updated deprecation-fixes-plan.md with detailed punycode resolution strategy
+- Added comprehensive URL handling improvements to the plan
+- Documented architectural decision in decisionLog.md
+- Created staged implementation approach for safe deployment
 
 ## Open Questions/Issues
-- Verify backward compatibility of Cheerio v1.0.0 with current parser implementations
-- Monitor parser success rates during and after upgrade
-- Ensure proper error handling for any HTML parsing differences
+- Verify compatibility with Node.js 18+ across all dependencies
+- Test international character handling in updated URL system
+- Monitor integration with scraper API after URL handling changes
+- Assess impact on existing parsers and their URL handling

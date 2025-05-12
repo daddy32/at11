@@ -60,7 +60,8 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
 }
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
-import fetch, { Headers } from 'node-fetch';
+let fetch: typeof import('node-fetch').default | undefined;
+let Headers: typeof import('node-fetch').Headers | undefined;
 
 // Helper to extract cookies from Set-Cookie headers
 function extractCookies(setCookieHeaders: string[] | undefined): string {
@@ -73,6 +74,13 @@ function extractCookies(setCookieHeaders: string[] | undefined): string {
 
 // Fetches menu data from the API with all required headers and cookies
 async function fetchCartDataWithCookies(cookies: string, tracker: string): Promise<any> {
+    if (!fetch || !Headers) {
+        // Always use dynamic import to avoid ESM/CJS issues
+        const nodeFetch = await import('node-fetch');
+        fetch = nodeFetch.default;
+        Headers = nodeFetch.Headers;
+    }
+
     const url = "https://www.foodbooking.com/api/cart/init";
     const payload = {
         "#": null,
@@ -87,7 +95,7 @@ async function fetchCartDataWithCookies(cookies: string, tracker: string): Promi
         "tracker": tracker
     };
 
-    const headers = {
+    const headers: Record<string, string> = {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:138.0) Gecko/20100101 Firefox/138.0",
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en-GB,en;q=0.8,sk;q=0.5,en-US;q=0.3",
@@ -134,6 +142,11 @@ async function fetchCartDataWithCookies(cookies: string, tracker: string): Promi
 export class Bigger implements IParser {
     public async parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): Promise<void> {
         try {
+            // Defensive: html param is not used, but log if it's undefined for debugging
+            if (typeof html !== "string") {
+                console.error("[Bigger parser debug] Provided HTML is not a string or is undefined.");
+            }
+
             // Step 1: Use Puppeteer to get tracker (and cookies, if any)
             const { cookies, tracker } = await getSessionCookiesAndTracker();
 

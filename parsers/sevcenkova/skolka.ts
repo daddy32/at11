@@ -1,4 +1,4 @@
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import Axios from "axios";
 
 import { IMenuItem } from "../IMenuItem";

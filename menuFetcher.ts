@@ -3,6 +3,7 @@ import Axios from "axios";
 import { IConfig } from "./config";
 import { IMenuItem } from "./parsers/IMenuItem";
 import { IParser } from "./parsers/IParser";
+import { sanitizeUrl, isValidUrl } from "./parsers/parserUtil";
 import NodeCache from "node-cache";
 
 export interface IMenuResult {
@@ -16,7 +17,14 @@ export class MenuFetcher {
     constructor(private readonly _config: IConfig, private readonly _cache: NodeCache) { }
 
     public fetchMenu(urlFactory: (date: Date) => string, date: Date, parser: IParser, doneCallback: (result: IMenuResult) => void): void {
-        const url = urlFactory(date);
+        let url = urlFactory(date);
+        url = sanitizeUrl(url);
+
+        if (!isValidUrl(url)) {
+            doneCallback({ value: new Error("Invalid URL provided"), timestamp: new Date() });
+            return;
+        }
+
         const cacheKey = date + ":" + url;
         const cached = this._cache.get<IMenuResult>(cacheKey);
         if (cached && !this._config.bypassCache) {
@@ -36,7 +44,12 @@ export class MenuFetcher {
     private load(url: string, date: Date, parser: IParser, doneCallback: (error: Error, menu: IMenuItem[]) => void) {
         // on production (azure) use scraper api for zomato requests, otherwise zomato blocks them
         if (this._config.isProduction && url.search("zomato") >= 0) {
-            url = `http://api.scraperapi.com?api_key=${this._config.scraperApiKey}&url=${encodeURIComponent(url)}`;
+            url = sanitizeUrl(`http://api.scraperapi.com?api_key=${this._config.scraperApiKey}&url=${encodeURIComponent(url)}`);
+        }
+
+        if (!isValidUrl(url)) {
+            doneCallback(new Error("Invalid URL provided"), null);
+            return;
         }
 
         if (this._runningRequests[url]) { // if request is already running, just add additional callback
@@ -86,6 +99,9 @@ export class MenuFetcher {
                     done(err, null);
                 }
             }
-        }).catch(error => done(error, null));
+        }).catch(error => {
+            console.error("Axios request failed for %s: %s", url, error && error.message ? error.message : error);
+            done(error, null);
+        });
     }
 }

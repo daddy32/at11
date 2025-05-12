@@ -31,3 +31,6 @@ This file documents recurring patterns and standards used in the project.
 
 [2025-05-09 13:50:13] - Initial Memory Bank creation
 [2025-05-10 14:21:00] - Updated with new parser patterns and architectural improvements
+[2025-05-12 11:24:25] - Cheerio upgraded from 0.22.0 to 1.0.0. All parser imports must use `import * as cheerio from "cheerio";` for compatibility with Cheerio 1.x and CommonJS output. Default imports (`import cheerio from "cheerio";`) will break at runtime.
+[2025-05-12 11:24:25] - node-fetch downgraded to 2.x to ensure CommonJS compatibility for all parsers. node-fetch 3.x+ is ESM-only and will not work with CommonJS output.
+[2025-05-12 11:24:25] - When upgrading dependencies in the future, always verify module type (ESM vs CJS) and adjust import style and/or dependency version accordingly.

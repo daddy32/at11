@@ -1,6 +1,6 @@
 import type { Cheerio, CheerioAPI } from "cheerio";
 import type { Element } from "domhandler";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 import { IMenuItem } from "./IMenuItem";
 import { getDateRegex } from "./parserUtil";
@@ -8,6 +8,9 @@ import { getDateRegex } from "./parserUtil";
 
 export abstract class Menucka {
     protected parseBase(html: string, date: Date): IMenuItem[] {
+        if (!html || typeof html !== "string") {
+            return [];
+        }
         const $ = cheerio.load(html);
         const dateRegex = getDateRegex(date);
 

@@ -69,3 +69,28 @@ export function compareMenuItems(first: IMenuItem, second: IMenuItem): number {
     const s = second.isSoup ? 0 : 1;
     return f - s;
 }
+// Sanitizes and encodes URLs to prevent unescaped character errors
+export function sanitizeUrl(url: string): string {
+    try {
+        // Prefer modern URL API for robust parsing and encoding
+        const parsedUrl = new URL(url);
+        return parsedUrl.toString();
+    } catch {
+        // fallback: encode as-is
+        try {
+            return encodeURI(decodeURI(url));
+        } catch {
+            return encodeURI(url);
+        }
+    }
+}
+
+// Validates if a string is a well-formed URL
+export function isValidUrl(url: string): boolean {
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+}

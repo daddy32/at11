@@ -1,6 +1,6 @@
 import type { Cheerio } from "cheerio";
 import type { Element } from "domhandler";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";

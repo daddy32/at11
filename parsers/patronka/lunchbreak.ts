@@ -1,4 +1,4 @@
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
