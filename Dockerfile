@@ -1,6 +1,9 @@
-FROM node:18 as builder
+FROM node:20 as builder
 ENV TZ=Europe/Kiev
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Ensure consistent npm version
+RUN npm install -g npm@11.3.0
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -15,7 +18,10 @@ COPY . .
 RUN npm run build
 RUN ls -la /usr/src/app/*
 
-FROM node:18-slim
+FROM node:20-slim
+
+# Ensure consistent npm version
+RUN npm install -g npm@11.3.0
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -77,7 +83,7 @@ RUN apt-get update && apt-get install -y \
 # Install app dependencies
 COPY package*.json ./
 
-RUN npm ci --production
+RUN npm ci --omit=dev
 
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/static ./static
