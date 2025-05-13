@@ -1,4 +1,8 @@
 import puppeteer from "puppeteer";
+import { IMenuItem } from "../IMenuItem";
+import { IParser } from "../IParser";
+let fetch: typeof import('node-fetch').default | undefined;
+let Headers: typeof import('node-fetch').Headers | undefined;
 
 // Helper to bootstrap session cookies and tracker using Puppeteer
 // Usage: await getSessionCookiesAndTracker()
@@ -58,19 +62,6 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
     await browser.close();
     return { cookies, tracker };
 }
-import { IMenuItem } from "../IMenuItem";
-import { IParser } from "../IParser";
-let fetch: typeof import('node-fetch').default | undefined;
-let Headers: typeof import('node-fetch').Headers | undefined;
-
-// Helper to extract cookies from Set-Cookie headers
-function extractCookies(setCookieHeaders: string[] | undefined): string {
-    if (!setCookieHeaders) return "";
-    return setCookieHeaders
-        .map(cookieStr => cookieStr.split(";")[0])
-        .join("; ");
-}
-
 
 // Fetches menu data from the API with all required headers and cookies
 async function fetchCartDataWithCookies(cookies: string, tracker: string): Promise<any> {
@@ -162,14 +153,15 @@ export class Bigger implements IParser {
             const menu: IMenuItem[] = [];
             for (const category of apiData.restaurant.menu.categories) {
                 if (!category.items || !Array.isArray(category.items)) continue;
+                const isSoupCat = isSoupCategory(category);
                 for (const item of category.items) {
                     if (!item.name || typeof item.price !== "number") continue;
                     // Normalize name and description
                     const text = normalize(item.name);
                     const desc = item.description ? normalize(item.description) : "";
                     menu.push({
-                        isSoup: false,
-                        text: desc ? `${text} <small>(${desc})</small>` : text,
+                        isSoup: isSoupCat,
+                        text: isSoupCat || !desc ? text : `${text} <small>(${desc})</small>`,
                         price: item.price
                     });
                 }
@@ -182,6 +174,25 @@ export class Bigger implements IParser {
             doneCallback([]);
         }
     }
+}
+
+// --- Soup detection helpers ---
+function isSoupCategory(category: any): boolean {
+    return matchesSoupId(category.id) || matchesSoupName(category.name);
+}
+
+function matchesSoupId(id: number): boolean {
+    // Add more known soup category IDs if needed
+    const knownSoupIds = [2622837];
+    return knownSoupIds.includes(id);
+}
+
+function matchesSoupName(name: string): boolean {
+    if (typeof name !== "string") return false;
+    // Match "polievka", "polievok", etc., case-insensitive, with/without diacritics
+    // Accepts e.g. "Denná ponuka polievok", "Polievka", etc.
+    const soupPattern = /polievk[ay]?/i;
+    return soupPattern.test(name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 }
 
 // Normalization helpers (copied from previous version)
