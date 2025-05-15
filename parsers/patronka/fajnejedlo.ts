@@ -23,13 +23,12 @@ export class FajneJedlo implements IParser {
       let rawText = ocrResult.data.text;
 
       // Dump raw OCR text for debugging.
-      fs.writeFileSync("fajnejedlo-ocr-debug.txt", rawText, "utf-8");
-
+      /* fs.writeFileSync("fajnejedlo-ocr-debug.txt", rawText, "utf-8"); // Debug output disabled */
       // Post-process the OCR text.
-      console.log("[OCR DEBUG] raw: ", rawText);
+      /* console.log("[OCR DEBUG] raw: ", rawText); // Debug output disabled */
       let normalizedText = rawText.tidyAfterOCR();
       normalizedText = normalizedText.normalizeWhitespace();
-      console.log("[OCR DEBUG] normalized: ", normalizedText);
+      /* console.log("[OCR DEBUG] normalized: ", normalizedText); // Debug output disabled */
 
       // Extract menu items for the given date.
       const items: IMenuItem[] = extractMenuFromText(rawText, date);

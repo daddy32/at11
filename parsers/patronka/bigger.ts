@@ -135,7 +135,7 @@ export class Bigger implements IParser {
         try {
             // Defensive: html param is not used, but log if it's undefined for debugging
             if (typeof html !== "string") {
-                console.error("[Bigger parser debug] Provided HTML is not a string or is undefined.");
+                /* console.error("[Bigger parser debug] Provided HTML is not a string or is undefined."); // Debug output disabled */
             }
 
             // Step 1: Use Puppeteer to get tracker (and cookies, if any)
@@ -145,7 +145,7 @@ export class Bigger implements IParser {
             const apiData = await fetchCartDataWithCookies(cookies, tracker);
 
             if (!apiData || !apiData.restaurant || !apiData.restaurant.menu || !Array.isArray(apiData.restaurant.menu.categories)) {
-                console.error("[Bigger parser debug] API response missing menu categories", apiData);
+                /* console.error("[Bigger parser debug] API response missing menu categories", apiData); // Debug output disabled */
                 doneCallback([]);
                 return;
             }
@@ -170,7 +170,7 @@ export class Bigger implements IParser {
             // console.log("[Bigger parser debug] Parsed menu items:", menu);
             doneCallback(menu);
         } catch (error) {
-            console.error("[Bigger parser debug] Failed to fetch or parse Bigger menu:", error);
+            /* console.error("[Bigger parser debug] Failed to fetch or parse Bigger menu:", error); // Debug output disabled */
             doneCallback([]);
         }
     }
