@@ -14,6 +14,7 @@ import { Bigger } from "./parsers/patronka/bigger";
 import { LunchBreak } from "./parsers/patronka/lunchbreak";
 import { FajneJedlo } from "./parsers/patronka/fajnejedlo";
 import { Dummy } from "./parsers/patronka/dummy";
+import { Mdvsr } from "./parsers/patronka/mdvsr";
 
 export interface IConfig {
     readonly isProduction: boolean;
@@ -85,9 +86,9 @@ export class Config implements IConfig {
                 parser: new LunchBreak()
             },
             {
-                id: 10, name: "Jedáleň MDV SR (link)",
+                id: 10, name: "Jedáleň MDV SR",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
-                parser: new Dummy() // TODO: parser
+                parser: new Mdvsr()
             },
             {
                 id: 3, name: "Patrónsky pivovar",
