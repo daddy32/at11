@@ -53,6 +53,7 @@ function extractMenuFromText(text: string, date: Date): IMenuItem[] {
       .replace(/["]+$/, "") // Remove trailing quotes
       .replace(/\s+a$/, "") // Remove trailing ' a' if present
       .removeAlergens?.()
+      .removeOCRArtifacts?.()
       .removeMetrics?.()
       .trim()
       .capitalizeFirstLetter?.();

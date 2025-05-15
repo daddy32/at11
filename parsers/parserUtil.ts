@@ -9,8 +9,21 @@ declare global {
         correctCommaSpacing: () => string;
         capitalizeFirstLetter: () => string;
         removeItemNumbering: () => string;
+        removeOCRArtifacts: () => string;
     }
 }
+
+// Removes common OCR artifacts at the end of menu items
+String.prototype.removeOCRArtifacts = function() {
+    let s = this.trim();
+    // Remove trailing number-dot sequences (e.g. " 1.3.", " 2.1. ")
+    s = s.replace(/(\s*\d{1,2}(\.\d{1,2})+\.*\s*)$/g, "");
+    // Remove trailing 1-3 uppercase letter words (e.g. " Ť", " TE", " ABC")
+    s = s.replace(/(\s+[A-ZÁČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ]{1,3})+$/u, "");
+    // Remove trailing single uppercase letter with possible punctuation (e.g. " Ť.", " T,")
+    s = s.replace(/(\s+[A-ZÁČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ][.?!,;:]*)+$/u, "");
+    return s.trim();
+};
 
 export function parsePrice(item: string): { price: number, text: string} {
     const priceRegex = /(\d+(?:[.,]\d+)?)[.,]?\s*(?:€|Eur)/ig;
