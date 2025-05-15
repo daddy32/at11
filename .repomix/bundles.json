@@ -1,0 +1,33 @@
+{
+  "bundles": {
+    "selected-331": {
+      "name": "selected",
+      "created": "2025-05-15T06:57:10.287Z",
+      "lastUsed": "2025-05-15T06:58:05.855Z",
+      "tags": [],
+      "files": [
+        "parsers/patronka/bigger.ts",
+        "memory-bank",
+        "parsers/patronka/dummy.ts",
+        "parsers/patronka/foodseason.ts",
+        "parsers/BaseParser.ts",
+        "parsers/IMenuItem.ts",
+        "parsers/IParser.ts",
+        "parsers/menucka.ts",
+        "parsers/parserUtil.ts",
+        "parsers/sme.ts",
+        "parsers/zomato.ts",
+        "static",
+        "views/index.html",
+        "app.ts",
+        "config.ts",
+        "Dockerfile",
+        "menuFetcher.ts",
+        "package-lock.json",
+        "package.json",
+        "README.md",
+        "tsconfig.json"
+      ]
+    }
+  }
+}
