@@ -96,7 +96,7 @@ export class Config implements IConfig {
                 parser: new PatronskyPivovar()
             },
             {
-                id: 11, name: "Fajne jedlo (obrázok)",
+                id: 11, name: "Fajne jedlo (OCR)",
                 urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
                 parser: new FajneJedlo()
             },

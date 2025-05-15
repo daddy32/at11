@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import * as cheerio from "cheerio";
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
 import Tesseract from "tesseract.js";
@@ -11,14 +11,12 @@ import "../parserUtil";
 export class FajneJedlo implements IParser {
   public async parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): Promise<void> {
     try {
-      const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-      const page = await browser.newPage();
-      await page.goto("https://fajnejedlo.sk/menu-tyzdnove-bistro/", { waitUntil: "networkidle2" });
-
-      // Use the first image inside #content section (menu image)
-      const imageUrl = await page.$eval("section#content img", (el: any) => el.getAttribute("src"));
+      // Use Cheerio to extract the image URL from the provided HTML
+      const $ = cheerio.load(html);
+      const img = $("section#content img").first();
+      const imageUrl = img.attr("src");
+      if (!imageUrl) throw new Error("Menu image not found in HTML");
       const fullUrl = imageUrl.startsWith("http") ? imageUrl : `https://fajnejedlo.sk${imageUrl}`;
-      await browser.close();
 
       const response = await axios.get(fullUrl, { responseType: "arraybuffer" });
       const ocrResult = await Tesseract.recognize(response.data, "slk");
@@ -28,9 +26,10 @@ export class FajneJedlo implements IParser {
       fs.writeFileSync("fajnejedlo-ocr-debug.txt", rawText, "utf-8");
 
       // Post-process the OCR text.
-      rawText = rawText.tidyAfterOCR();
-      rawText = rawText.normalizeWhitespace();
-      console.log("[OCR DEBUG]", rawText);
+      console.log("[OCR DEBUG] raw: ", rawText);
+      let normalizedText = rawText.tidyAfterOCR();
+      normalizedText = normalizedText.normalizeWhitespace();
+      console.log("[OCR DEBUG] normalized: ", normalizedText);
 
       // Extract menu items for the given date.
       const items: IMenuItem[] = extractMenuFromText(rawText, date);
