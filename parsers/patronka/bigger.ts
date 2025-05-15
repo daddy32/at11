@@ -209,13 +209,13 @@ function normalize(str: string): string {
     // 3. Replace all-uppercase dish name (with dashes, diacritics, spaces, unicode) before first parenthesis or end with Title Case
     let s = str.replace(
         /^(\s*\d+\s*[–-]\s*)([^\d(]+?)(?=(\s*[Aa]:|\s*\(|\d|$))/u,
-        (_, prefix, name) => {
+        (_, _prefix, name) => {
             const normalized = name
                 .toLocaleLowerCase("sk")
                 .replace(/(^|\s|-|’|')[\p{Ll}]/gu, (c) =>
                     c.toLocaleUpperCase("sk")
                 );
-            return prefix + normalized;
+            return normalized;
         }
     );
 
