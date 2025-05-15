@@ -12,6 +12,7 @@ import { Bigger } from "./parsers/patronka/bigger";
 // import { Foodseason } from "./parsers/patronka/foodseason";
 // import { Bemi } from "./parsers/patronka/bemi";
 import { LunchBreak } from "./parsers/patronka/lunchbreak";
+import { FajneJedlo } from "./parsers/patronka/fajnejedlo";
 import { Dummy } from "./parsers/patronka/dummy";
 
 export interface IConfig {
@@ -40,7 +41,7 @@ export class Config implements IConfig {
     public readonly bypassCache: boolean = process.env.AT11_NO_CACHE === "true";
     public readonly cacheExpiration = 2 * 60 * 60; // 2h
     public readonly requestTimeout = 15 * 1000; // 15s
-    public readonly parserTimeout = 15 * 1000; // 15s
+    public readonly parserTimeout = 60 * 1000; // 60s (increased for OCR parsers)
     public readonly restaurants = new Map<string, ReadonlyArray<{
          id: number,
          name: string,
@@ -95,9 +96,9 @@ export class Config implements IConfig {
                 parser: new PatronskyPivovar()
             },
             {
-                id: 11, name: "Fajne jedlo (link)",
+                id: 11, name: "Fajne jedlo (obrázok)",
                 urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
-                parser: new Dummy() // TODO: Parser? Je tam len obrazok a docx... Mozno embed obrazku? Zaberie ale vela miesta...
+                parser: new FajneJedlo()
             },
         ]]
     ])

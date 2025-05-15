@@ -26,3 +26,5 @@ dist
 /.vs/at11_patronka/v16/.suo
 /.roo/roo-code-settings.json
 /repomix-output.txt
+/fajnejedlo-ocr-debug.txt
+/slk.traineddata
