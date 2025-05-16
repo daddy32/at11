@@ -8,6 +8,7 @@
         "cheerio": "^1.0.0",
         "date-fns": "^2.29.3",
         "express": "^4.18.1",
+        "fuzzball": "^2.2.2",
         "hbs": "^4.2.0",
         "node-cache": "^5.1.2",
         "node-fetch": "2.6.9",
