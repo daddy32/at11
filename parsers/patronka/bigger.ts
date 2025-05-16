@@ -51,9 +51,9 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
 
     // Log cookies and HTML for inspection
     // Print cookies and HTML to process.stdout directly for visibility
-    process.stdout.write("[Puppeteer] Cookies after page load: " + cookies + "\n");
+    // process.stdout.write("[Puppeteer] Cookies after page load: " + cookies + "\n");
     const html = await page.content();
-    process.stdout.write("[Puppeteer] HTML after page load (first 2000 chars):\n" + html.slice(0, 2000) + "\n");
+    // process.stdout.write("[Puppeteer] HTML after page load (first 2000 chars):\n" + html.slice(0, 2000) + "\n");
 
     if (!tracker) {
         throw new Error("Could not extract tracker from Puppeteer session.");
