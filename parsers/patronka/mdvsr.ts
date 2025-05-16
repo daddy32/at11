@@ -72,7 +72,7 @@ export class Mdvsr implements IParser {
                     price < 1 || price > 20 // only keep reasonable prices
                 ) continue;
 
-                const isSoup = /polievka/i.test(line) || i === 0;
+                const isSoup = /polievka/i.test(line) || i <= 2;
                 menu.push({ text, price: NaN, isSoup });
             }
 
