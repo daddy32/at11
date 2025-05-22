@@ -79,6 +79,7 @@ export class Config implements IConfig {
                 id: 8, name: "Bigger",
                 urlFactory: _ => "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=2d9fcc59-e13a-4152-b6cb-d587e182dd1c&restaurant_uid=c5622c60-4cca-4961-acb4-a9c2a9a61006",
                 parser: new Bigger()
+                // TODO: Parsing cien
             },
             {
                 id: 9, name: "Lunch Break Westend Plazza",
@@ -89,6 +90,7 @@ export class Config implements IConfig {
                 id: 10, name: "Jedáleň MDV SR",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
                 parser: new Mdvsr()
+                // TODO: Parsing cien
             },
             {
                 id: 3, name: "Patrónsky pivovar",
