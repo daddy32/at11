@@ -48,19 +48,23 @@ export class LunchBreak implements IParser {
 
         // --- Soup section fix ---
         let inSoupSection = false;
+        let lastMenuItemText: string | null = null;
         parentElement.find("div>p").each(function() {
           prevText = text;
           text = $(this).text();
-          if (!text.trim()) {
+          if (!text.trim() || text.trim() === "\u00A0" || text.trim().toLowerCase() === "&nbsp;") {
+            // whitespace-only line: do not clear lastMenuItemText, just skip
             return;
           }
           // Section header detection (any line containing "MENU", case-insensitive)
           if (/MENU/i.test(text)) {
             inSoupSection = false;
+            lastMenuItemText = null;
             return; // do not process this line as soup
           }
           if (text.match(soupPattern)) {
             inSoupSection = true;
+            lastMenuItemText = null;
             return;
           }
           if (inSoupSection) {
@@ -77,28 +81,32 @@ export class LunchBreak implements IParser {
 
           const priceMatch = text.match(pricePattern);
           if (priceMatch) {
-            // console.log("\tpricePattern matched");
+            // Try to pair with last non-empty menu item text
             try {
               const pricenum = parseFloat(priceMatch[1].replace(/\s+/, "").replace(",", "."));
               price = pricenum;
-              text = normalize(prevText);
-              // console.log(`text: "${text}"`)
-              // console.log(`price: "${price}"`)
-              if (text.length == 0) {
-                // console.log(`\tEmpty text, dropping.`);
-                // console.log("------------------------");
+              let itemText = lastMenuItemText ? normalize(lastMenuItemText) : normalize(prevText);
+              // If itemText is empty, fallback to prevText or skip
+              if (!itemText || itemText.length === 0) {
+                itemText = normalize(prevText);
+              }
+              if (itemText.length == 0) {
+                // If still empty, fail gracefully: skip adding, but do not crash
                 return;
               }
               dayMenu.push({
                 isSoup: false,
-                text: text,
+                text: itemText,
                 price: price
               });
+              lastMenuItemText = null; // reset after pairing
             } catch (err) {
               // console.warn("\t\tprice not parsed");
+              lastMenuItemText = null;
             }
           } else {
-            // console.log("\tpricePattern not matched");
+            // Not a price: remember as possible menu item
+            lastMenuItemText = text;
           }
           // console.log("------------------------");
         });
