@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 
+import "../parserUtil";
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
 import { format } from "date-fns";
@@ -45,31 +46,32 @@ export class LunchBreak implements IParser {
         var prevText = ""
         var price = NaN;
 
+        // --- Soup section fix ---
+        let inSoupSection = false;
         parentElement.find("div>p").each(function() {
           prevText = text;
           text = $(this).text();
           if (!text.trim()) {
             return;
           }
-          // console.log(`text: "${text}"`);
-          if (dropJunk.test(text)) {
-            // console.log("\tdropJunk");
-            // console.log("------------------------");
-            return;
-          } else {
-            // console.log("\tdropJunk not matched");
+          // Section header detection (any line containing "MENU", case-insensitive)
+          if (/MENU/i.test(text)) {
+            inSoupSection = false;
+            return; // do not process this line as soup
           }
-
-          if (prevText.match(soupPattern)) {
-            // console.log("\tsoupPattern matched on prevText");
-            text.split("/").forEach(function (item) {
+          if (text.match(soupPattern)) {
+            inSoupSection = true;
+            return;
+          }
+          if (inSoupSection) {
+            // skip price lines and empty lines
+            if (!pricePattern.test(text) && !dropJunk.test(text)) {
               dayMenu.push({
                 isSoup: true,
-                text: normalize(item),
+                text: normalize(text),
                 price: NaN
               });
-            });
-            // console.log("------------------------");
+            }
             return;
           }
 
