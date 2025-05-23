@@ -110,8 +110,8 @@ export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
   while ((menuMatch = menuRegex.exec(daySection)) !== null) {
     // Join wrapped lines and normalize whitespace
     let joined = menuMatch[1].replace(/\r?\n\s*/g, " ");
-    // Fix word splits: e.g., "m äso" -> "mäso"
-    joined = joined.replace(/(\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
+    // Fix word splits: only join if the first part is a single letter (e.g., "m äso" -> "mäso")
+    joined = joined.replace(/(\b\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
     mains.push({ isSoup: false, text: normalize(joined), price: 0 });
   }
   // Exklusiv lines
@@ -121,8 +121,8 @@ export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
   while ((exklMatch = exklRegex.exec(daySection)) !== null) {
     // Join wrapped lines and normalize whitespace
     let joined = exklMatch[1].replace(/\r?\n\s*/g, " ");
-    // Fix word splits: e.g., "m äso" -> "mäso"
-    joined = joined.replace(/(\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
+    // Fix word splits: only join if the first part is a single letter (e.g., "m äso" -> "mäso")
+    joined = joined.replace(/(\b\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
     mains.push({ isSoup: false, text: normalize(joined), price: 0 });
   }
 
