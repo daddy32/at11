@@ -115,10 +115,15 @@ export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
     mains.push({ isSoup: false, text: normalize(joined), price: 0 });
   }
   // Exklusiv lines
-  const exklRegex = /^Exklusiv\s+(.+)$/gim;
+  // Match Exklusiv lines, including wrapped lines and optional colon (lines not starting with MENU, Exklusiv, Polievka)
+  const exklRegex = /^Exklusiv[:\s]+\s*((?:.+(?:\r?\n(?!\s*(?:MENU|Exklusiv|Polievka|\w+ok|\w+tok|\w+eda|\w+atok)).+)*)+)/gim;
   let exklMatch;
   while ((exklMatch = exklRegex.exec(daySection)) !== null) {
-    mains.push({ isSoup: false, text: normalize(exklMatch[1]), price: 0 });
+    // Join wrapped lines and normalize whitespace
+    let joined = exklMatch[1].replace(/\r?\n\s*/g, " ");
+    // Fix word splits: e.g., "m äso" -> "mäso"
+    joined = joined.replace(/(\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
+    mains.push({ isSoup: false, text: normalize(joined), price: 0 });
   }
 
   return [...soups, ...mains];
