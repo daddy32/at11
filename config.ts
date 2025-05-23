@@ -90,7 +90,6 @@ export class Config implements IConfig {
                 id: 10, name: "Jedáleň MDV SR",
                 urlFactory: _ => "http://intelsys.sk/jedalnylistok.pdf",
                 parser: new Mdvsr()
-                // TODO: Parsing cien
             },
             {
                 id: 3, name: "Patrónsky pivovar",

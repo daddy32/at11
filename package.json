@@ -22,6 +22,7 @@
         "@types/hbs": "^4.0.1",
         "@types/mocha": "^10.0.0",
         "@types/node": "^18.7.23",
+        "@types/sinon": "^17.0.4",
         "@typescript-eslint/eslint-plugin": "^7.0.0",
         "@typescript-eslint/parser": "^7.0.0",
         "chai": "^5.2.0",
@@ -29,6 +30,7 @@
         "eslint-plugin-import": "^2.29.0",
         "eslint-plugin-prefer-arrow": "^1.2.3",
         "mocha": "^10.0.0",
+        "sinon": "^20.0.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
     },

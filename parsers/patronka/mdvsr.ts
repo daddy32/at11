@@ -19,37 +19,48 @@ export class Mdvsr implements IParser {
             const rawText = (await pdf(response.data)).text;
 
             const dayName = format(date, "EEEE", { locale: sk }).toLowerCase();
+            // console.log("DEBUG: dayName:", dayName);
 
             const lines = extractDayLines(rawText, dayName);
+            // console.log("DEBUG: lines after extractDayLines:", lines);
 
             // Merge price lines into previous dish line (append only price, not portion/weight)
             const merged: string[] = [];
             const priceRegex = /(\d{1,3}(?:[.,]\d{2}))\s*€?/g;
-            for (const line of lines) {
-                // Looks like a price/portion line (contains € or matches price pattern, but not a dish)
+            let i = 0;
+            while (i < lines.length) {
+                const line = lines[i];
+                // If next line contains a price, merge it into this line
                 if (
-                    merged.length > 0 &&
-                    priceRegex.test(line) &&
-                    !/\p{L}/u.test(line.replace(/[€,.]/g, "")) // no letters except currency
+                    i + 1 < lines.length &&
+                    priceRegex.test(lines[i + 1])
                 ) {
-                    // Extract only the price part (last match)
-                    let match, lastMatch = null;
-                    while ((match = priceRegex.exec(line)) !== null) {
-                        lastMatch = match[0];
-                    }
-                    if (lastMatch) {
-                        merged[merged.length - 1] += " " + lastMatch;
-                    }
-                } else {
-                    merged.push(line);
+                    // Always merge the next line if it contains a price, regardless of allergens or extra tokens
+                    merged.push(line + " " + lines[i + 1]);
+                    i += 2;
+                    continue;
                 }
+                merged.push(line);
+                i += 1;
             }
 
+            // Post-process merged lines: merge price-only lines into previous line
+            for (let j = 1; j < merged.length; ) {
+                if (!/(\d{1,3}(?:[.,]\d{2}))\s*€/.test(merged[j - 1]) && /(\d{1,3}(?:[.,]\d{2}))\s*€/.test(merged[j])) {
+                    merged[j - 1] += " " + merged[j];
+                    merged.splice(j, 1);
+                } else {
+                    j++;
+                }
+            }
+            // console.log("DEBUG: merged lines after merging:", merged);
             const menu: IMenuItem[] = [];
             for (const [i, line] of merged.entries()) {
-                // Extract last price from the merged line
+                // DEBUG: Output merged line and price extraction to console
+                // console.log("DEBUG: merged line:", line);
                 let price = NaN;
-                let priceMatch = [...line.matchAll(/(\d{1,3}(?:[.,]\d{2}))\s*€?/g)];
+                let priceMatch = [...line.matchAll(/(\d{1,3}(?:[.,]\d{2}))\s*€/g)];
+                // console.log("DEBUG: priceMatch:", priceMatch);
                 if (priceMatch.length > 0) {
                     const last = priceMatch[priceMatch.length - 1][1];
                     price = parseFloat(last.replace(",", "."));
@@ -63,6 +74,7 @@ export class Mdvsr implements IParser {
                     .replace(/\b\d{1,3}(?:,\d{1,3})*(?:ks)?\b/gi, "") // remove portion/weight info
                     .removeMetrics()
                     .capitalizeFirstLetter()
+                    .replace(/[\s,]+$/, "") // remove trailing commas and whitespace
                     .trim();
 
                 // Drop lines that are just numbers/commas/ks or empty after cleaning
@@ -72,13 +84,17 @@ export class Mdvsr implements IParser {
                     price < 1 || price > 20 // only keep reasonable prices
                 ) continue;
 
-                const isSoup = /polievka/i.test(line) || i <= 2;
-                menu.push({ text, price: NaN, isSoup });
+                // Only first two items are soup for PIATOK, or if text contains "polievka"
+                const isSoup = /polievka/i.test(line) || i < 2;
+                menu.push({ text, price, isSoup });
             }
+            // REMOVE DUPLICATE MENU LOOP AND DECLARATION
 
             doneCallback(menu);
         } catch (e) {
-            console.error("[MDV SR parser] Error:", e);
+            try {
+                require("fs").writeFileSync("parser-error-debug.txt", String(e), { encoding: "utf8" });
+            } catch (_) {}
             doneCallback([]);
         }
     }
