@@ -201,13 +201,16 @@ const junkPattern2 = /[A-Z]\d*:/g;
 function normalize(str: string): string {
     if (!str) return "";
 
+    // Remove leading "Zloženie:" (with optional whitespace)
+    let s = str.replace(/^Zloženie:\s*/i, "");
+
     // console.log("[Bigger parser debug] Normalizing string:", str);
 
     // 1. Remove leading number and dash (e.g., "6 – ")
     // let s = str.replace(/^\s*\d+\s*[–-]\s*/, "");
 
     // 3. Replace all-uppercase dish name (with dashes, diacritics, spaces, unicode) before first parenthesis or end with Title Case
-    let s = str.replace(
+    s = s.replace(
         /^(\s*\d+\s*[–-]\s*)([^\d(]+?)(?=(\s*[Aa]:|\s*\(|\d|$))/u,
         (_, _prefix, name) => {
             const normalized = name
