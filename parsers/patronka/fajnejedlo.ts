@@ -40,7 +40,7 @@ export class FajneJedlo implements IParser {
   }
 }
 
-function extractMenuFromText(text: string, date: Date): IMenuItem[] {
+export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
   // Helper: Slovak day names as they appear in OCR
   const dayNames = [
     "Pondelok", "Utorok", "Streda", "Stvrtok", "Štvrtok", "Piatok"
@@ -104,10 +104,15 @@ function extractMenuFromText(text: string, date: Date): IMenuItem[] {
     mains.push({ isSoup: false, text: special, price: 0 });
   }
   // MENU lines
-  const menuRegex = /^MENU\s*\d*\s*(.+)$/gim;
+  // Match MENU lines, including wrapped lines (lines not starting with MENU, Exklusiv, Polievka)
+  const menuRegex = /^MENU\s*\d*\s*((?:.+(?:\r?\n(?!\s*(?:MENU|Exklusiv|Polievka|\w+ok|\w+tok|\w+eda|\w+atok)).+)*)+)/gim;
   let menuMatch;
   while ((menuMatch = menuRegex.exec(daySection)) !== null) {
-    mains.push({ isSoup: false, text: normalize(menuMatch[1]), price: 0 });
+    // Join wrapped lines and normalize whitespace
+    let joined = menuMatch[1].replace(/\r?\n\s*/g, " ");
+    // Fix word splits: e.g., "m äso" -> "mäso"
+    joined = joined.replace(/(\w)\s+([aáäeéiíoóuúyýžščřďťňĺľŕ])/gi, "$1$2");
+    mains.push({ isSoup: false, text: normalize(joined), price: 0 });
   }
   // Exklusiv lines
   const exklRegex = /^Exklusiv\s+(.+)$/gim;
