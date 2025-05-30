@@ -41,4 +41,40 @@ describe("Mdvsr parser (PDF price extraction)", function () {
             expect(menu[i].price).to.be.closeTo(expected[i].price, 0.01);
         }
     });
+
+    describe("Mdvsr parser (PDF price extraction)", function () {
+        it("should extract all items for PIATOK (30.05.2025)", async function () {
+            // Arrange: stub axios.get to return local PDF buffer
+            const pdfPath = path.resolve(process.cwd(), "test/samples/jedalnylistok_2025-05-30.pdf");
+            const pdfBuffer = fs.readFileSync(pdfPath);
+            const axiosStub = sinon.stub(axios, "get").resolves({ data: pdfBuffer });
+
+            const parser = new Mdvsr();
+            const date = new Date("2025-05-30T10:00:00+02:00");
+            let menu: IMenuItem[] = [];
+            await parser.parse("", date, (result) => { menu = result; });
+
+            // Clean up stub
+            axiosStub.restore();
+
+            // Assert: menu items and prices for PIATOK
+            const expected = [
+                { text: "Fazuľová na kyslo", price: 1.00 },
+                { text: "Kelová so zemiakmi", price: 1.00 },
+                { text: "Marinovaný losos, dusená zelenina, pečené zemiaky", price: 6.00 },
+                { text: "Pečené sedliacke bravčové rebro na kapustných strapačkách", price: 5.00 },
+                { text: "Kurací paprikáš, maslové halušky", price: 5.00 },
+                { text: "Domáce pirohy so slivkovým lekvárom a opečenou škoricovou strúhankou", price: 5.00 },
+                { text: "Grilovaná bravčová panenka s pečeným cesnakom, pečená zelenina", price: 5.00 }
+            ];
+
+            // Check that all expected items are present in the parsed menu
+            for (const exp of expected) {
+                const found = menu.find(
+                    m => m.text.includes(exp.text) && Math.abs(m.price - exp.price) < 0.01
+                );
+                expect(found, `Missing: ${exp.text} ${exp.price}`).to.exist;
+            }
+        });
+    });
 });

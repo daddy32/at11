@@ -30,12 +30,11 @@ export class Mdvsr implements IParser {
             let i = 0;
             while (i < lines.length) {
                 const line = lines[i];
-                // If next line contains a price, merge it into this line
+                // If next line contains a price (even with portion/weight/allergens), merge it into this line
                 if (
                     i + 1 < lines.length &&
-                    priceRegex.test(lines[i + 1])
+                    /(\d{1,3}(?:[.,]\d{2}))\s*€/.test(lines[i + 1])
                 ) {
-                    // Always merge the next line if it contains a price, regardless of allergens or extra tokens
                     merged.push(line + " " + lines[i + 1]);
                     i += 2;
                     continue;
@@ -53,29 +52,42 @@ export class Mdvsr implements IParser {
                     j++;
                 }
             }
-            // console.log("DEBUG: merged lines after merging:", merged);
+            console.log("DEBUG: merged lines after merging:", merged);
             const menu: IMenuItem[] = [];
             for (const [i, line] of merged.entries()) {
                 // DEBUG: Output merged line and price extraction to console
                 // console.log("DEBUG: merged line:", line);
-                let price = NaN;
-                let priceMatch = [...line.matchAll(/(\d{1,3}(?:[.,]\d{2}))\s*€/g)];
-                // console.log("DEBUG: priceMatch:", priceMatch);
-                if (priceMatch.length > 0) {
-                    const last = priceMatch[priceMatch.length - 1][1];
-                    price = parseFloat(last.replace(",", "."));
-                }
 
                 // Remove price and trailing portion/weight info from dish text
+                // Insert a space before any price pattern that is immediately preceded by a digit
+                let fixedLine = line;
+                // Insert a space before every price pattern that is immediately preceded by a digit, repeatedly
+                let prev;
+                do {
+                    prev = fixedLine;
+                    fixedLine = fixedLine.replace(/(\d)(\d{1,3}[.,]\d{2}\s*€)/g, '$1 $2');
+                } while (fixedLine !== prev);
+
                 let text = line
                     .normalizeWhitespace()
                     .removeAlergens()
-                    .replace(/(\d{1,3}(?:[.,]\d{2}))\s*€?$/, "") // remove last price at end
-                    .replace(/\b\d{1,3}(?:,\d{1,3})*(?:ks)?\b/gi, "") // remove portion/weight info
+                    .replace(/\d{1,3}(?:,\d{1,3})*(?:ks)?(?=\d{1,3}(?:[.,]\d{2})\s*€)/, "")
+                    .split(/\d{1,3}(?:[.,]\d{2})\s*€/)[0]
                     .removeMetrics()
                     .capitalizeFirstLetter()
                     .replace(/[\s,]+$/, "") // remove trailing commas and whitespace
                     .trim();
+
+                // Try to find the price as the last number with two decimals before €
+                let price = NaN;
+                const priceMatches = [...fixedLine.matchAll(/(\d{1,3}[.,]\d{2})\s*€/g)];
+                if (priceMatches.length > 0) {
+                    price = parseFloat(priceMatches[priceMatches.length - 1][1].replace(",", "."));
+                }
+
+                // DEBUG: Output extracted text and price
+                // eslint-disable-next-line no-console
+                console.log("DEBUG: parsed line:", { line, text, price });
 
                 // Drop lines that are just numbers/commas/ks or empty after cleaning
                 if (
@@ -88,6 +100,7 @@ export class Mdvsr implements IParser {
                 const isSoup = /polievka/i.test(line) || i < 2;
                 menu.push({ text, price, isSoup });
             }
+            console.log("DEBUG: final menu items:", menu.map(m => m.text));
             // REMOVE DUPLICATE MENU LOOP AND DECLARATION
 
             doneCallback(menu);
