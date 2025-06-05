@@ -162,3 +162,28 @@ Complete assessment of Test Infrastructure Modernization Phase 1 implementation 
 1. **Immediate**: Update all memory bank documentation with current status
 2. **Phase 2 Planning**: Prioritize legacy test migration and remaining parser implementation
 3. **Quality Assurance**: Validate current test suite functionality before proceeding
+
+## 2025-06-05 23:20 - FajneJedlo OCR Artifact Removal Enhancement
+
+### Decision
+Enhanced the `removeAlergens()` function in [`parserUtil.ts`](parsers/parserUtil.ts:1) to robustly remove OCR artifacts from menu text, specifically targeting patterns like `1:`, `1-`, `1:5`, `1-37`, `1.34` that were not caught by the original regex.
+
+### Problem Analysis
+1. **Root Cause**: Original regex `/\s*\d{1,2}[:\-]\s*$/g` only removed simple patterns like `1:` or `1-` but failed on complex patterns like `1:5`, `1-37`, `1.34`
+2. **OCR Reality**: Real Tesseract output produces varied artifact patterns including multi-digit combinations with colons, dashes, and dots
+3. **Impact**: Menu items displayed with trailing artifacts like "valeriánšalát 1:5" and "citrón 1-37"
+
+### Solution Implementation
+1. **Enhanced Regex**: Updated to `/\s*\d{1,2}([:,\-\.]\d+)*\s*$/g` to handle complex patterns
+2. **Debug Infrastructure**: Added conditional OCR output logging for troubleshooting
+3. **Test Coverage**: Created failing test cases with real OCR data to validate fixes
+
+### Rationale
+- OCR artifacts significantly impact user experience by cluttering menu text
+- Real-world OCR output varies significantly from simplified test data
+- Enhanced pattern matching provides robust artifact removal without breaking existing functionality
+
+### Implementation Details
+- Modified `String.prototype.removeAlergens` to handle complex digit-punctuation patterns
+- Maintained backward compatibility with existing artifact removal logic
+- Added debug logging capability for OCR troubleshooting

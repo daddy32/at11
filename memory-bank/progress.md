@@ -35,3 +35,4 @@ This file tracks the project's progress using a task list format.
 [2025-05-10 14:22:00] - Updated with completed tasks and new objectives
 [2025-05-31 20:38:00] - Phase 1 Test Infrastructure Modernization Plan completed for patronka parsers
 [2025-05-10 23:27:29] - Implemented URL sanitization, parser HTML validation, and improved error logging as per deprecation-fixes-plan.md.
+[2025-06-05 23:20:29] - Fixed FajneJedlo OCR artifact removal issue: Enhanced removeAlergens() regex to handle complex patterns like 1:5, 1-37, 1.34 from real Tesseract output. Added debug logging infrastructure for OCR troubleshooting.

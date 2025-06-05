@@ -34,3 +34,5 @@ This file documents recurring patterns and standards used in the project.
 [2025-05-12 11:24:25] - Cheerio upgraded from 0.22.0 to 1.0.0. All parser imports must use `import * as cheerio from "cheerio";` for compatibility with Cheerio 1.x and CommonJS output. Default imports (`import cheerio from "cheerio";`) will break at runtime.
 [2025-05-12 11:24:25] - node-fetch downgraded to 2.x to ensure CommonJS compatibility for all parsers. node-fetch 3.x+ is ESM-only and will not work with CommonJS output.
 [2025-05-12 11:24:25] - When upgrading dependencies in the future, always verify module type (ESM vs CJS) and adjust import style and/or dependency version accordingly.
+[2025-06-05 23:20:16] - OCR Artifact Removal Pattern: Enhanced `removeAlergens()` function uses regex `/\s*\d{1,2}([:,\-\.]\d+)*\s*$/g` to remove complex OCR artifacts like `1:5`, `1-37`, `1.34` from menu text. This pattern handles real-world Tesseract OCR output variations.
+[2025-06-05 23:20:16] - OCR Debug Pattern: Added conditional debug logging in FajneJedlo parser using `process.env.FAJNEJEDLO_DEBUG=1` to dump raw OCR output for troubleshooting artifact removal issues.

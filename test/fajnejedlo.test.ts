@@ -101,6 +101,95 @@ function testExklusivMenuItem() {
 
 testExklusivMenuItem();
 
+// Test: OCR-based artifact "1:" and "1-" are not removed (real image)
+async function testUnremovedArtifactsWithOCR() {
+  const imagePath = "test/samples/JEDLIS_BISTRO_0602_0606-1200x1779.jpg";
+  const imageBuffer = readFileSync(imagePath);
+  const ocrResult = await Tesseract.recognize(imageBuffer, "slk");
+  const ocrText = ocrResult.data.text;
+
+  // Friday, 2025-06-06
+  const date = new Date(2025, 6, 6);
+  const items = extractMenuFromText(ocrText, date);
+  console.log("Extracted items:", items.map(item => item.text).join("\n"));
+
+  const menu1 = items.find(item => !item.isSoup && item.text.includes("1:"));
+  const menu2 = items.find(item => !item.isSoup && item.text.includes("1-"));
+
+  if (menu1 || menu2) {
+    throw new Error(
+      "Artifacts '1:' or '1-' were not removed (OCR): " +
+      [menu1?.text, menu2?.text].filter(Boolean).join(" | ")
+    );
+  }
+  console.log("Test passed: Artifacts '1:' and '1-' are removed (OCR).");
+}
+
+testUnremovedArtifactsWithOCR().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
+// Test: artifact "1:" and "1-" are not removed
+function fakeOCRTextWithUnremovedArtifacts() {
+  return `
+Piatok 6. jún
+MENU 1 Vyprážané rybacie filé, zemiaková kaša s pečenou karotkou, valeriánšalát 1:
+MENU 2 Vyprážané rezne z bravčovej panenky, zemiakový šmykľavý šalát s jarnou cibuľkou, citrón 1-
+`;
+}
+
+function testUnremovedArtifacts() {
+  const date = new Date(2025, 5, 6); // June is month 5 (0-based)
+  const ocrText = fakeOCRTextWithUnremovedArtifacts();
+  const items = extractMenuFromText(ocrText, date);
+
+  const menu1 = items.find(item => !item.isSoup && item.text.includes("1:"));
+  const menu2 = items.find(item => !item.isSoup && item.text.includes("1-"));
+
+  if (menu1 || menu2) {
+    throw new Error(
+      "Artifacts '1:' or '1-' were not removed: " +
+      [menu1?.text, menu2?.text].filter(Boolean).join(" | ")
+    );
+  }
+  console.log("Test passed: Artifacts '1:' and '1-' are removed.");
+}
+
+testUnremovedArtifacts();
+// Test for Friday artifact removal (1:, 1-, diod])
+function fakeOCRTextWithFridayArtifacts() {
+  return `
+Piatok 6. jún
+Polievka 1 Slepačia s rezancami
+MENU 1 Vyprážané rybacie filé, zemiaková kaša s pečenou karotkou, valeriánšalát 1:
+MENU 2 Vyprážané rezne z bravčovej panenky, zemiakový šmykľavý šalát s jarnou cibuľkou, citrón 1-
+MENU 3 Chrumkavé opekané hovädzie rezančeky, pražená jasmínová ryža diod] s chrumkavou zeleninou a vajíčkom, koriander, biely sezam
+`;
+}
+
+function testFridayArtifactRemoval() {
+  const date = new Date(2025, 5, 6); // June is month 5 (0-based)
+  const ocrText = fakeOCRTextWithFridayArtifacts();
+  const items = extractMenuFromText(ocrText, date);
+
+  const menu1 = items.find(item => !item.isSoup && item.text.startsWith("Vyprážané rybacie filé"));
+  const menu2 = items.find(item => !item.isSoup && item.text.startsWith("Vyprážané rezne z bravčovej panenky"));
+  const menu3 = items.find(item => !item.isSoup && item.text.startsWith("Chrumkavé opekané hovädzie rezančeky"));
+
+  if (!menu1 || !menu2 || !menu3) {
+    throw new Error("One or more Friday menu items not found in parsed items");
+  }
+
+  if (/\b1[:\-]\b/.test(menu1.text) || /\b1[:\-]\b/.test(menu2.text) || /\bdiod\]/.test(menu3.text)) {
+    throw new Error(
+      "Friday artifact removal failed: " +
+      [menu1.text, menu2.text, menu3.text].join(" | ")
+    );
+  }
+  console.log("Test passed: Friday artifact removal works.");
+}
+
+testFridayArtifactRemoval();
 // Test for Exklusiv extraction using real OCR on the provided image
 
 
