@@ -18,10 +18,10 @@ export class Foodseason implements IParser {
         dayElements.each((i, elem) => {
             const node = $(elem);
             let text = node.text().trim().toLowerCase();
-            text = text.substring(0, text.length - 1);
 
             if (text === targetDayName) {
-                const soupsNode = node.parent().next().next();
+                // Robust: select next siblings directly after the <h3>
+                const soupsNode = node.next();
                 const foodsNode = soupsNode.next().next();
 
                 dayMenu.push(...extractItems(soupsNode, true));

@@ -16,28 +16,66 @@ export abstract class Menucka {
 
         const dayMenu = new Array<IMenuItem>();
 
-        let currentDay: Cheerio<Element>;
-        let nextDay: Cheerio<Element>;
+        // Find the .day-title for the requested date
+        let currentDay: Cheerio<Element> | undefined;
+        let nextDay: Cheerio<Element> | undefined;
         $(".day-title").each((i, elem) => {
-            const node =  $(elem);
-            if (currentDay) {
-                nextDay = node.parent();
+            const node = $(elem);
+            // Try to find the date in a <p> or fallback to .text()
+            let dateText = node.find("p").text().trim();
+            if (!dateText) dateText = node.text().trim();
+            // Extract date from parentheses if present
+            const parenMatch = dateText.match(/\(([\d.\s]+)\)/);
+            let dateToTest = dateText;
+            if (parenMatch) {
+                dateToTest = parenMatch[1];
+            }
+            if (!currentDay && dateRegex.test(dateToTest)) {
+                currentDay = node;
+            } else if (currentDay && !nextDay) {
+                nextDay = node;
                 return false;
             }
-            const dateText = node.text().trim();
-            if (dateRegex.test(dateText)) {
-                currentDay = node.parent();
-            }
-        }).parent();
+        });
 
-        const menuElems = currentDay.nextUntil(nextDay);
-        for (let i = 0; i < menuElems.length; i+=2) {
-            const text = menuElems.eq(i).text().trim();
-            if (!text) {
-                continue;
+        if (!currentDay) return [];
+
+        // Traverse siblings after the .day-title's parent until the next .day-title's parent
+        let menuElems: Cheerio<Element>[] = [];
+        const parent = currentDay.parent();
+        let sibling = parent.next();
+        while (sibling.length && (!nextDay || !sibling.is(nextDay.parent()))) {
+            // Only consider <div> siblings with text content
+            if (sibling[0].type === "tag" && sibling.text().trim()) {
+                menuElems.push(sibling);
             }
-            const price = parseFloat(menuElems.eq(i+1).text().trim().replace(",", "."));
-            dayMenu.push({ isSoup: false, text, price });
+            sibling = sibling.next();
+        }
+
+        // Enhanced: Combine adjacent description and price divs
+        for (let i = 0; i < menuElems.length; i++) {
+            const elem = menuElems[i];
+            const raw = elem.text().trim();
+            if (!raw) continue;
+
+            // Check if next element is a price div
+            const nextElem = menuElems[i + 1];
+            if (
+                nextElem &&
+                nextElem.hasClass("price") &&
+                nextElem.text().trim()
+            ) {
+                // Combine description and price
+                const text = raw;
+                const priceRaw = nextElem.text().trim();
+                const { price } = require("./parserUtil").parsePrice(priceRaw);
+                dayMenu.push({ isSoup: false, text, price });
+                i++; // Skip the price div
+            } else {
+                // Fallback: parse as before
+                const { price, text } = require("./parserUtil").parsePrice(raw);
+                dayMenu.push({ isSoup: false, text, price });
+            }
         }
         return dayMenu;
     }

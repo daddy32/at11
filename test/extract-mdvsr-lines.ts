@@ -19,7 +19,10 @@ async function main() {
 
     const piatokLines = lines.slice(startIdx, endIdx);
     fs.writeFileSync("piatok-lines-debug.txt", piatokLines.join("\n"), { encoding: "utf8" });
-    console.log("Extracted PIATOK lines written to piatok-lines-debug.txt");
+    console.log("Extracted PIATOK lines:");
+    piatokLines.forEach((line: string): void => {
+        console.log(line);
+    });
 }
 
 main().catch(console.error);

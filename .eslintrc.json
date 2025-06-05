@@ -1,7 +1,4 @@
 {
-    "ignorePatterns": [
-        "dist/*"
-    ],
     "env": {
         "es2020": true,
         "node": true,
