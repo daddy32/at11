@@ -14,7 +14,7 @@ export class LunchBreak implements IParser {
         const junkPattern = /^\s*\/*\s*|(\+\s*Polievka\s*:.*)/g
         const dropJunk = /\s*MENU\s*$|^$/g
         const pricePattern = /(\d+,\d+)\s*[e€]/i;
-        const alergPattern = /\/*\s*[\/(](\s*\d\s?[.,]?\s?)+[\/)]\s*/g;
+        const alergPattern = /\/*\s*[\/(](\s*[\d\-+*]\s?[.,]?\s?)*[\/)]\s*/g;
         const soupPattern = /POLIEVKA/;
 
         const targetDayName = format(date, "EEEE", { locale: sk });
