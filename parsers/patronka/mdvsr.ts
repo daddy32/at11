@@ -52,7 +52,7 @@ export class Mdvsr implements IParser {
                     j++;
                 }
             }
-            console.log("DEBUG: merged lines after merging:", merged);
+            // console.log("DEBUG: merged lines after merging:", merged);
             const menu: IMenuItem[] = [];
             for (const [i, line] of merged.entries()) {
                 // DEBUG: Output merged line and price extraction to console
@@ -87,7 +87,7 @@ export class Mdvsr implements IParser {
 
                 // DEBUG: Output extracted text and price
                 // eslint-disable-next-line no-console
-                console.log("DEBUG: parsed line:", { line, text, price });
+                // console.log("DEBUG: parsed line:", { line, text, price });
 
                 // Drop lines that are just numbers/commas/ks or empty after cleaning
                 if (
@@ -100,7 +100,7 @@ export class Mdvsr implements IParser {
                 const isSoup = /polievka/i.test(line) || i < 2;
                 menu.push({ text, price, isSoup });
             }
-            console.log("DEBUG: final menu items:", menu.map(m => m.text));
+            // console.log("DEBUG: final menu items:", menu.map(m => m.text));
             // REMOVE DUPLICATE MENU LOOP AND DECLARATION
 
             doneCallback(menu);

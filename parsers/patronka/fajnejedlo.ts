@@ -58,12 +58,44 @@ export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
       .trim()
       .capitalizeFirstLetter?.();
   }
+// Specialized normalization for weekly special OCR artifacts
+function normalizeWeeklySpecial(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/\*\*/g, "") // Remove bold markers
+    .replace(/\bY[.\s]*VY\b/gi, "") // Remove "Y VY" or "Y. VY" artifact
+    .replace(/\bPA\b/gi, "") // Remove "PA" artifact
+    .replace(/\bUchára\b/gi, "") // Remove "Uchára" artifact
+    .replace(/[pP]-?\s*ONRNA[\w\sŠÚáÁrd\d,]*/g, "") // Remove "p- ONRNA ..." OCR garbage
+    .replace(/\bSpecial\s*\(každý deň v ponuke\)\b/gi, "") // Remove "Special (každý deň v ponuke)"
+    .replace(/\bš[ \u00C0-\u017F]*Úá á rd 6,7,11\b/gi, "") // Remove "š Úá á rd 6,7,11" artifact
+    .replace(/\bš[ \u00C0-\u017F]*Úá á rd\b/gi, "") // Remove "š Úá á rd" artifact (without numbers)
+    .replace(/\bš\b/gi, "") // Remove orphan "š"
+    .replace(/\b[ÚÁárd]+\b/gi, "") // Remove orphan OCR letter clusters
+    .replace(/\b6,7,11\b/g, "") // Remove orphan numbers
+    .replace(/biela\s+$/i, "") // Remove orphan "biela" at end
+    .replace(/biela\s+š\s*Úá\s*á\s*(rd)?\s*(6,7,11)?\s*/gi, "biela ") // Remove "biela š Úá á [rd] [6,7,11]"
+    .replace(/biela\s+š\s*Úá\s*á\s*/gi, "biela ") // Remove "biela š Úá á"
+    .replace(/\bš\s*Úá\s*á\b/gi, "") // Remove standalone "š Úá á"
+    .replace(/biela\s+(?=\))/i, "") // Remove orphan "biela" before closing parenthesis
+    .replace(/\(\s*,/g, "(") // Remove comma after opening parenthesis
+    .replace(/,\s*\)/g, ")") // Remove comma before closing parenthesis
+    .replace(/>\s*/g, "") // Remove stray >
+    .replace(/\s{2,}/g, " ") // Collapse multiple spaces
+    .replace(/^\s+|\s+$/g, "") // Trim
+    .replace(/\s+\)/g, ")") // Remove space before closing parenthesis
+    .replace(/\(\s+/g, "(") // Remove space after opening parenthesis
+    .replace(/ +([,.;:])/g, "$1") // Remove space before punctuation
+    .replace(/^\W+/, "") // Remove leading non-word chars
+    .trim();
+}
 
   // 1. Extract "Týždňový špeciál" (if present)
   let special = "";
   const specialMatch = text.match(/Týždňový špeciál.*?\n([\s\S]+?)\n(?:Pondelok|Utorok|Streda|Stvrtok|Štvrtok|Piatok)/i);
   if (specialMatch) {
-    special = normalize(specialMatch[1].replace(/\n/g, " ").trim());
+    special = normalizeWeeklySpecial(specialMatch[1].replace(/\n/g, " ").trim());
+    special = normalize(special);
   }
 
   // 2. Find current day header (e.g., "Stvrtok 15. máj")

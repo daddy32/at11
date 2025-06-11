@@ -69,6 +69,7 @@ String.prototype.removeAlergens = function() {
     return this
         // Remove trailing patterns like 1:, 1-, 1:5, 1-37, 1.34, 1.3.1.9, etc.
         .replace(/\s*\d{1,2}([:,\-\.]\d+)*\s*$/g, "")
+        .replace(/\s*\d{1,2}[:\-]\s*$/g, "") // Remove trailing "1:" or "1-"
         .replace(/\b[A-Za-z]+\]/g, "")       // Remove any word ending with ] (e.g. "diod]")
         .replace(/\s*[A\s(\d,)]+$|\/[A-Z0-9,\s]+\/{0,1}/g, ""); // Original logic
 };

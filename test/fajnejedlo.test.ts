@@ -48,26 +48,20 @@ function testWrappedMenuLine() {
     );
   }
   console.log("Test passed: Wrapped MENU line is correctly parsed.");
-}
+  }
 
-testWrappedMenuLine();
-
-// Failing test for missing Exklusiv menu item (should be fixed by parser update)
-
-
-// Simulate OCR output for a Friday with a wrapped Exklusiv line
-function fakeOCRTextWithExklusiv() {
-  return `
-Piatok 23. máj
-Polievka 1 Slepačia s rezancami
-Polievka 2 Zeleninová
-MENU 1 Bravčový rezeň, zemiaková kaša
-MENU 2 Kuracie prsia na prírodno, ryža
-MENU 3 Grilovane dvojičky (bravčove karé, kuracie prsia), hrášok s kukuricou na masle, pečené m
-äso, zemiaky
-Exklusiv Viedenský rezeň, slovenský zemiakový šalát
-`;
-}
+  // Simulate OCR output for a Friday with a wrapped Exklusiv line
+  function fakeOCRTextWithExklusiv() {
+    return `
+  Piatok 23. máj
+  Polievka 1 Slepačia s rezancami
+  Polievka 2 Zeleninová
+  MENU 1 Bravčový rezeň, zemiaková kaša
+  MENU 2 Kuracie prsia na prírodno, ryža
+  MENU 3 Grilovane dvojičky (bravčove karé, kuracie prsia), hrášok s kukuricou na masle, pečené mäso, zemiaky
+  Exklusiv Viedenský rezeň, slovenský zemiakový šalát
+  `;
+  }
 
 function testExklusivMenuItem() {
   const date = new Date(2025, 4, 23); // May is month 4 (0-based)
@@ -98,8 +92,6 @@ function testExklusivMenuItem() {
   }
   console.log("Test passed: Exklusiv menu item is correctly parsed.");
 }
-
-testExklusivMenuItem();
 
 // Test: OCR-based artifact "1:" and "1-" are not removed (real image)
 async function testUnremovedArtifactsWithOCR() {
@@ -247,6 +239,65 @@ async function debugDumpOCRDaySection() {
 }
 
 debugDumpOCRDaySection().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
+
+// Test for Weekly Special OCR Junk Issue (real image, June 9-13, 2025)
+async function testWeeklySpecialJunkRemovalWithOCR() {
+  const imagePath = "test/samples/JEDLIS_BISTRO_0609_0613-1-1200x1806.jpg";
+  const imageBuffer = readFileSync(imagePath);
+  const ocrResult = await Tesseract.recognize(imageBuffer, "slk");
+  const ocrText = ocrResult.data.text;
+
+  // Use Wednesday, June 11, 2025
+  const date = new Date(2025, 5, 11);
+  const items = extractMenuFromText(ocrText, date);
+
+  // Find the weekly special (should be present for every day)
+  const special = items.find(
+    (item) =>
+      !item.isSoup &&
+      (item.text.toLowerCase().includes("špeciál") ||
+        item.text.toLowerCase().includes("poké"))
+  );
+
+  console.log("Extracted Weekly Special:", special?.text);
+
+  if (!special) {
+    throw new Error("Weekly special not found in parsed items");
+  }
+
+  // Assert that known junk artifacts are not present
+  const junkPatterns = [
+    /Y VY/i,
+    />/,
+    /\bPA\b/,
+    /\*\*/,
+    /\bSpecial\b.*\*\*/,
+  ];
+  for (const pattern of junkPatterns) {
+    if (pattern.test(special.text)) {
+      throw new Error(
+        "Weekly special contains OCR junk artifact: " +
+          pattern +
+          " in: " +
+          special.text
+      );
+    }
+  }
+
+  // Assert that the special is a clean, readable dish description
+  if (special.text.length < 20) {
+    throw new Error(
+      "Weekly special is too short, likely not parsed correctly: " +
+        special.text
+    );
+  }
+  console.log("Test passed: Weekly special OCR junk is removed.");
+}
+
+testWeeklySpecialJunkRemovalWithOCR().catch((e) => {
   console.error(e);
   process.exit(1);
 });
