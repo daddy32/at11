@@ -274,7 +274,7 @@ async function testWeeklySpecialJunkRemovalWithOCR() {
     />/,
     /\bPA\b/,
     /\*\*/,
-    /\bSpecial\b.*\*\*/,
+    /\bSpecial\b.*\*\*/
   ];
   for (const pattern of junkPatterns) {
     if (pattern.test(special.text)) {

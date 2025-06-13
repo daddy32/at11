@@ -27,11 +27,11 @@ describe("Priatelia Parser", () => {
       const node = $(elem);
       console.log(`.day-title[${i}]:`, node.text());
       const parent = node.parent();
-      console.log(`  parent tag:`, parent[0]?.tagName);
-      console.log(`  parent html:`, parent.html()?.slice(0, 500));
+      console.log("  parent tag:", parent[0]?.tagName);
+      console.log("  parent html:", parent.html()?.slice(0, 500));
       const next = parent.next();
-      console.log(`  parent's next tag:`, next[0]?.tagName);
-      console.log(`  parent's next html:`, next.html()?.slice(0, 500));
+      console.log("  parent's next tag:", next[0]?.tagName);
+      console.log("  parent's next html:", next.html()?.slice(0, 500));
     });
   });
 

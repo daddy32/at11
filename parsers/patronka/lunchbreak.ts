@@ -11,40 +11,40 @@ export class LunchBreak implements IParser {
         const $ = cheerio.load(html);
         const dayMenu = new Array<IMenuItem>();
 
-        const junkPattern = /^\s*\/*\s*|(\+\s*Polievka\s*:.*)/g
-        const dropJunk = /\s*MENU\s*$|^$/g
+        const junkPattern = /^\s*\/*\s*|(\+\s*Polievka\s*:.*)/g;
+        const dropJunk = /\s*MENU\s*$|^$/g;
         const pricePattern = /(\d+,\d+)\s*[e€]/i;
         const alergPattern = /\/*\s*[\/(](\s*[\d\-+*]\s?[.,]?\s?)*[\/)]\s*/g;
         const soupPattern = /POLIEVKA/;
 
         const targetDayName = format(date, "EEEE", { locale: sk });
-        const selector = "h5:contains('" + targetDayName.substring(2) + "')"
+        const selector = "h5:contains('" + targetDayName.substring(2) + "')";
         var dayMenuElement = $(selector);
         // console.log("dayMenuElement: ")
         // console.log(dayMenuElement)
         // console.log(dayMenuElement.text())
         // console.log(dayMenuElement.length)
         if (dayMenuElement.length < 1) {
-          console.error(`LunchBreak: No dayMenuElement found! Selector: "${selector}". Trying by date...`)
+          console.error(`LunchBreak: No dayMenuElement found! Selector: "${selector}". Trying by date...`);
           const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
-          const selectorDate = `h5:contains("${targetDayDate}")`
+          const selectorDate = `h5:contains("${targetDayDate}")`;
           // console.log(` selectorDate: ${selectorDate}`)
           var dayMenuElement = $(selector);
           if (dayMenuElement.length >= 1) {
             // console.log(` Found!`)
           } else {
-            console.error(` Not found!`)
-            return
+            console.error(" Not found!");
+            return;
           }
         }
 
-        let parentElement = dayMenuElement.parent();
+        const parentElement = dayMenuElement.parent();
         // console.log("parentElement:")
         // console.log(parentElement)
 
-        var text = ""
-        var prevText = ""
-        var price = NaN;
+        let text = "";
+        let prevText = "";
+        let price = NaN;
 
         // --- Soup section fix ---
         let inSoupSection = false;

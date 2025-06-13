@@ -17,7 +17,7 @@ export class Foodseason implements IParser {
 
         dayElements.each((i, elem) => {
             const node = $(elem);
-            let text = node.text().trim().toLowerCase();
+            const text = node.text().trim().toLowerCase();
 
             if (text === targetDayName) {
                 // Robust: select next siblings directly after the <h3>

@@ -27,7 +27,7 @@ export class TestHelper {
       text: "Test menu item",
       price: 5.0,
       isSoup: false,
-      ...overrides,
+      ...overrides
     };
   }
 

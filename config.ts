@@ -101,9 +101,9 @@ export class Config implements IConfig {
                 id: 11, name: "Fajne jedlo (OCR)",
                 urlFactory: _ => "https://fajnejedlo.sk/menu-tyzdnove-bistro/",
                 parser: new FajneJedlo()
-            },
+            }
         ]]
-    ])
+    ]);
 }
 
 /*

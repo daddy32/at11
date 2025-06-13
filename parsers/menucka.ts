@@ -41,7 +41,7 @@ export abstract class Menucka {
         if (!currentDay) return [];
 
         // Traverse siblings after the .day-title's parent until the next .day-title's parent
-        let menuElems: Cheerio<Element>[] = [];
+        const menuElems: Cheerio<Element>[] = [];
         const parent = currentDay.parent();
         let sibling = parent.next();
         while (sibling.length && (!nextDay || !sibling.is(nextDay.parent()))) {

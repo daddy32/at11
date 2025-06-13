@@ -7,7 +7,6 @@ import pdf from "pdf-parse";
 import { format } from "date-fns";
 import { sk } from "date-fns/locale";
 import { parsePrice } from "../parserUtil";
-import "../parserUtil";
 
 export class Mdvsr implements IParser {
     public async parse(_: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): Promise<void> {
@@ -65,10 +64,10 @@ export class Mdvsr implements IParser {
                 let prev;
                 do {
                     prev = fixedLine;
-                    fixedLine = fixedLine.replace(/(\d)(\d{1,3}[.,]\d{2}\s*€)/g, '$1 $2');
+                    fixedLine = fixedLine.replace(/(\d)(\d{1,3}[.,]\d{2}\s*€)/g, "$1 $2");
                 } while (fixedLine !== prev);
 
-                let text = line
+                const text = line
                     .normalizeWhitespace()
                     .removeAlergens()
                     .replace(/\d{1,3}(?:,\d{1,3})*(?:ks)?(?=\d{1,3}(?:[.,]\d{2})\s*€)/, "")

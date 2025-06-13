@@ -9,7 +9,7 @@ const normalText = "Šošovicová polievka s párkom";
 const promoTemplates = [
     "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! Vo Freshmarkete začína happy hour o 15:00.",
     "Vo Freshmarkete začína happy hour o 15:00.",
-    "Happy hour sa nevzťahuje na dezerty, nápoje a donášku.",
+    "Happy hour sa nevzťahuje na dezerty, nápoje a donášku."
 ];
 const promoThreshold = 80;
 console.log("SIMILARITY promoText:", promoTemplates.map(t => fuzz.ratio(promoText, t)));

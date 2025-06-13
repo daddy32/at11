@@ -20,10 +20,10 @@ describe("Bemi Parser", () => {
   it("should extract menu items and prices from valid HTML", (done) => {
     // Simulate the expected HTML structure for Bemi
     const html = TestHelper.createMockHTML(
-      '<div id="ktmain"><div class="entry-content"><div class="tab-content">' +
-      '<div><p>Polievka 1,50 €</p><p>Menu 5,90 €</p></div>' +
-      '<div><p>Polievka 2,00 €</p><p>Menu 6,50 €</p></div>' +
-      '</div></div></div>'
+      "<div id=\"ktmain\"><div class=\"entry-content\"><div class=\"tab-content\">" +
+      "<div><p>Polievka 1,50 €</p><p>Menu 5,90 €</p></div>" +
+      "<div><p>Polievka 2,00 €</p><p>Menu 6,50 €</p></div>" +
+      "</div></div></div>"
     );
     parser.parse(html, mockDate, (menu) => {
       expect(menu).to.be.an("array").with.length.greaterThan(0);
@@ -44,9 +44,9 @@ describe("Bemi Parser", () => {
 
   it("should skip junk/empty lines", (done) => {
     const html = TestHelper.createMockHTML(
-      '<div id="ktmain"><div class="entry-content"><div class="tab-content">' +
-      '<div><p>   </p><p>Menu 5,90 €</p></div>' +
-      '</div></div></div>'
+      "<div id=\"ktmain\"><div class=\"entry-content\"><div class=\"tab-content\">" +
+      "<div><p>   </p><p>Menu 5,90 €</p></div>" +
+      "</div></div></div>"
     );
     parser.parse(html, mockDate, (menu) => {
       expect(menu.some(item => item.text.trim() === "")).to.be.false;

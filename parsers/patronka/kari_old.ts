@@ -24,14 +24,14 @@ export class Kari implements IParser {
             const node = $(elements[0]);
             const text = node.html();
             //console.log(text);
-            var lineItems = text.split(lineBreakPattern);
+            const lineItems = text.split(lineBreakPattern);
             //console.log(lineItems);
-            var seenToday = false;
+            let seenToday = false;
 
             for (const x of lineItems) {
-                var isPolievka = false;
-                var isDay = false;
-                var isToday = false;
+                let isPolievka = false;
+                let isDay = false;
+                let isToday = false;
 
                 if (!lineBreakPattern.test(x)) {
                     //console.log(`"${x}"`);
@@ -60,7 +60,7 @@ export class Kari implements IParser {
                         });
                     }
                 }
-            };
+            }
             if (!seenToday) {
                 dayMenu.push({
                     isSoup: false,

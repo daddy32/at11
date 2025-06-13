@@ -20,7 +20,7 @@ export class FajneJedlo implements IParser {
 
       const response = await axios.get(fullUrl, { responseType: "arraybuffer" });
       const ocrResult = await Tesseract.recognize(response.data, "slk");
-      let rawText = ocrResult.data.text;
+      const rawText = ocrResult.data.text;
 
       // Dump raw OCR text for debugging.
       /* fs.writeFileSync("fajnejedlo-ocr-debug.txt", rawText, "utf-8"); // Debug output disabled */

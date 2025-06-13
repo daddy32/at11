@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
-let fetch: typeof import('node-fetch').default | undefined;
-let Headers: typeof import('node-fetch').Headers | undefined;
+let fetch: typeof import("node-fetch").default | undefined;
+let Headers: typeof import("node-fetch").Headers | undefined;
 
 // Helper to bootstrap session cookies and tracker using Puppeteer
 // Usage: await getSessionCookiesAndTracker()
@@ -11,7 +11,7 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
     const url = "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=2d9fcc59-e13a-4152-b6cb-d587e182dd1c&restaurant_uid=c5622c60-4cca-4961-acb4-a9c2a9a61006";
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
     const page = await browser.newPage();
 
@@ -67,7 +67,7 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
 async function fetchCartDataWithCookies(cookies: string, tracker: string): Promise<any> {
     if (!fetch || !Headers) {
         // Always use dynamic import to avoid ESM/CJS issues
-        const nodeFetch = await import('node-fetch');
+        const nodeFetch = await import("node-fetch");
         fetch = nodeFetch.default;
         Headers = nodeFetch.Headers;
     }
@@ -242,7 +242,7 @@ function normalize(str: string): string {
 
     // console.log("[Bigger parser debug] Normalized string:", s);
 
-    return s
+    return s;
 }
 
 // Standalone runner for Puppeteer session bootstrap (debugging only)

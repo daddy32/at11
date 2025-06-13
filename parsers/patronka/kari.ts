@@ -6,9 +6,9 @@ import { parsePrice } from "../parserUtil";
 export class Kari extends Sme implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItemsOrig = super.parseBase(html, date);
-        var menuItemsFinal: IMenuItem[] = [];
+        const menuItemsFinal: IMenuItem[] = [];
         const junkPattern = /(\d+\.*){1,}$/;
-        var seenSoup = false;
+        let seenSoup = false;
         // console.log("Parsing Kari.");
         // console.log("   date:" + date);
 
@@ -26,7 +26,7 @@ export class Kari extends Sme implements IParser {
             }
 
             item.text = result.text.replace(/^(\d+\.*){1,}/, "").replace(/^.*\|\s+/, "").replace(/\(obsahuje:/, "").removeAlergens();
-            menuItemsFinal.push(item)
+            menuItemsFinal.push(item);
         });
 
         doneCallback(menuItemsFinal);
