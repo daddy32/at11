@@ -3,7 +3,7 @@ import type { Element } from "domhandler";
 import * as cheerio from "cheerio";
 
 import { IMenuItem } from "./IMenuItem";
-import { getDateRegex } from "./parserUtil";
+import { getDateRegex, parsePrice } from "./parserUtil";
 
 
 export abstract class Menucka {
@@ -68,12 +68,12 @@ export abstract class Menucka {
                 // Combine description and price
                 const text = raw;
                 const priceRaw = nextElem.text().trim();
-                const { price } = require("./parserUtil").parsePrice(priceRaw);
+                const { price } = parsePrice(priceRaw);
                 dayMenu.push({ isSoup: false, text, price });
                 i++; // Skip the price div
             } else {
                 // Fallback: parse as before
-                const { price, text } = require("./parserUtil").parsePrice(raw);
+                const { price, text } = parsePrice(raw);
                 dayMenu.push({ isSoup: false, text, price });
             }
         }

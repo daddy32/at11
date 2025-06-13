@@ -1,8 +1,8 @@
 /**
  * Test for LunchBreak parser: "(-)" allergen bug reproduction (CommonJS)
  */
-const { expect } = require("chai");
-const { LunchBreak } = require("../../../dist/parsers/patronka/lunchbreak.js");
+import { expect } from "chai";
+import { LunchBreak } from "../../../dist/parsers/patronka/lunchbreak.js";
 
 const problematicInput = `
 <html>

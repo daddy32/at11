@@ -46,8 +46,8 @@ describe("Priatelia Parser", () => {
   });
 
   it("should correctly parse Friday (06.06.2025) menu items as single entries (description + price)", (done) => {
-    const html = require("fs").readFileSync(
-      require("path").join(__dirname, "../../samples/priatelia-real.html"),
+    const html = fs.readFileSync(
+      path.join(__dirname, "../../samples/priatelia-real.html"),
       "utf-8"
     );
     const parser = new Priatelia();
@@ -63,9 +63,9 @@ describe("Priatelia Parser", () => {
           !arr[idx + 1].text
       );
       // Should not find any split description/price pairs
-      require("chai").expect(hasSplit).to.be.false;
+      expect(hasSplit).to.be.false;
       // Should find at least one menu item for Friday
-      require("chai").expect(menu.length).to.be.greaterThan(0);
+      expect(menu.length).to.be.greaterThan(0);
       done();
     });
   });

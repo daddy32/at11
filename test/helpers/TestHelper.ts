@@ -1,4 +1,5 @@
 import sinon from "sinon";
+import axios from "axios";
 import { IMenuItem } from "../../parsers/IMenuItem";
 
 /**
@@ -35,7 +36,6 @@ export class TestHelper {
    * Stubs axios.get to return the provided data.
    */
   static mockAxiosResponse(data: any): sinon.SinonStub {
-    const axios = require("axios");
     return sinon.stub(axios, "get").resolves({ data });
   }
 

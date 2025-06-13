@@ -4,6 +4,7 @@ import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
 import axios from "axios";
 import pdf from "pdf-parse";
+import fs from "fs";
 import { format } from "date-fns";
 import { sk } from "date-fns/locale";
 import { parsePrice } from "../parserUtil";
@@ -105,7 +106,7 @@ export class Mdvsr implements IParser {
             doneCallback(menu);
         } catch (e) {
             try {
-                require("fs").writeFileSync("parser-error-debug.txt", String(e), { encoding: "utf8" });
+                fs.writeFileSync("parser-error-debug.txt", String(e), { encoding: "utf8" });
             } catch (_) {}
             doneCallback([]);
         }
