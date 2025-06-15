@@ -1,22 +1,32 @@
 // Test for Mdvsr parser: price extraction for PIATOK (23.05.2025)
 
+import "../../../parsers/parserUtil";
 import { expect } from "chai";
-import { Mdvsr } from "../parsers/patronka/mdvsr";
-import { IMenuItem } from "../parsers/IMenuItem";
+import { Mdvsr } from "../../../parsers/patronka/mdvsr";
+import { IMenuItem } from "../../../parsers/IMenuItem";
+import { TestHelper } from "../../helpers/TestHelper";
 import sinon from "sinon";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
 
-describe("Mdvsr parser (PDF price extraction)", function () {
+describe("Mdvsr Parser (PDF price extraction)", function () {
+    beforeEach(() => {
+        TestHelper.cleanupMocks();
+    });
+
+    afterEach(() => {
+        TestHelper.cleanupMocks();
+    });
+
     it("should extract prices for PIATOK (23.05.2025)", async function () {
         // Arrange: stub axios.get to return local PDF buffer
         const pdfPath = path.resolve(process.cwd(), "test/samples/jedalnylistok.pdf");
         const pdfBuffer = fs.readFileSync(pdfPath);
-        const axiosStub = sinon.stub(axios, "get").resolves({ data: pdfBuffer });
+        const axiosStub = TestHelper.mockAxiosResponse(pdfBuffer);
 
         const parser = new Mdvsr();
-        const date = new Date("2025-05-23T10:00:00+02:00");
+        const date = TestHelper.createMockDate("2025-05-23");
         let menu: IMenuItem[] = [];
         await parser.parse("", date, (result) => { menu = result; });
 
@@ -47,10 +57,10 @@ describe("Mdvsr parser (PDF price extraction)", function () {
             // Arrange: stub axios.get to return local PDF buffer
             const pdfPath = path.resolve(process.cwd(), "test/samples/jedalnylistok_2025-05-30.pdf");
             const pdfBuffer = fs.readFileSync(pdfPath);
-            const axiosStub = sinon.stub(axios, "get").resolves({ data: pdfBuffer });
+            const axiosStub = TestHelper.mockAxiosResponse(pdfBuffer);
 
             const parser = new Mdvsr();
-            const date = new Date("2025-05-30T10:00:00+02:00");
+            const date = TestHelper.createMockDate("2025-05-30");
             let menu: IMenuItem[] = [];
             await parser.parse("", date, (result) => { menu = result; });
 

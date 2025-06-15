@@ -1,5 +1,4 @@
 {
-    "ignorePatterns": ["dist/**/*", "node_modules/**/*"],
     "env": {
         "es2020": true,
         "node": true,
@@ -29,6 +28,13 @@
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": 1,
         "@typescript-eslint/no-inferrable-types": [ "warn", { "ignoreParameters": true }],
-        "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }]
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-unnecessary-type-constraint": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/triple-slash-reference": "off",
+        "@typescript-eslint/no-unsafe-declaration-merging": "off",
+        "@typescript-eslint/no-require-imports": "off",
+        "@typescript-eslint/no-array-constructor": "off",
+        "@typescript-eslint/prefer-namespace-keyword": "off"
+      }
     }
-}

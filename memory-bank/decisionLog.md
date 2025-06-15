@@ -187,3 +187,29 @@ Enhanced the `removeAlergens()` function in [`parserUtil.ts`](parsers/parserUtil
 - Modified `String.prototype.removeAlergens` to handle complex digit-punctuation patterns
 - Maintained backward compatibility with existing artifact removal logic
 - Added debug logging capability for OCR troubleshooting
+
+## 2025-06-15 20:11 - ES Module/CommonJS Compatibility Warning Resolution
+
+### Decision
+Standardize test file import patterns to eliminate experimental warning when loading Chai 5.x ESM via CommonJS require().
+
+### Problem Analysis
+1. **Root Cause**: [`veglife.test.ts`](test/unit/patronka/veglife.test.ts:4) uses `const { expect } = require("chai");`
+2. **Module Conflict**: Chai 5.x is pure ESM, causing experimental warning with CommonJS require()
+3. **Inconsistency**: Other test files use `import { expect } from "chai";` syntax
+
+### Solution Implementation
+1. **Single File Fix**: Change line 4 in veglife.test.ts from `require("chai")` to `import { expect } from "chai"`
+2. **Audit Confirmation**: Search revealed only one affected file in entire codebase
+3. **Configuration Validation**: tsconfig.json already has proper ES module interop settings
+
+### Rationale
+- **Immediate Resolution**: Eliminates experimental warning without architectural changes
+- **Consistency**: Standardizes import patterns across all test files
+- **Low Risk**: Simple syntax change with existing ES module interop support
+- **Future-Proof**: Aligns with modern ES module practices
+
+### Implementation Details
+- Requires Code mode for actual file modification
+- Single line change: `const { expect } = require("chai");` → `import { expect } from "chai";`
+- No breaking changes to existing functionality
