@@ -88,9 +88,15 @@ function initialHide(cont) {
 function getDateCompound() {
     var date = new Date();
     var desc = "dnes";
-    if (date.getHours() >= 17) {
+    if (date.getHours() >= 16) {
         date.setDate(date.getDate() + 1);
         desc = "zajtra";
+    }
+    console.log("Date: " + date.toLocaleDateString("sk"));
+    // if the date is a weekend, skip to next monday
+    while (date.getDay() === 0 || date.getDay() === 6) {
+        date.setDate(date.getDate() + 1);
+        desc = "pondelok";
     }
     return { date: date, description: desc + " " + date.toLocaleDateString("sk") };
 }
