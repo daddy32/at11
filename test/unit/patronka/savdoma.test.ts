@@ -33,4 +33,17 @@ describe("SavDoma Parser", () => {
       done();
     });
   });
+it("should not produce trailing comma or space in soup text (real data)", (done) => {
+  const fs = require("fs");
+  const html = fs.readFileSync("test/samples/Streda__Restauracia-doma.html", "utf8");
+  parser.parse(html, mockDate, (menu) => {
+    // Log all menu items for visual inspection
+    console.log("Parsed menu items:");
+    menu.forEach((item, idx) => {
+      console.log(`[${idx}] ${item.isSoup ? "[SOUP]" : "[MAIN]"} "${item.text}" (${item.price})`);
+    });
+    expect(menu[0].text).to.not.match(/[, ]+$/);
+    done();
+  });
+});
 });
