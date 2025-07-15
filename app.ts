@@ -56,11 +56,22 @@ app.use(express.static(__dirname + "/../static"));
 app.get("/:location?", (req, res) => {
     res.setHeader("Content-Type", "text/html; charset=UTF-8");
     res.setHeader("Content-Language", "sk");
-    const location = req.params.location || config.restaurants.keys().next().value; // use first location if not specified
+    const locationParam = req.params.location;
+    const normalizedLocation = Array.from(config.restaurants.keys()).find(
+        k => k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
+            (locationParam || k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    ) || config.restaurants.keys().next().value;
+    const restaurants = config.restaurants.get(normalizedLocation);
+
+    if (!restaurants) {
+        res.status(404).send(`Location '${locationParam}' not found`);
+        return;
+    }
+
     res.render(__dirname + "/../views/index.html", {
-        locations: [...config.restaurants.keys()].map(k => ({ name: k, selected: k === location })),
-        restaurants: config.restaurants.get(location).map(x => ({
-            id: location + "-" + x.id,
+        locations: [...config.restaurants.keys()].map(k => ({ name: k, selected: k === normalizedLocation })),
+        restaurants: restaurants.map(x => ({
+            id: normalizedLocation + "-" + x.id,
             name: x.name,
             url: x.urlFactory(new Date())
         })),
