@@ -16,6 +16,10 @@ This file tracks the project's progress using a task list format.
 
 ## Current Tasks
 
+* Updated the `normalize` function in `parsers/patronka/bigger.ts` to remove leading numbers and punctuation.
+* Verified the changes with unit tests in `test/unit/patronka/bigger.test.ts`.
+* Successfully ran tests using `npx ts-mocha`.
+
 * Test Infrastructure Modernization - Phase 1 (64% complete - 9/14 parsers tested)
 * Legacy test migration to standardized structure (4 tests pending)
 * Complex parser testing implementation (5 parsers remaining)

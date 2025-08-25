@@ -196,19 +196,12 @@ function matchesSoupName(name: string): boolean {
 }
 
 // Normalization helpers (copied from previous version)
-const junkPattern2 = /[A-Z]\d*:/g;
+export const junkPattern2 = /[A-Z]\d*:/g;
 
-function normalize(str: string): string {
+export function normalize(str: string): string {
     if (!str) return "";
-
-    // Remove leading "Zloženie:" (with optional whitespace)
     let s = str.replace(/^Zloženie:\s*/i, "");
-
-    // console.log("[Bigger parser debug] Normalizing string:", str);
-
-    // 1. Remove leading number and dash (e.g., "6 – ")
-    // let s = str.replace(/^\s*\d+\s*[–-]\s*/, "");
-
+    s = s.replace(/^\s*\d+[\.\-:]*\s*/, "");
     // 3. Replace all-uppercase dish name (with dashes, diacritics, spaces, unicode) before first parenthesis or end with Title Case
     s = s.replace(
         /^(\s*\d+\s*[–-]\s*)([^\d(]+?)(?=(\s*[Aa]:|\s*\(|\d|$))/u,
@@ -221,27 +214,22 @@ function normalize(str: string): string {
             return normalized;
         }
     );
-
     // 4. Remove unmatched extra opening or closing parenthesis after dish name
     s = s.replace(/\(\s*\(/g, "(");
     s = s.replace(/\)\s*\)/g, ")");
-
     // 5. Remove any trailing "(", " (", or " (" with spaces
     s = s.replace(/(\s*\(\s*)+$/, "");
-
     // 6. Continue with previous normalization
-    s = s
-        .removeAlergens?.()
-        .removeMetrics?.()
-        .replace(junkPattern2, "")
-        .trim()
-        .capitalizeFirstLetter?.();
-
+    if (typeof s === "string" && s.removeAlergens) {
+        s = s
+            .removeAlergens?.()
+            .removeMetrics?.()
+            .replace(junkPattern2, "")
+            .trim()
+            .capitalizeFirstLetter?.();
+    }
     // 2. Remove extra parenthesis after dish name (e.g., "((..." -> "(")
     s = s.replace(/\s*\(\s*$/g, "");
-
-    // console.log("[Bigger parser debug] Normalized string:", s);
-
     return s;
 }
 
