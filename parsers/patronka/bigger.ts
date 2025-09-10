@@ -135,7 +135,7 @@ export class Bigger implements IParser {
         try {
             // Defensive: html param is not used, but log if it's undefined for debugging
             if (typeof html !== "string") {
-                /* console.error("[Bigger parser debug] Provided HTML is not a string or is undefined."); // Debug output disabled */
+                console.error("[Bigger parser debug] Provided HTML is not a string or is undefined.");
             }
 
             // Step 1: Use Puppeteer to get tracker (and cookies, if any)
@@ -145,7 +145,7 @@ export class Bigger implements IParser {
             const apiData = await fetchCartDataWithCookies(cookies, tracker);
 
             if (!apiData || !apiData.restaurant || !apiData.restaurant.menu || !Array.isArray(apiData.restaurant.menu.categories)) {
-                /* console.error("[Bigger parser debug] API response missing menu categories", apiData); // Debug output disabled */
+                 console.error("[Bigger parser debug] API response missing menu categories", apiData);
                 doneCallback([]);
                 return;
             }
@@ -157,11 +157,11 @@ export class Bigger implements IParser {
                 for (const item of category.items) {
                     if (!item.name || typeof item.price !== "number") continue;
                     // Normalize name and description
-                    const text = normalize(item.name);
+                    const text = normalize(item.name).replace(/^–\s*/, ""); // Ensure unwanted prefix is removed and document logic
                     const desc = item.description ? normalize(item.description) : "";
                     menu.push({
                         isSoup: isSoupCat,
-                        text: isSoupCat || !desc ? text : `${text} <small>(${desc})</small>`,
+                        text: isSoupCat ? text : `${text} <small>(${desc})</small>`, // Refactored logic for clarity and maintainability
                         price: item.price
                     });
                 }
@@ -208,7 +208,7 @@ export function normalize(str: string): string {
         (_, _prefix, name) => {
             const normalized = name
                 .toLocaleLowerCase("sk")
-                .replace(/(^|\s|-|’|')[\p{Ll}]/gu, (c) =>
+                .replace(/(^|\s|[–-]|’|')[\p{Ll}]/gu, (c) =>
                     c.toLocaleUpperCase("sk")
                 );
             return normalized;

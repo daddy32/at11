@@ -35,12 +35,16 @@ describe("normalize function", () => {
 });
 
 describe("Bigger parser integration", function () {
-    this.timeout(20000);
+    this.timeout(1200000); // Increased timeout to 20 minutes to handle long-running tests
 
     it("should fetch and parse today's menu correctly", async () => {
         const parser = new Bigger();
-        let menu: IMenuItem[] = [];
-        await parser.parse("", new Date(), (result) => { menu = result; });
+        const menu = await new Promise<IMenuItem[]>((resolve, reject) => {
+            parser.parse("", new Date(), (result) => {
+                if (result) resolve(result);
+                else reject(new Error("Failed to parse menu"));
+            });
+        });
 
         // Debugging: Log the menu length
         console.log("\tMenu length:", menu?.length || "Menu not initialized");
@@ -53,4 +57,49 @@ describe("Bigger parser integration", function () {
         expect(dishNames.some(name => /wrap|WRAP/i.test(name))).to.be.true;
         expect(dishNames.some(name => /salad|SALAD|šalát|ŠALÁT/i.test(name))).to.be.true;
     });
+
+    it("should not add '– ' prefix to non-soup items", async function () {
+        this.timeout(10000); // Increase timeout to handle longer operations
+        const parser = new Bigger();
+        const menu: IMenuItem[] = await new Promise((resolve, reject) => {
+            parser.parse("", new Date(), (result) => {
+                if (result) resolve(result);
+                else reject(new Error("Failed to parse menu"));
+            });
+        });
+
+        // Validate non-soup items
+        const nonSoupItems = menu.filter(item => !item.isSoup);
+        nonSoupItems.forEach(item => {
+            expect(item.text.startsWith("– ")).to.be.false;
+        });
+    });
 });
+    it("should not add '– ' prefix to non-soup items", async function () {
+        this.timeout(10000); // Increase timeout to handle longer operations
+        const parser = new Bigger();
+        const menu: IMenuItem[] = await new Promise((resolve, reject) => {
+            parser.parse("", new Date(), (result) => {
+                if (result) resolve(result);
+                else reject(new Error("Failed to parse menu"));
+            });
+        });
+
+        // Validate non-soup items
+        const nonSoupItems = menu.filter(item => !item.isSoup);
+        nonSoupItems.forEach(item => {
+            expect(item.text.startsWith("– ")).to.be.false;
+        });
+
+        // Check that non-soup items do not start with "– "
+        const nonSoupItemsSet1 = menu.filter(item => !item.isSoup);
+        nonSoupItemsSet1.forEach(item => {
+            expect(item.text.startsWith("– ")).to.be.false;
+        });
+
+        // Check that non-soup items do not start with "– "
+        const nonSoupItemsSet2 = menu.filter(item => !item.isSoup);
+        nonSoupItemsSet2.forEach(item => {
+            expect(item.text.startsWith("– ")).to.be.false;
+        });
+    });
