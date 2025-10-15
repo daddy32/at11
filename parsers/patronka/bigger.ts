@@ -156,9 +156,9 @@ export class Bigger implements IParser {
                 const isSoupCat = isSoupCategory(category);
                 for (const item of category.items) {
                     if (!item.name || typeof item.price !== "number") continue;
-                    // Normalize name and description
-                    const text = normalize(item.name).replace(/^–\s*/, ""); // Ensure unwanted prefix is removed and document logic
-                    const desc = item.description ? normalize(item.description) : "";
+                    // Title Case for name, simple normalization for description
+                    const text = normalize(item.name).replace(/^–\s*/, "");
+                    const desc = item.description ? normalizeDescription(item.description) : "";
                     menu.push({
                         isSoup: isSoupCat,
                         text: isSoupCat ? text : `${text} <small>(${desc})</small>`, // Refactored logic for clarity and maintainability
@@ -200,36 +200,50 @@ export const junkPattern2 = /[A-Z]\d*:/g;
 
 export function normalize(str: string): string {
     if (!str) return "";
-    let s = str.replace(/^Zloženie:\s*/i, "");
+    // 1. Basic cleanup and trimming
+    let s = str.trim();
+    // 2. Remove composition prefix
+    s = s.replace(/^Zloženie:\s*/i, "");
+    // 3. Remove leading numbers and punctuation
     s = s.replace(/^\s*\d+[\.\-:]*\s*/, "");
-    // 3. Replace all-uppercase dish name (with dashes, diacritics, spaces, unicode) before first parenthesis or end with Title Case
-    s = s.replace(
-        /^(\s*\d+\s*[–-]\s*)([^\d(]+?)(?=(\s*[Aa]:|\s*\(|\d|$))/u,
-        (_, _prefix, name) => {
-            const normalized = name
-                .toLocaleLowerCase("sk")
-                .replace(/(^|\s|[–-]|’|')[\p{Ll}]/gu, (c) =>
-                    c.toLocaleUpperCase("sk")
-                );
-            return normalized;
-        }
+    // 4. Convert to Title Case using Slovak locale rules
+    s = s.toLocaleLowerCase("sk").replace(
+        /(^|\s|[–-]|'|')[\p{Ll}]/gu,
+        c => c.toLocaleUpperCase("sk")
     );
-    // 4. Remove unmatched extra opening or closing parenthesis after dish name
-    s = s.replace(/\(\s*\(/g, "(");
-    s = s.replace(/\)\s*\)/g, ")");
-    // 5. Remove any trailing "(", " (", or " (" with spaces
-    s = s.replace(/(\s*\(\s*)+$/, "");
-    // 6. Continue with previous normalization
-    if (typeof s === "string" && s.removeAlergens) {
-        s = s
-            .removeAlergens?.()
-            .removeMetrics?.()
-            .replace(junkPattern2, "")
-            .trim()
-            .capitalizeFirstLetter?.();
-    }
-    // 2. Remove extra parenthesis after dish name (e.g., "((..." -> "(")
-    s = s.replace(/\s*\(\s*$/g, "");
+    // 5. Remove allergen codes (including those in parentheses)
+    s = s.replace(/\s*(?:\(?\s*(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:\-]?\s*)?\b\d{1,2}(?:\s*,\s*\d{1,2})*\b\s*\)?/gi, "");
+    // 6. Clean up parentheses after removing allergens
+    s = s.replace(/\(\s*\)/g, "") // Remove empty parentheses
+         .replace(/\(\s*\(/g, "(")
+         .replace(/\)\s*\)/g, ")")
+         .replace(/(\s*\(\s*)+$/, "")
+         .replace(/\s*\(\s*$/g, "");
+    // 7. Remove any remaining junk patterns and final cleanup
+    s = s.replace(junkPattern2, "").trim();
+    return s;
+}
+
+// Normalizes descriptions by removing metrics, allergens, and cleaning up whitespace
+export function normalizeDescription(str: string): string {
+    if (!str) return "";
+    let s = str.trim();
+    // Remove metric measurements
+    s = s.replace(/\b\d+(?:[.,]\d+)?\s?(?:g|kg|mg|ml|l|dl|cl)\b/gi, "");
+    // Remove allergen listings (with or without parentheses)
+    s = s.replace(/\s*\(?(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:\-]?\s*\d{1,2}(?:\s*,\s*\d{1,2})*\)?/gi, "");
+    // Clean up parentheses
+    s = s.replace(/\(\s*\(/g, "(")
+         .replace(/\)\s*\)/g, ")")
+         .replace(/(\s*\(\s*)+$/, "")
+         .replace(/\s*\(\s*$/g, "");
+    // Clean up extra spaces and commas
+    s = s.replace(/\s+/g, " ")
+         .replace(/\s*,\s*/g, ", ")
+         .replace(/,+/g, ",")
+         .replace(/\s+,/g, ",")
+         .replace(/,(?=\s*$)/, "")
+         .trim();
     return s;
 }
 
