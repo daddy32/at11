@@ -69,4 +69,21 @@ describe("Priatelia Parser", () => {
       done();
     });
   });
+
+  it("should remove trailing allergen markers like 1,3/ from menu item text", (done) => {
+    const html = fs.readFileSync(
+      path.join(__dirname, "../../samples/priatelia-menucka.html"),
+      "utf-8"
+    );
+    const todayDate = TestHelper.createMockDate("2026-01-12");
+    parser.parse(html, todayDate, (menu) => {
+      expect(menu.length).to.be.greaterThan(0);
+      const trailingPattern = /\d{1,2}(?:,\d{1,2})*\/\s*$/;
+      const hasTrailingAllergens = menu.some((item) =>
+        trailingPattern.test(item.text || "")
+      );
+      expect(hasTrailingAllergens).to.be.false;
+      done();
+    });
+  });
 });
