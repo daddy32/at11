@@ -42,7 +42,13 @@ export class Config implements IConfig {
     public readonly bypassCache: boolean = process.env.AT11_NO_CACHE === "true";
     public readonly cacheExpiration = 2 * 60 * 60; // 2h
     public readonly requestTimeout = 15 * 1000; // 15s
-    public readonly parserTimeout = 60 * 1000; // 60s (increased for OCR parsers)
+    public readonly parserTimeout = (() => {
+        const configuredTimeout = Number(process.env.AT11_PARSER_TIMEOUT_MS);
+        if (Number.isFinite(configuredTimeout) && configuredTimeout > 0) {
+            return configuredTimeout;
+        }
+        return 120 * 1000; // 120s default for slower OCR parsers
+    })();
     public readonly restaurants = new Map<string, ReadonlyArray<{
          id: number,
          name: string,
