@@ -28,7 +28,7 @@ if (config.appInsightsInstrumentationKey) {
     appInsights.start();
 }
 
-const actions = new Map<string, ((date: Date, done: (result: IMenuResult) => void) => void)>();
+const actions = new Map<string, ((date: Date, forceRefresh: boolean, done: (result: IMenuResult) => void) => void)>();
 for (const location of config.restaurants.keys()) {
     for (const restaurant of config.restaurants.get(location)) {
         console.log(`Processing: ${location}/${restaurant.id} - ${restaurant.name}`);
@@ -37,7 +37,13 @@ for (const location of config.restaurants.keys()) {
             if (actions.has(id)) {
                 throw new Error("Non unique id '" + id + "' provided within '" + location + "' restaurants");
             }
-            actions.set(id, (date, doneCallback) => menuFetcher.fetchMenu(restaurant.urlFactory, date, restaurant.parser, doneCallback));
+            actions.set(id, (date, forceRefresh, doneCallback) => menuFetcher.fetchMenu(
+                restaurant.urlFactory,
+                date,
+                restaurant.parser,
+                doneCallback,
+                { forceRefresh }
+            ));
         } catch (e) {
             console.warn(e);
         }
@@ -92,7 +98,9 @@ app.get("/menu/:id", (req, res) => {
         return;
     }
 
-    actions.get(req.params.id)(date, result => {
+    const forceRefresh = req.query.forceRefresh === "1" || req.query.forceRefresh === "true";
+
+    actions.get(req.params.id)(date, forceRefresh, result => {
         const timeago = formatDistance(result.timestamp, new Date(), { addSuffix: true, locale: sk });
         if (isError(result.value)) {
             res.status(500).json({ error: result.value.toString(), timeago });

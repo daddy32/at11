@@ -11,12 +11,22 @@ export interface IMenuResult {
     value: IMenuItem[] | Error;
 }
 
+export interface IFetchMenuOptions {
+    forceRefresh?: boolean;
+}
+
 export class MenuFetcher {
     private readonly _runningRequests: { [url: string]: ((error: Error, menu: IMenuItem[]) => void)[] } = {};
 
     constructor(private readonly _config: IConfig, private readonly _cache: NodeCache) { }
 
-    public fetchMenu(urlFactory: (date: Date) => string, date: Date, parser: IParser, doneCallback: (result: IMenuResult) => void): void {
+    public fetchMenu(
+        urlFactory: (date: Date) => string,
+        date: Date,
+        parser: IParser,
+        doneCallback: (result: IMenuResult) => void,
+        options: IFetchMenuOptions = {}
+    ): void {
         let url = urlFactory(date);
         url = sanitizeUrl(url);
 
@@ -27,7 +37,7 @@ export class MenuFetcher {
 
         const cacheKey = date + ":" + url;
         const cached = this._cache.get<IMenuResult>(cacheKey);
-        if (cached && !this._config.bypassCache) {
+        if (cached && !this._config.bypassCache && !options.forceRefresh) {
             doneCallback(cached);
         } else {
             this.load(url, date, parser, (error: Error, menu: IMenuItem[]) => {
