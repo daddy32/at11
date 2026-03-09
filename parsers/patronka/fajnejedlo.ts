@@ -82,8 +82,12 @@ function extractWeeklySpecial(rawText: string): string {
 function findDaySection(rawText: string, date: Date): string {
   const dayNum = date.getDate();
   const dayName = format(date, "EEEE", { locale: sk });
-  const dayRegex = new RegExp(`(${DAY_NAMES.join("|")})\\s+${dayNum}\\.\\s*\\w+`, "i");
-  const dayMatch = rawText.match(dayRegex);
+  const dayRegex = new RegExp(
+    `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n]{0,8}\\s*${dayNum}\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`,
+    "i"
+  );
+  const dateOnlyRegex = new RegExp(`\\b${dayNum}\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`, "i");
+  const dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
 
   if (!dayMatch) {
     console.error(`[FajneJedlo parser] Day section not found in OCR for ${format(date, "yyyy-MM-dd")} (${dayName}).`);
@@ -97,10 +101,24 @@ function findDaySection(rawText: string, date: Date): string {
       continue;
     }
 
-    const nextDayRegex = new RegExp(`${day}\\s+\\d+\\.\\s*\\w+`, "i");
+    const nextDayRegex = new RegExp(
+      `${day}\\s*[^\\d\\r\\n]{0,8}\\s*\\d+\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`,
+      "i"
+    );
     const m = nextDayRegex.exec(rawText.slice(startIdx + 1));
     if (m && startIdx + 1 + m.index < endIdx) {
       endIdx = startIdx + 1 + m.index;
+    }
+  }
+
+  const nextDate = new Date(date);
+  nextDate.setDate(nextDate.getDate() + 1);
+  const nextDateRegex = new RegExp(`\\b${nextDate.getDate()}\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`, "i");
+  const nextDateMatch = nextDateRegex.exec(rawText.slice(startIdx + 1));
+  if (nextDateMatch) {
+    const nextDateIdx = startIdx + 1 + nextDateMatch.index;
+    if (nextDateIdx < endIdx) {
+      endIdx = nextDateIdx;
     }
   }
 

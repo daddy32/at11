@@ -76,5 +76,28 @@ Exklusiv Viedensky rezen, slovensky zemiakovy salat
       expect(normalizedTexts.some((text) => text.includes("masovy vyvar"))).to.equal(true);
       expect(normalizedTexts.some((text) => /vyprazany\s*bravcovy\s*rezen/.test(text))).to.equal(true);
     });
+
+    it("should parse Monday menu from JEDLIS-BISTRO-0309_0313.jpg", async function() {
+      this.timeout(180000);
+
+      const date = new Date("2026-03-09T00:00:00.000Z");
+      const imagePath = path.resolve(process.cwd(), "test/samples/JEDLIS-BISTRO-0309_0313.jpg");
+      const ocrResult = await Tesseract.recognize(imagePath, "slk");
+      const items = extractMenuFromText(ocrResult.data.text, date);
+      const soups = items.filter((item) => item.isSoup);
+      const mains = items.filter((item) => !item.isSoup);
+      const normalizedTexts = items.map((item) =>
+        item.text
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      );
+
+      expect(items.length).to.be.greaterThan(0);
+      expect(soups.length).to.be.greaterThan(0);
+      expect(mains.length).to.be.greaterThan(0);
+      expect(normalizedTexts.some((text) => text.includes("kacaci vyvar"))).to.equal(true);
+      expect(normalizedTexts.some((text) => /grilovana\s*zelenina/.test(text))).to.equal(true);
+    });
   });
 });
