@@ -14,10 +14,10 @@ describe("locations registry", () => {
         expect(getLocationBySlug("eurovea")?.displayName).to.equal("Eurovea");
     });
 
-    it("starts eurovea as a valid empty location", () => {
+    it("includes the first parser-backed eurovea venue", () => {
         const eurovea = getLocationBySlug("eurovea");
 
         expect(eurovea).to.not.equal(undefined);
-        expect(eurovea?.restaurants).to.deep.equal([]);
+        expect(eurovea?.restaurants.map(restaurant => restaurant.name)).to.deep.equal(["DOCK7"]);
     });
 });
