@@ -86,6 +86,8 @@ export class Dock7 implements IParser {
             }
 
             currentItem.text = currentItem.text
+                .replace(/\[\s*\*\s*[\d,\s]+\]/g, " ")
+                .replace(/\s*\|\s*/g, " ")
                 .normalizeWhitespace()
                 .removeAlergens()
                 .removeMetrics()

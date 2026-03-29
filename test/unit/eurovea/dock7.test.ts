@@ -36,11 +36,14 @@ describe("Dock7 Parser", () => {
             const chicken = menu.find(item => item.text.includes("Kuracie prsia sous-vide"));
             expect(chicken).to.not.equal(undefined);
             expect(chicken?.text).to.include("cannelloni");
+            expect(chicken?.text).to.not.include("[ * 1, 3, 7, 9 ]");
+            expect(chicken?.text).to.not.include("|");
             expect(chicken?.price).to.equal(11.9);
 
             const salad = menu.find(item => item.text.includes("Šalát z miešaných listov"));
             expect(salad).to.not.equal(undefined);
             expect(salad?.text).to.include("grilované hrušky");
+            expect(salad?.text).to.not.include("[ * 7, 8, 12 ]");
             expect(salad?.price).to.equal(10.9);
 
             expect(menu.some(item => item.text.includes("s denným menu"))).to.equal(false);
