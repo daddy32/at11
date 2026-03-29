@@ -20,6 +20,14 @@ function readCookie(name) {
     }
 }
 
+function getLocationSlug() {
+    return document.body.getAttribute("data-location-slug") || "patronka";
+}
+
+function getHiddenRestaurantsCookieKey() {
+    return "hiddenRestaurants:" + getLocationSlug();
+}
+
 function getRetryButtonLabel(secondsRemaining) {
     if (secondsRemaining > 0) {
         return RETRY_ICON_HTML + " Sk\u00fasi\u0165 znova o " + secondsRemaining + " s";
@@ -147,7 +155,7 @@ function loadMenu(article, date, container, forceRefresh) {
 
 function initialHide(cont) {
     window.hiddenRestaurants = {};
-    var hidden = readCookie("hiddenRestaurants");
+    var hidden = readCookie(getHiddenRestaurantsCookieKey());
     if (typeof hidden === "undefined") {
         return;
     }
@@ -244,7 +252,7 @@ $("#selectrestaurants").on("click", function(e) {
             unChecked.push($(this).val());
         }
     });
-    writeCookie("hiddenRestaurants", unChecked.join(","), 10 * 365);
+    writeCookie(getHiddenRestaurantsCookieKey(), unChecked.join(","), 10 * 365);
 });
 
 // run additional layout when page is fully loaded (including fonts, images etc..)

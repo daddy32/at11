@@ -5,6 +5,15 @@ Web application displaying daily menus of favorite restaurants at Patrónka, Bra
 
 Live application is running at [https://patronka.cloud.kozej.com/](https://patronka.cloud.kozej.com/).
 
+Locations
+---
+
+- Canonical URLs are `/patronka` and `/eurovea`.
+- `/` redirects to the default location.
+- Shared server and frontend code stay in the project root.
+- Location-specific metadata lives in `locations/`.
+- Location-specific parsers live in `parsers/<slug>/`.
+
 
 Fork of at11 by Erni.
 

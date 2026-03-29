@@ -29,8 +29,8 @@ describe("Bemi Parser", () => {
       expect(menu).to.be.an("array").with.length.greaterThan(0);
       expect(menu[0]).to.have.property("text").that.is.a("string");
       expect(menu[0]).to.have.property("price").that.is.a("number");
-      expect(menu.some(item => item.price === 1.5)).to.be.true;
-      expect(menu.some(item => item.price === 5.9)).to.be.true;
+      expect(menu.some(item => item.price === 1.5)).to.equal(true);
+      expect(menu.some(item => item.price === 5.9)).to.equal(true);
       done();
     });
   });
@@ -49,7 +49,7 @@ describe("Bemi Parser", () => {
       "</div></div></div>"
     );
     parser.parse(html, mockDate, (menu) => {
-      expect(menu.some(item => item.text.trim() === "")).to.be.false;
+      expect(menu.some(item => item.text.trim() === "")).to.equal(false);
       done();
     });
   });

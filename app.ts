@@ -4,6 +4,7 @@ import hbs from "hbs";
 import NodeCache from "node-cache";
 
 import { Config } from "./config";
+import { buildPageModel } from "./locations/buildPageModel";
 import { MenuFetcher, IMenuResult } from "./menuFetcher";
 /**
  * Node.js 20+ does not export isError from "util".
@@ -29,13 +30,13 @@ if (config.appInsightsInstrumentationKey) {
 }
 
 const actions = new Map<string, ((date: Date, forceRefresh: boolean, done: (result: IMenuResult) => void) => void)>();
-for (const location of config.restaurants.keys()) {
-    for (const restaurant of config.restaurants.get(location)) {
-        console.log(`Processing: ${location}/${restaurant.id} - ${restaurant.name}`);
+for (const location of config.locations.values()) {
+    for (const restaurant of location.restaurants) {
+        console.log(`Processing: ${location.slug}/${restaurant.id} - ${restaurant.name}`);
         try {
-            const id = location + "-" + restaurant.id;
+            const id = location.slug + "-" + restaurant.id;
             if (actions.has(id)) {
-                throw new Error("Non unique id '" + id + "' provided within '" + location + "' restaurants");
+                throw new Error("Non unique id '" + id + "' provided within '" + location.slug + "' restaurants");
             }
             actions.set(id, (date, forceRefresh, doneCallback) => menuFetcher.fetchMenu(
                 restaurant.urlFactory,
@@ -59,28 +60,23 @@ const app = express();
 app.set("view engine", "html");
 app.engine("html", hbs.__express);
 app.use(express.static(__dirname + "/../static"));
-app.get("/:location?", (req, res) => {
+
+app.get("/", (_, res) => {
+    res.redirect(302, `/${config.defaultLocation.slug}`);
+});
+
+app.get("/:locationSlug", (req, res) => {
     res.setHeader("Content-Type", "text/html; charset=UTF-8");
     res.setHeader("Content-Language", "sk");
-    const locationParam = req.params.location;
-    const normalizedLocation = Array.from(config.restaurants.keys()).find(
-        k => k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
-            (locationParam || k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    ) || config.restaurants.keys().next().value;
-    const restaurants = config.restaurants.get(normalizedLocation);
+    const location = config.locations.get(req.params.locationSlug);
 
-    if (!restaurants) {
-        res.status(404).send(`Location '${locationParam}' not found`);
+    if (!location) {
+        res.status(404).send(`Location '${req.params.locationSlug}' not found`);
         return;
     }
 
     res.render(__dirname + "/../views/index.html", {
-        locations: [...config.restaurants.keys()].map(k => ({ name: k, selected: k === normalizedLocation })),
-        restaurants: restaurants.map(x => ({
-            id: normalizedLocation + "-" + x.id,
-            name: x.name,
-            url: x.urlFactory(new Date())
-        })),
+        ...buildPageModel(location, [...config.locations.values()], new Date()),
         appInsightsKey: config.appInsightsInstrumentationKey
     });
 });

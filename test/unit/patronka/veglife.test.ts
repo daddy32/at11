@@ -12,10 +12,17 @@ describe("VegLife Parser", () => {
   let parser: VegLife;
   let mockDate: Date;
 
-  const promoText = "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! Vo Freshmarkete začína happy hour o 15:00.";
+  const promoText =
+    "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo " +
+    "polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a " +
+    "donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! " +
+    "Vo Freshmarkete začína happy hour o 15:00.";
   const normalText = "Šošovicová polievka s párkom";
   const promoTemplates = [
-    "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! Vo Freshmarkete začína happy hour o 15:00.",
+    "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo " +
+    "polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a " +
+    "donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! " +
+    "Vo Freshmarkete začína happy hour o 15:00.",
     "Vo Freshmarkete začína happy hour o 15:00.",
     "Happy hour sa nevzťahuje na dezerty, nápoje a donášku."
   ];
@@ -38,10 +45,12 @@ describe("VegLife Parser", () => {
 
   it("should filter out promo text and preserve normal menu items", async () => {
     // Patch parseBase to return our fake menu
-    const parseBaseStub = sinon.stub((VegLife.prototype as any), "parseBase").returns(JSON.parse(JSON.stringify(fakeMenu)));
+    const parseBaseStub = sinon
+      .stub(VegLife.prototype as unknown as { parseBase: () => IMenuItem[] }, "parseBase")
+      .returns(JSON.parse(JSON.stringify(fakeMenu)));
     await parser.parse(html, mockDate, (menu: IMenuItem[]) => {
-      expect(menu.some(item => item.text === promoText)).to.be.false;
-      expect(menu.some(item => item.text.includes("Šošovicová"))).to.be.true;
+      expect(menu.some(item => item.text === promoText)).to.equal(false);
+      expect(menu.some(item => item.text.includes("Šošovicová"))).to.equal(true);
       parseBaseStub.restore();
     });
   });

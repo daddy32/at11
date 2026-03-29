@@ -107,7 +107,9 @@ export class Mdvsr implements IParser {
         } catch (e) {
             try {
                 fs.writeFileSync("parser-error-debug.txt", String(e), { encoding: "utf8" });
-            } catch (_) {}
+            } catch (_error) {
+                // Ignore failures in debug-file creation and return an empty menu.
+            }
             doneCallback([]);
         }
     }

@@ -43,11 +43,11 @@
         "start": "node dist/app.js",
         "lint": "tsc --noEmit && eslint . --ext .js,.ts --fix",
         "pretest": "eslint . --ext .js,.ts",
-        "test": "mocha test/**/*.test.ts --exit",
-        "test:unit": "mocha test/**/*.test.ts",
-        "test:integration": "mocha test/integration/**/*.test.ts",
-        "test:watch": "mocha test/**/*.test.ts --watch",
-        "test:coverage": "nyc mocha test/**/*.test.ts"
+        "test": "mocha --require ts-node/register --timeout 10000 --extension ts \"test/**/*.test.ts\" --exit",
+        "test:unit": "mocha --require ts-node/register --timeout 10000 --extension ts \"test/**/*.test.ts\"",
+        "test:integration": "mocha --require ts-node/register --timeout 10000 --extension ts \"test/integration/**/*.test.ts\"",
+        "test:watch": "mocha --require ts-node/register --timeout 10000 --extension ts \"test/**/*.test.ts\" --watch",
+        "test:coverage": "nyc mocha --require ts-node/register --timeout 10000 --extension ts \"test/**/*.test.ts\""
     },
     "author": {
         "name": "Jakub Šturc",

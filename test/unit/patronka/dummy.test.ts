@@ -20,7 +20,7 @@ describe("Dummy Parser", () => {
     parser.parse("", mockDate, (menu) => {
       expect(menu).to.be.an("array").with.lengthOf(1);
       expect(menu[0].text).to.include("Klik");
-      expect(menu[0].isSoup).to.be.true;
+      expect(menu[0].isSoup).to.equal(true);
       done();
     });
   });

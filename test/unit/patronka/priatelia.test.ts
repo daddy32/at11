@@ -63,7 +63,7 @@ describe("Priatelia Parser", () => {
           !arr[idx + 1].text
       );
       // Should not find any split description/price pairs
-      expect(hasSplit).to.be.false;
+      expect(hasSplit).to.equal(false);
       // Should find at least one menu item for Friday
       expect(menu.length).to.be.greaterThan(0);
       done();
@@ -82,7 +82,7 @@ describe("Priatelia Parser", () => {
       const hasTrailingAllergens = menu.some((item) =>
         trailingPattern.test(item.text || "")
       );
-      expect(hasTrailingAllergens).to.be.false;
+      expect(hasTrailingAllergens).to.equal(false);
       done();
     });
   });

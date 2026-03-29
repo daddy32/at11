@@ -14,12 +14,12 @@ export class LunchBreak implements IParser {
         const junkPattern = /^\s*\/*\s*|(\+\s*Polievka\s*:.*)/g;
         const dropJunk = /\s*MENU\s*$|^$/g;
         const pricePattern = /(\d+,\d+)\s*[e€]/i;
-        const alergPattern = /\/*\s*[\/(](\s*[\d\-+*]\s?[.,]?\s?)*[\/)]\s*/g;
+        const alergPattern = /\/*\s*[/(](\s*[\d-+*]\s?[.,]?\s?)*[/)]\s*/g;
         const soupPattern = /POLIEVKA/;
 
         const targetDayName = format(date, "EEEE", { locale: sk });
         const selector = "h5:contains('" + targetDayName.substring(2) + "')";
-        var dayMenuElement = $(selector);
+        let dayMenuElement = $(selector);
         // console.log("dayMenuElement: ")
         // console.log(dayMenuElement)
         // console.log(dayMenuElement.text())
@@ -29,7 +29,7 @@ export class LunchBreak implements IParser {
           const targetDayDate = format(date, "d.LL.yyyy", { locale: sk });
           const selectorDate = `h5:contains("${targetDayDate}")`;
           // console.log(` selectorDate: ${selectorDate}`)
-          var dayMenuElement = $(selector);
+          dayMenuElement = $(selectorDate);
           if (dayMenuElement.length >= 1) {
             // console.log(` Found!`)
           } else {

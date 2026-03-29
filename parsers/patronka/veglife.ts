@@ -18,7 +18,10 @@ export class VegLife extends Menucka implements IParser {
         if (menuItems.length > 0) {
             let prev_text = "";
             const promoTemplates = [
-                "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje a donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú cenu! Vo Freshmarkete začína happy hour o 15:00.",
+                "Nestihli ste u nás obed? Príďte k nám medzi 14:00 a 15:00 a za jedlo na váhu alebo " +
+                "polievku zaplatíte cenu zníženú o 40 %. Happy hour sa nevzťahuje na dezerty, nápoje " +
+                "a donášku. Buďte v správny čas na správnom mieste a užite si skvelé jedlo za výhodnú " +
+                "cenu! Vo Freshmarkete začína happy hour o 15:00.",
                 "Vo Freshmarkete začína happy hour o 15:00.",
                 "Happy hour sa nevzťahuje na dezerty, nápoje a donášku.",
                 "Donáška a osobný odber:",

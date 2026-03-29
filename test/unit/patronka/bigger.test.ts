@@ -76,12 +76,12 @@ describe("Bigger parser integration", function () {
         console.log("\tMenu length:", menu?.length || "Menu not initialized");
 
         // Basic checks
-        expect(menu).to.be.an("array").that.is.not.empty;
+        expect(menu).to.be.an("array").that.has.length.greaterThan(0);
         const dishNames = menu.map(item => item.text);
-        expect(dishNames.some(name => /burger|BURGER/i.test(name))).to.be.true;
-        expect(dishNames.some(name => /burrito|BURRITO/i.test(name))).to.be.true;
-        expect(dishNames.some(name => /wrap|WRAP/i.test(name))).to.be.true;
-        expect(dishNames.some(name => /salad|SALAD|šalát|ŠALÁT/i.test(name))).to.be.true;
+        expect(dishNames.some(name => /burger|BURGER/i.test(name))).to.equal(true);
+        expect(dishNames.some(name => /burrito|BURRITO/i.test(name))).to.equal(true);
+        expect(dishNames.some(name => /wrap|WRAP/i.test(name))).to.equal(true);
+        expect(dishNames.some(name => /salad|SALAD|šalát|ŠALÁT/i.test(name))).to.equal(true);
     });
 
     it("should not add '– ' prefix to non-soup items", async function () {

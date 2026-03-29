@@ -2,6 +2,7 @@ import { expect } from "chai";
 import NodeCache from "node-cache";
 
 import { IConfig } from "../../config";
+import { getDefaultLocation, getLocations } from "../../locations";
 import { IMenuItem } from "../../parsers/IMenuItem";
 import { IParser } from "../../parsers/IParser";
 import { MenuFetcher, IMenuResult } from "../../menuFetcher";
@@ -13,6 +14,9 @@ class NoopParser implements IParser {
 }
 
 function createConfig(): IConfig {
+    const defaultLocation = getDefaultLocation();
+    const locations = new Map(getLocations().map(location => [location.slug, location] as const));
+
     return {
         isProduction: false,
         scraperApiKey: "",
@@ -22,6 +26,8 @@ function createConfig(): IConfig {
         cacheExpiration: 120,
         requestTimeout: 1000,
         parserTimeout: 1000,
+        defaultLocation,
+        locations,
         restaurants: new Map()
     };
 }

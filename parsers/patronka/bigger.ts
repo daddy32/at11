@@ -1,8 +1,10 @@
 import puppeteer from "puppeteer";
 import { IMenuItem } from "../IMenuItem";
 import { IParser } from "../IParser";
-let fetch: typeof import("node-fetch").default | undefined;
-let Headers: typeof import("node-fetch").Headers | undefined;
+
+type NodeFetchModule = typeof import("node-fetch");
+
+let nodeFetchModulePromise: Promise<NodeFetchModule> | undefined;
 
 // Helper to bootstrap session cookies and tracker using Puppeteer
 // Usage: await getSessionCookiesAndTracker()
@@ -65,12 +67,10 @@ export async function getSessionCookiesAndTracker(): Promise<{ cookies: string, 
 
 // Fetches menu data from the API with all required headers and cookies
 async function fetchCartDataWithCookies(cookies: string, tracker: string): Promise<any> {
-    if (!fetch || !Headers) {
-        // Always use dynamic import to avoid ESM/CJS issues
-        const nodeFetch = await import("node-fetch");
-        fetch = nodeFetch.default;
-        Headers = nodeFetch.Headers;
+    if (!nodeFetchModulePromise) {
+        nodeFetchModulePromise = import("node-fetch");
     }
+    const nodeFetch = await nodeFetchModulePromise;
 
     const url = "https://www.foodbooking.com/api/cart/init";
     const payload = {
@@ -109,7 +109,7 @@ async function fetchCartDataWithCookies(cookies: string, tracker: string): Promi
     // console.log("[Bigger parser debug] API request headers:", headers);
     // console.log("[Bigger parser debug] API request payload:", JSON.stringify(payload));
 
-    const response = await fetch(url, {
+    const response = await nodeFetch.default(url, {
         method: "POST",
         headers,
         body: JSON.stringify(payload)
@@ -205,14 +205,14 @@ export function normalize(str: string): string {
     // 2. Remove composition prefix
     s = s.replace(/^Zloženie:\s*/i, "");
     // 3. Remove leading numbers and punctuation
-    s = s.replace(/^\s*\d+[\.\-:]*\s*/, "");
+    s = s.replace(/^\s*\d+[.-:]*\s*/, "");
     // 4. Convert to Title Case using Slovak locale rules
     s = s.toLocaleLowerCase("sk").replace(
         /(^|\s|[–-]|'|')[\p{Ll}]/gu,
         c => c.toLocaleUpperCase("sk")
     );
     // 5. Remove allergen codes (including those in parentheses)
-    s = s.replace(/\s*(?:\(?\s*(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:\-]?\s*)?\b\d{1,2}(?:\s*,\s*\d{1,2})*\b\s*\)?/gi, "");
+    s = s.replace(/\s*(?:\(?\s*(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:-]?\s*)?\b\d{1,2}(?:\s*,\s*\d{1,2})*\b\s*\)?/gi, "");
     // 6. Clean up parentheses after removing allergens
     s = s.replace(/\(\s*\)/g, "") // Remove empty parentheses
          .replace(/\(\s*\(/g, "(")
@@ -231,7 +231,7 @@ export function normalizeDescription(str: string): string {
     // Remove metric measurements
     s = s.replace(/\b\d+(?:[.,]\d+)?\s?(?:g|kg|mg|ml|l|dl|cl)\b/gi, "");
     // Remove allergen listings (with or without parentheses)
-    s = s.replace(/\s*\(?(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:\-]?\s*\d{1,2}(?:\s*,\s*\d{1,2})*\)?/gi, "");
+    s = s.replace(/\s*\(?(?:A(?:lerg(?:e|é)ny?)?|A)\s*[:-]?\s*\d{1,2}(?:\s*,\s*\d{1,2})*\)?/gi, "");
     // Clean up parentheses
     s = s.replace(/\(\s*\(/g, "(")
          .replace(/\)\s*\)/g, ")")

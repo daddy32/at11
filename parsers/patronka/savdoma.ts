@@ -16,8 +16,8 @@ export class SavDoma implements IParser {
 
         if (textNodes.length > 0 && priceNodes.length > 0 && textNodes.length === priceNodes.length) {
             textNodes.each((i, elem) => {
-                let text = $(elem).text().trim().toLowerCase();
-                let price = parseFloat($(priceNodes[i]).text().replace(",", ".").replace("€", ""));
+                const text = $(elem).text().trim().toLowerCase();
+                const price = parseFloat($(priceNodes[i]).text().replace(",", ".").replace("€", ""));
                 if (!text || !/\w/.test(text)) return;
                 dayMenu.push({
                     isSoup: /polievka|vývar|krém|soup/.test(text),

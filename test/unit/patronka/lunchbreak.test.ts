@@ -16,7 +16,8 @@ const testHtml = `
   <p><span style="font-size: 12pt">0,25l   Kurací vývar so zeleninou a rezancami (1,3,9)</span><span style="font-size: 12pt"> </span></p>
   <hr>
   <p><strong><span style="font-size: 14pt;color: #b87e17">MENU</span></strong></p>
-  <p><strong><span style="font-size: 12pt"><span style="font-size: 14pt">A,</span> </span></strong><span style="font-size: 12pt">150/200g    Kuracia tikka masala s kokosovým mliekom, jazmínová ryža s bylinkami, klíčky, pak choi, Naan Indický chlieb, koriander (-)</span></p>
+  <p><strong><span style="font-size: 12pt"><span style="font-size: 14pt">A,</span> </span></strong>
+  <span style="font-size: 12pt">150/200g Kuracia tikka masala s kokosovým mliekom, jazmínová ryža s bylinkami, klíčky, pak choi, Naan Indický chlieb, koriander (-)</span></p>
   <p><span style="font-size: 14pt"><strong>8,80 €</strong></span></p>
 </div>
 </body>

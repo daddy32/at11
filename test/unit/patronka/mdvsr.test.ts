@@ -83,7 +83,7 @@ describe("Mdvsr Parser (PDF price extraction)", function () {
                 const found = menu.find(
                     m => m.text.includes(exp.text) && Math.abs(m.price - exp.price) < 0.01
                 );
-                expect(found, `Missing: ${exp.text} ${exp.price}`).to.exist;
+                expect(found, `Missing: ${exp.text} ${exp.price}`).to.not.equal(undefined);
             }
         });
     });
