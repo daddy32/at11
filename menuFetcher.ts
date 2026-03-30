@@ -1,4 +1,6 @@
 import Axios from "axios";
+import puppeteer from "puppeteer";
+import type { Browser } from "puppeteer";
 
 import { IConfig } from "./config";
 import { IMenuItem } from "./parsers/IMenuItem";
@@ -17,6 +19,7 @@ export interface IFetchMenuOptions {
 
 export class MenuFetcher {
     private readonly _runningRequests: { [url: string]: ((error: Error, menu: IMenuItem[]) => void)[] } = {};
+    private _browserPromise?: Promise<Browser>;
 
     constructor(private readonly _config: IConfig, private readonly _cache: NodeCache) { }
 
@@ -89,31 +92,95 @@ export class MenuFetcher {
             timeout: this._config.requestTimeout
         }).then(response => {
             if (response.status === 200) {
-                let timer = setTimeout(() => {
-                    timer = null; // clear needed as value is kept even after timeout fired
-                    done(new Error("Parser timeout"), null);
-                }, this._config.parserTimeout);
-
-                try {
-                    parser.parse(response.data, date, (menu) => {
-                        if (!timer) {
-                            // multiple calls in parser or parser called back after timeout
-                            return;
-                        }
-                        clearTimeout(timer);
-                        timer = null;
-
-                        done(null, menu);
-                    });
-                } catch (err) {
-                    clearTimeout(timer);
-                    timer = null;
-                    done(err, null);
-                }
+                this.parseFetchedHtml(response.data, date, parser, done);
             }
         }).catch(error => {
+            if (this.shouldUseBrowserFallback(url, error)) {
+                this.fetchHtmlWithBrowser(url)
+                    .then(html => {
+                        this.parseFetchedHtml(html, date, parser, done);
+                    })
+                    .catch(browserError => {
+                        console.error("Browser fallback failed for %s: %s", url, browserError && browserError.message ? browserError.message : browserError);
+                        done(browserError, null);
+                    });
+                return;
+            }
+
             console.error("Axios request failed for %s: %s", url, error && error.message ? error.message : error);
             done(error, null);
         });
+    }
+
+    private parseFetchedHtml(
+        html: string,
+        date: Date,
+        parser: IParser,
+        done: (error: Error, menu: IMenuItem[]) => void
+    ): void {
+        let timer = setTimeout(() => {
+            timer = null; // clear needed as value is kept even after timeout fired
+            done(new Error("Parser timeout"), null);
+        }, this._config.parserTimeout);
+
+        try {
+            parser.parse(html, date, (menu) => {
+                if (!timer) {
+                    // multiple calls in parser or parser called back after timeout
+                    return;
+                }
+                clearTimeout(timer);
+                timer = null;
+
+                done(null, menu);
+            });
+        } catch (err) {
+            clearTimeout(timer);
+            timer = null;
+            done(err, null);
+        }
+    }
+
+    private shouldUseBrowserFallback(url: string, error: unknown): boolean {
+        if (!url.includes("restauracie.sme.sk")) {
+            return false;
+        }
+
+        const axiosError = error as {
+            response?: {
+                status?: number;
+                data?: unknown;
+            };
+        };
+
+        return axiosError.response?.status === 403
+            && String(axiosError.response?.data ?? "").includes("Security Verification | SME");
+    }
+
+    private async fetchHtmlWithBrowser(url: string): Promise<string> {
+        const browser = await this.getBrowser();
+        const page = await browser.newPage();
+        try {
+            await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+            await page.setExtraHTTPHeaders({ "Accept-Language": "sk" });
+            await page.goto(url, { waitUntil: "domcontentloaded", timeout: this._config.requestTimeout });
+            await page.waitForSelector(".dnesne_menu, .ostatne_menu", { timeout: this._config.requestTimeout }).catch(() => undefined);
+            return await page.content();
+        } finally {
+            await page.close().catch(() => undefined);
+        }
+    }
+
+    private async getBrowser(): Promise<Browser> {
+        if (!this._browserPromise) {
+            this._browserPromise = puppeteer.launch({ headless: true });
+        }
+
+        try {
+            return await this._browserPromise;
+        } catch (error) {
+            this._browserPromise = undefined;
+            throw error;
+        }
     }
 }
