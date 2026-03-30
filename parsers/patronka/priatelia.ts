@@ -8,8 +8,11 @@ export class Priatelia extends Menucka implements IParser {
         const junkPatternMeal  = /A:|\s:|^\s*:\s*$/g;
         const junkPatternSoup = /\/\s*A\s*:[-,\s]*(\d+\s*,*)+.*/g;
         const junkPattern3 = /facebook|POLIEVKA K/i;
+        const mainItemPattern = /^(Menu|Jedlo)\s*\d+/i;
 
         if (menuItems.length > 0) {
+            const firstMainItemIndex = menuItems.findIndex(item => mainItemPattern.test(item.text.trim()));
+
             // Remove lines that are only allergen info (e.g. "/A:1.3.7", "/A:1,3,4,7")
             const allergenLinePattern = /^\/A:[\d.,\s]+$/;
             for (let i = menuItems.length - 1; i >= 0; i--) {
@@ -29,7 +32,8 @@ export class Priatelia extends Menucka implements IParser {
 
             menuItems.forEach((item, i) => {
                 // console.log(item.text, '   => ');
-                if (i==0) {
+                const isLeadingSoup = firstMainItemIndex > 0 ? i < firstMainItemIndex : i === 0;
+                if (isLeadingSoup) {
                     item.isSoup = true;
                     item.text = item.text
                         .replace(junkPatternSoup, "")

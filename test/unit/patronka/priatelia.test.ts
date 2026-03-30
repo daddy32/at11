@@ -86,4 +86,25 @@ describe("Priatelia Parser", () => {
       done();
     });
   });
+
+  it("marks the first two items as soups when both appear before Menu 1", (done) => {
+    const html = `
+      <div class="day-wrapper"><div class="day-title">Pondelok (30.03.2026)</div></div>
+      <div>0,25l Silný hovädzí vývar s cestovinou /A:1,3 aj bez 1,3</div>
+      <div class="price">2,00 €</div>
+      <div>0,25l Frankfurtska</div>
+      <div class="price">2,00 €</div>
+      <div>Menu 1:150g/200g Madarsky bravčový tokáň Halušky A1,3,7</div>
+      <div class="price">7,90 €</div>
+      <div class="day-wrapper"><div class="day-title">Utorok (31.03.2026)</div></div>
+    `;
+
+    parser.parse(html, TestHelper.createMockDate("2026-03-30"), (menu) => {
+      expect(menu).to.have.length(3);
+      expect(menu[0].isSoup).to.equal(true);
+      expect(menu[1].isSoup).to.equal(true);
+      expect(menu[2].isSoup).to.equal(false);
+      done();
+    });
+  });
 });
