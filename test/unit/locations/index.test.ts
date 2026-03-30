@@ -18,6 +18,12 @@ describe("locations registry", () => {
         const eurovea = getLocationBySlug("eurovea");
 
         expect(eurovea).to.not.equal(undefined);
-        expect(eurovea?.restaurants.map(restaurant => restaurant.name)).to.deep.equal(["DOCK7", "COMO", "Fajne Jedlo Tower"]);
+        expect(eurovea?.restaurants.map(restaurant => restaurant.name)).to.deep.equal([
+            "DOCK7",
+            "COMO",
+            "Fajne Jedlo Tower",
+            "Kolkovna Eurovea",
+            "Brasserie La Marine"
+        ]);
     });
 });
