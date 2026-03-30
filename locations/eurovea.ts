@@ -3,6 +3,9 @@ import { Como } from "../parsers/eurovea/como";
 import { Dock7 } from "../parsers/eurovea/dock7";
 import { FajneJedloTower } from "../parsers/eurovea/fajnejedlotower";
 import { KolkovnaEurovea } from "../parsers/eurovea/kolkovnaeurovea";
+import { Obederia } from "../parsers/eurovea/obederia";
+import { Priatelia } from "../parsers/patronka/priatelia";
+import { VegLife } from "../parsers/patronka/veglife";
 import { ILocationConfig } from "./types";
 
 export const euroveaLocation: ILocationConfig = {
@@ -40,6 +43,24 @@ export const euroveaLocation: ILocationConfig = {
             name: "Brasserie La Marine",
             urlFactory: _ => "https://restauracie.sme.sk/restauracia/brasserie-la-marine_3850-stare-mesto_2949/denne-menu",
             parser: new BrasserieLaMarine()
+        },
+        {
+            id: 6,
+            name: "Canteen Priatelia",
+            urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/canteen-priatelia-landererova-12",
+            parser: new Priatelia()
+        },
+        {
+            id: 7,
+            name: "Veg life",
+            urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/veg-life-pribinova",
+            parser: new VegLife()
+        },
+        {
+            id: 8,
+            name: "OBEDERIA",
+            urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/obederia-bratislava",
+            parser: new Obederia()
         }
     ]
 };

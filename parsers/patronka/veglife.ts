@@ -54,9 +54,11 @@ export class VegLife extends Menucka implements IParser {
                     item.text = "";
                 } else {
                     item.text = item.text
+                        .replace(/\[\s*[\d,\s]+\]/g, "")
                         .replace(junkPattern, "")
                         .removeAlergens()
                         .removeMetrics()
+                        .normalizeWhitespace()
                         .removeItemNumbering();
                 }
                 if (item.text == prev_text) {

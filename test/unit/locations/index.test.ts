@@ -23,7 +23,10 @@ describe("locations registry", () => {
             "COMO",
             "Fajne Jedlo Tower",
             "Kolkovna Eurovea",
-            "Brasserie La Marine"
+            "Brasserie La Marine",
+            "Canteen Priatelia",
+            "Veg life",
+            "OBEDERIA"
         ]);
     });
 });
