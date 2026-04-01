@@ -16,4 +16,10 @@ describe("index view", () => {
 
         expect(template).to.include('<article data-restaurant-id="{{this.id}}" {{#if this.isDummy}}class="dummy-menu"{{/if}}>');
     });
+
+    it("renders a masonry sizer so dummy tiles can share a row", () => {
+        const template = readFileSync("views/index.html", "utf8");
+
+        expect(template).to.include('<div class="grid-sizer"></div>');
+    });
 });

@@ -10,6 +10,9 @@ describe("dummy menu rendering", () => {
         expect(script).to.include('li.addClass("dummy-item")');
         expect(script).to.include('article.addClass("dummy-menu")');
         expect(script).to.include('article.removeClass("dummy-menu")');
+        expect(script).to.include('columnWidth: ".grid-sizer"');
+        expect(script).to.include("gutter: 20");
+        expect(script).to.include('itemSelector: "article"');
 
         expect(style).to.include("article.dummy-menu ul li.dummy-item");
         expect(style).to.include("font-size: 1em;");
@@ -18,7 +21,11 @@ describe("dummy menu rendering", () => {
         expect(style).to.include("article.dummy-menu > i.timeago");
         expect(style).to.include("article.dummy-menu h2");
         expect(style).to.include("font-size: 2em;");
+        expect(style).to.include("margin: 0 0 20px;");
+        expect(style).to.include("box-sizing: border-box;");
+        expect(style).to.include(".grid-sizer {");
+        expect(style).to.include("width: calc((33em - 20px) / 2);");
         expect(style).to.include("article.dummy-menu {");
-        expect(style).to.include("width: 15em;");
+        expect(style).to.include("width: calc((33em - 20px) / 2);");
     });
 });

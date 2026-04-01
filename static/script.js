@@ -224,6 +224,9 @@ var container = $("#container");
 loadMenus(container);
 initialHide(container);
 container.masonry({
+    itemSelector: "article",
+    columnWidth: ".grid-sizer",
+    gutter: 20,
     fitWidth: true
 });
 
