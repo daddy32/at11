@@ -36,8 +36,12 @@ describe("buildPageModel", () => {
             "Iná Haluška",
             "Regal Burger",
             "Chilantro",
-            "Plna miska",
-            "KFC"
+            "Plná miska",
+            "KFC",
+            "Sunshine",
+            "Mondieu",
+            "Konn Steakbar",
+            "Rams"
         ];
 
         expect(

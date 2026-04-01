@@ -93,7 +93,7 @@ export const euroveaLocation: ILocationConfig = {
         },
         {
             id: 13,
-            name: "Plna miska",
+            name: "Plná miska",
             urlFactory: _ => "https://www.instagram.com/plnamiska.bratislava/?__d=11",
             parser: new Dummy(),
             isDummy: true
@@ -102,6 +102,34 @@ export const euroveaLocation: ILocationConfig = {
             id: 14,
             name: "KFC",
             urlFactory: _ => "https://www.kfcslovakia.sk/produkty",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 15,
+            name: "Sunshine",
+            urlFactory: _ => "https://www.bistro.sk/restauracia/sunshine-eurovea-2",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 16,
+            name: "Mondieu",
+            urlFactory: _ => "https://mondieu.sk/menu/bratislava/eurovea/",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 17,
+            name: "Konn Steakbar",
+            urlFactory: _ => "https://www.konn.sk/menu/?gad_source=1&gad_campaignid=23695352384&gbraid=0AAAAAqZFlo3L1C8XizloB-NjJA7jlqgO3&gclid=CjwKCAjwvqjOBhAGEiwAngeQnS-H6L1Mljai2hwHTEVxHvXLZ7Jh9wXuKTomRQA_bTsxAX2DyCKHgxoC_gAQAvD_BwE&filter_product_cat=specialitky",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 18,
+            name: "Rams",
+            urlFactory: _ => "https://ramsfood.sk/menu/section:menu/predjedla",
             parser: new Dummy(),
             isDummy: true
         }

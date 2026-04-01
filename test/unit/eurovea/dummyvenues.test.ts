@@ -15,12 +15,28 @@ describe("Eurovea dummy venues", () => {
             url: "https://oceurovea.chilantro.sk/section:menu"
         },
         {
-            name: "Plna miska",
+            name: "Plná miska",
             url: "https://www.instagram.com/plnamiska.bratislava/?__d=11"
         },
         {
             name: "KFC",
             url: "https://www.kfcslovakia.sk/produkty"
+        },
+        {
+            name: "Sunshine",
+            url: "https://www.bistro.sk/restauracia/sunshine-eurovea-2"
+        },
+        {
+            name: "Mondieu",
+            url: "https://mondieu.sk/menu/bratislava/eurovea/"
+        },
+        {
+            name: "Konn Steakbar",
+            url: "https://www.konn.sk/menu/?gad_source=1&gad_campaignid=23695352384&gbraid=0AAAAAqZFlo3L1C8XizloB-NjJA7jlqgO3&gclid=CjwKCAjwvqjOBhAGEiwAngeQnS-H6L1Mljai2hwHTEVxHvXLZ7Jh9wXuKTomRQA_bTsxAX2DyCKHgxoC_gAQAvD_BwE&filter_product_cat=specialitky"
+        },
+        {
+            name: "Rams",
+            url: "https://ramsfood.sk/menu/section:menu/predjedla"
         }
     ];
 
