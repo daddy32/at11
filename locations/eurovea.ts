@@ -76,6 +76,34 @@ export const euroveaLocation: ILocationConfig = {
             urlFactory: _ => "https://www.bistro.sk/restauracia/ina-haluska-ba",
             parser: new Dummy(),
             isDummy: true
+        },
+        {
+            id: 11,
+            name: "Regal Burger",
+            urlFactory: _ => "https://www.menucka.sk/denne-menu/bratislava/regal-burger-eurovea-2",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 12,
+            name: "Chilantro",
+            urlFactory: _ => "https://oceurovea.chilantro.sk/section:menu",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 13,
+            name: "Plna miska",
+            urlFactory: _ => "https://www.instagram.com/plnamiska.bratislava/?__d=11",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 14,
+            name: "KFC",
+            urlFactory: _ => "https://www.kfcslovakia.sk/produkty",
+            parser: new Dummy(),
+            isDummy: true
         }
     ]
 };

@@ -31,8 +31,17 @@ describe("buildPageModel", () => {
             new Date("2026-03-24")
         );
 
-        const kinka = model.restaurants.find(x => x.name === "Kinka Ramen");
+        const dummyRestaurantNames = [
+            "Kinka Ramen",
+            "Iná Haluška",
+            "Regal Burger",
+            "Chilantro",
+            "Plna miska",
+            "KFC"
+        ];
 
-        expect(kinka?.isDummy).to.equal(true);
+        expect(
+            model.restaurants.filter(x => x.isDummy).map(x => x.name)
+        ).to.deep.equal(dummyRestaurantNames);
     });
 });

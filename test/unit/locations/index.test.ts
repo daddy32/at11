@@ -28,7 +28,11 @@ describe("locations registry", () => {
             "Veg life",
             "OBEDERIA",
             "Kinka Ramen",
-            "Iná Haluška"
+            "Iná Haluška",
+            "Regal Burger",
+            "Chilantro",
+            "Plna miska",
+            "KFC"
         ]);
     });
 });
