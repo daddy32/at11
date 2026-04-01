@@ -19,6 +19,8 @@ describe("Dummy Parser", () => {
   it("should return a single menu item with placeholder text", (done) => {
     parser.parse("", mockDate, (menu) => {
       expect(menu).to.be.an("array").with.lengthOf(1);
+      expect(menu[0].text).to.equal("👆");
+      expect((menu[0] as any).tooltip).to.equal("Klik 👆 (stále menu)");
       expect(menu[0].isSoup).to.equal(true);
       expect(menu[0].isDummy).to.equal(true);
       done();

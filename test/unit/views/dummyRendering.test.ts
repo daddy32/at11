@@ -8,6 +8,7 @@ describe("dummy menu rendering", () => {
 
         expect(script).to.include('if (item.isDummy) {');
         expect(script).to.include('li.addClass("dummy-item")');
+        expect(script).to.include('li.attr("title", item.tooltip)');
         expect(script).to.include('article.addClass("dummy-menu")');
         expect(script).to.include('article.removeClass("dummy-menu")');
         expect(script).to.include('columnWidth: ".grid-sizer"');
@@ -16,6 +17,8 @@ describe("dummy menu rendering", () => {
 
         expect(style).to.include("article.dummy-menu ul li.dummy-item");
         expect(style).to.include("font-size: 1em;");
+        expect(style).to.include("article.dummy-menu ul li.dummy-item span");
+        expect(style).to.include("text-align: center;");
         expect(style).to.include("article.dummy-menu ul li.dummy-item.soup:before");
         expect(style).to.include("display: none;");
         expect(style).to.include("article.dummy-menu > i.timeago");

@@ -129,6 +129,9 @@ function loadMenu(article, date, container, forceRefresh) {
                         }
                         if (item.isDummy) {
                             li.addClass("dummy-item");
+                            if (item.tooltip) {
+                                li.attr("title", item.tooltip);
+                            }
                             hasDummyItem = true;
                         }
                         li.append("<span>" + item.text + "</span>");

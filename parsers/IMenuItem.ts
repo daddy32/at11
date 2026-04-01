@@ -3,4 +3,5 @@ export interface IMenuItem {
     price: number;
     isSoup: boolean;
     isDummy?: boolean;
+    tooltip?: string;
 }

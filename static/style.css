@@ -285,6 +285,9 @@ article.dummy-menu h2 {
 article.dummy-menu ul li.dummy-item {
     font-size: 1em;
 }
+article.dummy-menu ul li.dummy-item span {
+    text-align: center;
+}
 article.dummy-menu ul li.dummy-item.soup:before {
     display: none;
 }

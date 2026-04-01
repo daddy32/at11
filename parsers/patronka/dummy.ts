@@ -6,10 +6,11 @@ export class Dummy extends Sme implements IParser {
     public parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): void {
         const menuItems = new Array<IMenuItem>();
         menuItems.push({
-            text: "<center>Klik &#128070; (stále menu)</center>",
+            text: "👆",
             price: 0,
             isSoup: true,
-            isDummy: true
+            isDummy: true,
+            tooltip: "Klik 👆 (stále menu)"
         });
 
         doneCallback(menuItems);
