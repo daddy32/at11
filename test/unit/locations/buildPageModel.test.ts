@@ -45,7 +45,10 @@ describe("buildPageModel", () => {
             "McDonalds",
             "Al Faro",
             "Le Bar",
-            "Sajado"
+            "Sajado",
+            "Primi",
+            "La Crema",
+            "Wagamama"
         ];
 
         expect(

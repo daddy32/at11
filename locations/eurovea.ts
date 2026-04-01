@@ -160,6 +160,27 @@ export const euroveaLocation: ILocationConfig = {
             urlFactory: _ => "https://www.sajado.sk/sajado-eurovea#jedalny-listok-1",
             parser: new Dummy(),
             isDummy: true
+        },
+        {
+            id: 23,
+            name: "Primi",
+            urlFactory: _ => "https://www.primieurovea.sk/wp-content/uploads/2026/03/menu_primi_eurovea_210x260_2026-3_SK.pdf",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 24,
+            name: "La Crema",
+            urlFactory: _ => "https://eurovea.lacrema.sk/wp-content/uploads/2025/08/LaCrema_EUROVEA_04_2025.pdf",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 25,
+            name: "Wagamama",
+            urlFactory: _ => "https://www.wagamama.sk/nase-jedlo?category=main-dishes",
+            parser: new Dummy(),
+            isDummy: true
         }
     ]
 };

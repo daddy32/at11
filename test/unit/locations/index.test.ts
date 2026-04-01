@@ -40,7 +40,10 @@ describe("locations registry", () => {
             "McDonalds",
             "Al Faro",
             "Le Bar",
-            "Sajado"
+            "Sajado",
+            "Primi",
+            "La Crema",
+            "Wagamama"
         ]);
     });
 });

@@ -53,6 +53,18 @@ describe("Eurovea dummy venues", () => {
         {
             name: "Sajado",
             url: "https://www.sajado.sk/sajado-eurovea#jedalny-listok-1"
+        },
+        {
+            name: "Primi",
+            url: "https://www.primieurovea.sk/wp-content/uploads/2026/03/menu_primi_eurovea_210x260_2026-3_SK.pdf"
+        },
+        {
+            name: "La Crema",
+            url: "https://eurovea.lacrema.sk/wp-content/uploads/2025/08/LaCrema_EUROVEA_04_2025.pdf"
+        },
+        {
+            name: "Wagamama",
+            url: "https://www.wagamama.sk/nase-jedlo?category=main-dishes"
         }
     ];
 
