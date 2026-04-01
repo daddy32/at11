@@ -4,6 +4,7 @@ import { Dock7 } from "../parsers/eurovea/dock7";
 import { FajneJedloTower } from "../parsers/eurovea/fajnejedlotower";
 import { KolkovnaEurovea } from "../parsers/eurovea/kolkovnaeurovea";
 import { Obederia } from "../parsers/eurovea/obederia";
+import { Dummy } from "../parsers/patronka/dummy";
 import { Priatelia } from "../parsers/patronka/priatelia";
 import { VegLife } from "../parsers/patronka/veglife";
 import { ILocationConfig } from "./types";
@@ -61,6 +62,13 @@ export const euroveaLocation: ILocationConfig = {
             name: "OBEDERIA",
             urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/obederia-bratislava",
             parser: new Obederia()
+        },
+        {
+            id: 9,
+            name: "Kinka Ramen",
+            urlFactory: _ => "https://www.kinkaramen.sk/menu",
+            parser: new Dummy(),
+            isDummy: true
         }
     ]
 };

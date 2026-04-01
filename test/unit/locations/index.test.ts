@@ -26,7 +26,8 @@ describe("locations registry", () => {
             "Brasserie La Marine",
             "Canteen Priatelia",
             "Veg life",
-            "OBEDERIA"
+            "OBEDERIA",
+            "Kinka Ramen"
         ]);
     });
 });

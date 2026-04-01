@@ -18,7 +18,8 @@ export function buildPageModel(
         restaurants: currentLocation.restaurants.map(restaurant => ({
             id: `${currentLocation.slug}-${restaurant.id}`,
             name: restaurant.name,
-            url: restaurant.urlFactory(now)
+            url: restaurant.urlFactory(now),
+            isDummy: restaurant.isDummy === true
         }))
     };
 }

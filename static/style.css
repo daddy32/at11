@@ -220,6 +220,9 @@ article {
     padding: 1.5em;
     background: white;
 }
+article.dummy-menu {
+    width: 15em;
+}
 article h2 {
     font-size: 2.5em;
     text-align: center;
@@ -272,6 +275,15 @@ article ul li.soup {
 article ul li.soup:before{
     background-image: url('../img/at11_soup_icon.png');
 }
+article.dummy-menu h2 {
+    font-size: 2em;
+}
+article.dummy-menu ul li.dummy-item {
+    font-size: 1em;
+}
+article.dummy-menu ul li.dummy-item.soup:before {
+    display: none;
+}
 article ul li.error {
     color: lightgrey;
     text-align: center;
@@ -315,6 +327,9 @@ article > i.timeago {
     font-size: 0.7em;
     text-align: right;
     color: #EE6B67;
+}
+article.dummy-menu > i.timeago {
+    display: none;
 }
 
 footer .copyright {

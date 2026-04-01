@@ -23,4 +23,16 @@ describe("buildPageModel", () => {
 
         expect(model.restaurants.every(x => x.id.startsWith("eurovea-"))).to.equal(true);
     });
+
+    it("exposes dummy restaurants in the page model for initial tile styling", () => {
+        const model = buildPageModel(
+            euroveaLocation,
+            [patronkaLocation, euroveaLocation],
+            new Date("2026-03-24")
+        );
+
+        const kinka = model.restaurants.find(x => x.name === "Kinka Ramen");
+
+        expect(kinka?.isDummy).to.equal(true);
+    });
 });

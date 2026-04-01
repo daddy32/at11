@@ -5,6 +5,7 @@ export interface IRestaurantConfig {
     readonly name: string;
     readonly urlFactory: (date: Date) => string;
     readonly parser: IParser;
+    readonly isDummy?: boolean;
 }
 
 export interface ILocationConfig {

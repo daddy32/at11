@@ -113,6 +113,7 @@ function loadMenu(article, date, container, forceRefresh) {
     var link = $("a", article).prop("href");
     var listElem = $("<ul></ul>");
     var refreshElem = null;
+    var hasDummyItem = false;
 
     $.ajax(buildMenuUrl(restaurantId, date, forceRefresh))
             .done(function(data) {
@@ -125,6 +126,10 @@ function loadMenu(article, date, container, forceRefresh) {
                         var li = $("<li></li>");
                         if (item.isSoup) {
                             li.addClass("soup");
+                        }
+                        if (item.isDummy) {
+                            li.addClass("dummy-item");
+                            hasDummyItem = true;
                         }
                         li.append("<span>" + item.text + "</span>");
                         if (item.price) {
@@ -145,6 +150,10 @@ function loadMenu(article, date, container, forceRefresh) {
             .always(function() {
                 article.find(".loader").remove();
                 article.find("ul, i.timeago").remove();
+                article.removeClass("dummy-menu");
+                if (hasDummyItem) {
+                    article.addClass("dummy-menu");
+                }
                 article.append(listElem);
                 if (refreshElem) {
                     article.append(refreshElem);
