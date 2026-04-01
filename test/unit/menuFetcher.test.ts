@@ -167,4 +167,32 @@ describe("MenuFetcher", () => {
         expect(gotoSpy.firstCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
         expect(gotoSpy.secondCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
     });
+
+    it("skips the HTTP request entirely for dummy menus and parses immediately", async () => {
+        const config = createConfig();
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache);
+        const date = new Date("2026-04-01T09:00:00.000Z");
+        const url = "https://www.bistro.sk/restauracia/ina-haluska-ba";
+        const parser: IParser = {
+            parse(html: string, _: Date, doneCallback: (menu: IMenuItem[]) => void): void {
+                doneCallback([{ text: html === "" ? "Dummy menu" : "Fetched unexpectedly", price: 0, isSoup: true, isDummy: true }]);
+            }
+        };
+
+        const axiosGetStub = sinon.stub(axios, "get");
+
+        const result = await new Promise<IMenuResult>(resolve => {
+            menuFetcher.fetchMenu(() => url, date, parser, resolve, { forceRefresh: true, skipFetch: true });
+        });
+
+        expect(axiosGetStub.called).to.equal(false);
+        expect(result.value).to.be.an("array");
+        expect((result.value as IMenuItem[])[0]).to.deep.include({
+            text: "Dummy menu",
+            price: 0,
+            isSoup: true,
+            isDummy: true
+        });
+    });
 });

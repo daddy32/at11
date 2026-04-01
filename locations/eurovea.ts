@@ -69,6 +69,13 @@ export const euroveaLocation: ILocationConfig = {
             urlFactory: _ => "https://www.kinkaramen.sk/menu",
             parser: new Dummy(),
             isDummy: true
+        },
+        {
+            id: 10,
+            name: "Iná Haluška",
+            urlFactory: _ => "https://www.bistro.sk/restauracia/ina-haluska-ba",
+            parser: new Dummy(),
+            isDummy: true
         }
     ]
 };

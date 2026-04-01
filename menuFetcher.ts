@@ -15,6 +15,7 @@ export interface IMenuResult {
 
 export interface IFetchMenuOptions {
     forceRefresh?: boolean;
+    skipFetch?: boolean;
 }
 
 export class MenuFetcher {
@@ -43,6 +44,18 @@ export class MenuFetcher {
         if (cached && !this._config.bypassCache && !options.forceRefresh) {
             doneCallback(cached);
         } else {
+            if (options.skipFetch) {
+                this.parseFetchedHtml("", date, parser, (error: Error, menu: IMenuItem[]) => {
+                    if (!error) {
+                        this._cache.set<IMenuResult>(cacheKey, { value: menu, timestamp: new Date() }, this._config.cacheExpiration);
+                    } else {
+                        this._cache.set<IMenuResult>(cacheKey, { value: error, timestamp: new Date() }, this._config.cacheExpiration / 2);
+                    }
+                    doneCallback(this._cache.get<IMenuResult>(cacheKey));
+                });
+                return;
+            }
+
             this.load(url, date, parser, (error: Error, menu: IMenuItem[]) => {
                 if (!error) {
                     this._cache.set<IMenuResult>(cacheKey, { value: menu, timestamp: new Date() }, this._config.cacheExpiration);

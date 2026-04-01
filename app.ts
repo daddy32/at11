@@ -43,7 +43,10 @@ for (const location of config.locations.values()) {
                 date,
                 restaurant.parser,
                 doneCallback,
-                { forceRefresh }
+                {
+                    forceRefresh,
+                    skipFetch: restaurant.isDummy === true
+                }
             ));
         } catch (e) {
             console.warn(e);

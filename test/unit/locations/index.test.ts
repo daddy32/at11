@@ -27,7 +27,8 @@ describe("locations registry", () => {
             "Canteen Priatelia",
             "Veg life",
             "OBEDERIA",
-            "Kinka Ramen"
+            "Kinka Ramen",
+            "Iná Haluška"
         ]);
     });
 });
