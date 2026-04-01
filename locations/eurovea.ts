@@ -132,6 +132,34 @@ export const euroveaLocation: ILocationConfig = {
             urlFactory: _ => "https://ramsfood.sk/menu/section:menu/predjedla",
             parser: new Dummy(),
             isDummy: true
+        },
+        {
+            id: 19,
+            name: "McDonalds",
+            urlFactory: _ => "https://www.mcdonalds.sk/menu/",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 20,
+            name: "Al Faro",
+            urlFactory: _ => "https://www.sassy.sk/upload/files/Alfaro_menu_jun_2025_web_1750845421.pdf",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 21,
+            name: "Le Bar",
+            urlFactory: _ => "https://sassy.sk/upload/files/HM_SK_12_25_web_1765192653.pdf",
+            parser: new Dummy(),
+            isDummy: true
+        },
+        {
+            id: 22,
+            name: "Sajado",
+            urlFactory: _ => "https://www.sajado.sk/sajado-eurovea#jedalny-listok-1",
+            parser: new Dummy(),
+            isDummy: true
         }
     ]
 };

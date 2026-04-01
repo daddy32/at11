@@ -36,7 +36,11 @@ describe("locations registry", () => {
             "Sunshine",
             "Mondieu",
             "Konn Steakbar",
-            "Rams"
+            "Rams",
+            "McDonalds",
+            "Al Faro",
+            "Le Bar",
+            "Sajado"
         ]);
     });
 });

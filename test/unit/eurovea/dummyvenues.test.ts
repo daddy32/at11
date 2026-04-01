@@ -37,6 +37,22 @@ describe("Eurovea dummy venues", () => {
         {
             name: "Rams",
             url: "https://ramsfood.sk/menu/section:menu/predjedla"
+        },
+        {
+            name: "McDonalds",
+            url: "https://www.mcdonalds.sk/menu/"
+        },
+        {
+            name: "Al Faro",
+            url: "https://www.sassy.sk/upload/files/Alfaro_menu_jun_2025_web_1750845421.pdf"
+        },
+        {
+            name: "Le Bar",
+            url: "https://sassy.sk/upload/files/HM_SK_12_25_web_1765192653.pdf"
+        },
+        {
+            name: "Sajado",
+            url: "https://www.sajado.sk/sajado-eurovea#jedalny-listok-1"
         }
     ];
 
