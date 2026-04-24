@@ -11,7 +11,7 @@ export class PatronskyPivovar extends Sme implements IParser {
             menuItems[0].isSoup = true;
             menuItems.forEach(item=> {
                 const result = parsePrice(item.text);
-                item.price = result.price;
+                item.price = Number.isNaN(result.price) ? item.price : result.price;
                 item.text = result.text.replace(/^.*\|\s+/, "").replace(/\(obsahuje:/, "").removeAlergens();
             });
         }

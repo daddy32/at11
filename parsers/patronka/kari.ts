@@ -25,6 +25,7 @@ export class Kari extends Sme implements IParser {
                 seenSoup = true;
             }
 
+            item.price = Number.isNaN(result.price) ? item.price : result.price;
             item.text = result.text.replace(/^(\d+\.*){1,}/, "").replace(/^.*\|\s+/, "").replace(/\(obsahuje:/, "").removeAlergens();
             menuItemsFinal.push(item);
         });
