@@ -1,6 +1,7 @@
 /* eslint-disable max-len, no-undef */
 var RETRY_COOLDOWN_SECONDS = 30;
 var RETRY_ICON_HTML = "&#x1F504;&#xFE0F;";
+var MENU_ROLLOVER_HOUR = 16;
 
 function writeCookie(cookieName, cookieValue, nDays) {
     var today = new Date();
@@ -188,7 +189,7 @@ function initialHide(cont) {
 function getDateCompound() {
     var date = new Date();
     var desc = "dnes";
-    if (date.getHours() >= 16) {
+    if (date.getHours() >= MENU_ROLLOVER_HOUR) {
         date.setDate(date.getDate() + 1);
         desc = "zajtra";
     }

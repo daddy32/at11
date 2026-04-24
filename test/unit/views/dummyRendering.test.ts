@@ -31,4 +31,12 @@ describe("dummy menu rendering", () => {
         expect(style).to.include("article.dummy-menu {");
         expect(style).to.include("width: calc((33em - 20px) / 2);");
     });
+
+    it("keeps today's menu visible until 16:00 before switching to tomorrow", () => {
+        const script = readFileSync("static/script.js", "utf8");
+
+        expect(script).to.include("var MENU_ROLLOVER_HOUR = 16;");
+        expect(script).to.include("if (date.getHours() >= MENU_ROLLOVER_HOUR) {");
+        expect(script).to.not.include("if (date.getHours() >= 16) {");
+    });
 });

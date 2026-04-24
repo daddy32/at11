@@ -8,7 +8,7 @@ import { extractMenuFromText } from "../../../parsers/patronka/fajnejedlo";
 describe("FajneJedlo Parser", () => {
   describe("Wrapped MENU line parsing", () => {
     it("should correctly join wrapped MENU 3 lines", () => {
-      const date = new Date(2025, 4, 23); // month is 0-based
+      const date = new Date(2025, 4, 23);
       const ocrText = `
 Piatok 23. maj
 Polievka 1 Slepacia s rezancami
@@ -32,7 +32,7 @@ Exklusiv Losos na masle, salat
 
   describe("Exklusiv menu item parsing", () => {
     it("should correctly parse Exklusiv menu item", () => {
-      const date = new Date(2025, 4, 23); // month is 0-based
+      const date = new Date(2025, 4, 23);
       const ocrText = `
 Piatok 23. maj
 Polievka 1 Slepacia s rezancami
@@ -98,6 +98,38 @@ Exklusiv Viedensky rezen, slovensky zemiakovy salat
       expect(mains.length).to.be.greaterThan(0);
       expect(normalizedTexts.some((text) => text.includes("kacaci vyvar"))).to.equal(true);
       expect(normalizedTexts.some((text) => /grilovana\s*zelenina/.test(text))).to.equal(true);
+    });
+  });
+
+  describe("Single-line OCR fallback parsing", () => {
+    it("recovers soups and mains when OCR glues the whole day into one line", () => {
+      const date = new Date(2025, 4, 23);
+      const ocrText = `
+Piatok 23. maj
+Polievka I: Kačací vývar s mäsom
+Paradajková minestrone mI: Kuracie soté s koreňovou zeleninou, dusenáryža, syr (1,3,7) Za SeeBravčovýsteak, BBO omáčka, grilovanélusky so slaninkou, tlačené zemiaky s paži ?Pečenátreskasorechovošpenátovou krustou, bylinkováomáčka, peč. zemiaky, polniček EMENU 4: Tvarohovéknedle s nugátovou náplňou preliate maslom, orechomak posýpka FEXKIUsiv: Viedenskýrezeň, majonézovýšalát, citrón (1,3,7) - a a a a A EJ KY S az SRO KA ž
+`;
+
+      const items = extractMenuFromText(ocrText, date);
+      const normalizedTexts = items.map((item) =>
+        item.text
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      );
+
+      expect(items.length).to.be.at.least(6);
+      expect(items.filter((item) => item.isSoup).length).to.be.at.least(2);
+      expect(normalizedTexts.some((text) => text.includes("kacaci vyvar s masom"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("paradajkova minestrone"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("kuracie sote"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("bravcovy"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("treska"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("tvarohove knedle"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("viedensky rezen"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.includes("majonezovy salat"))).to.equal(true);
+      expect(items.every((item) => !item.text.includes("(1,3,7)"))).to.equal(true);
+      expect(normalizedTexts).to.not.include("za see");
     });
   });
 });
