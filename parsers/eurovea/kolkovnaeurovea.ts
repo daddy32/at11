@@ -19,13 +19,13 @@ export class KolkovnaEurovea implements IParser {
                 return;
             }
 
-            if (/^denn[áa] polievka$/i.test(text)) {
+            if (this.isSoupHeading(text)) {
                 expectedKind = "soup";
                 currentItem = undefined;
                 return;
             }
 
-            if (/^jedlo d[ňn]a/i.test(text)) {
+            if (this.isMainHeading(text)) {
                 expectedKind = "main";
                 currentItem = undefined;
                 return;
@@ -34,6 +34,18 @@ export class KolkovnaEurovea implements IParser {
             const parsed = parsePrice(text);
             const normalizedText = this.normalizeDishText(parsed.text || text);
             const parsedPrice = parsed.price;
+
+            const inlineKind = this.getInlineItemKind(text);
+            if (inlineKind && normalizedText) {
+                currentItem = {
+                    text: normalizedText,
+                    price: parsedPrice,
+                    isSoup: inlineKind === "soup"
+                };
+                menu.push(currentItem);
+                expectedKind = undefined;
+                return;
+            }
 
             if (!normalizedText && !Number.isNaN(parsedPrice) && currentItem) {
                 currentItem.price = parsedPrice;
@@ -79,14 +91,37 @@ export class KolkovnaEurovea implements IParser {
         return /^\d{1,2}\.\d{1,2}\.\d{4}$/.test(text);
     }
 
+    private isSoupHeading(text: string): boolean {
+        return /^(denn[aá] polievka|polievka)$/i.test(text);
+    }
+
+    private isMainHeading(text: string): boolean {
+        return /^jedlo d[ňn]a(?:\s+č\.\d+)?$/i.test(text);
+    }
+
+    private getInlineItemKind(text: string): ExpectedKind {
+        if (/^polievka\b/i.test(text)) {
+            return "soup";
+        }
+
+        if (/^jedlo (?:č\.\d+|d[ňn]a\b)/i.test(text)) {
+            return "main";
+        }
+
+        return undefined;
+    }
+
     private normalizeDishText(text: string): string {
         return text
-            .replace(/\s*[\|I/]\s*\d{1,2}(?:\s*,\s*\d{1,2})*[\|I/]\s*$/g, "")
+            .replace(/\s*[|I/]\s*\d{1,2}(?:\s*,\s*\d{1,2})*[|I/]\s*$/g, "")
             .replace(/\s+\d{1,2}(?:\s*,\s*\d{1,2})+\s*$/g, "")
             .removeMetrics()
             .removeAlergens()
             .normalizeWhitespace()
             .toLocaleLowerCase("sk")
-            .capitalizeFirstLetter();
+            .capitalizeFirstLetter()
+            .replace(/^(Jedlo č\.\d+\s+)([a-záäčďéíĺľňóôŕšťúýž])/u, (_match, prefix: string, firstLetter: string) => {
+                return `${prefix}${firstLetter.toLocaleUpperCase("sk")}`;
+            });
     }
 }
