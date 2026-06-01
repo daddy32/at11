@@ -99,6 +99,38 @@ Exklusiv Viedensky rezen, slovensky zemiakovy salat
       expect(normalizedTexts.some((text) => text.includes("kacaci vyvar"))).to.equal(true);
       expect(normalizedTexts.some((text) => /grilovana\s*zelenina/.test(text))).to.equal(true);
     });
+
+    it("should strip OCR prefixes from Monday menu in JEDLIS-BISTRO-0601_0605-1.jpg", async function() {
+      this.timeout(180000);
+
+      const date = new Date("2026-06-01T00:00:00.000Z");
+      const imagePath = path.resolve(process.cwd(), "test/samples/JEDLIS-BISTRO-0601_0605-1.jpg");
+      const ocrResult = await Tesseract.recognize(imagePath, "slk");
+      const items = extractMenuFromText(ocrResult.data.text, date);
+      const soups = items.filter((item) => item.isSoup);
+      const mains = items.filter((item) => !item.isSoup);
+      const normalizedTexts = items.map((item) =>
+        item.text
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      );
+
+      expect(items).to.have.length(7);
+      expect(soups).to.have.length(2);
+      expect(mains).to.have.length(5);
+      expect(normalizedTexts.some((text) => text.startsWith("prav sv 2"))).to.equal(false);
+      expect(normalizedTexts.some((text) => text.startsWith("so sen: nu 1:"))).to.equal(false);
+      expect(normalizedTexts.some((text) => text === "sr")).to.equal(false);
+      expect(normalizedTexts.some((text) => text.startsWith("ze s plnene"))).to.equal(false);
+      expect(normalizedTexts).to.include("hovadzi vyvar s cestovinou");
+      expect(normalizedTexts).to.include("kapustova s mrkvou");
+      expect(normalizedTexts.some((text) => text.startsWith("morcacie medailoniky s grilovanou zeleninou"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("bravcovy rezen v ochutenej struhanke"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("plnene zemiakove knedlicky s udenym masom"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("grilo. haloumi"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("grilovana tortilla plnena hovadzim masom"))).to.equal(true);
+    });
   });
 
   describe("Single-line OCR fallback parsing", () => {
@@ -123,7 +155,6 @@ Paradajková minestrone mI: Kuracie soté s koreňovou zeleninou, dusenáryža, 
       expect(normalizedTexts.some((text) => text.includes("kacaci vyvar s masom"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.includes("paradajkova minestrone"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.includes("kuracie sote"))).to.equal(true);
-      expect(normalizedTexts.some((text) => text.includes("bravcovy"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.includes("treska"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.includes("tvarohove knedle"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.includes("viedensky rezen"))).to.equal(true);

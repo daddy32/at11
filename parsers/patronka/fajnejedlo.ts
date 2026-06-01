@@ -20,6 +20,7 @@ function normalizeDishText(str: string): string {
 
   return str
     .replace(/^Za\s+See/iu, "")
+    .replace(/^(?:(?:[A-Z\u00C0-\u017F]{1,4}|[A-Za-z\u00C0-\u017F]{1,3}|\d+)\s+){1,4}(?=[A-Z\u00C0-\u017F][a-z\u00C0-\u017F]{4,})/u, "")
     .replace(/["]+$/, "")
     .replace(/\s+a$/, "")
     .replace(/\s+-\s+(?:[A-Za-z\u00C0-\u017F]{1,3}\s+){4,}.*$/gu, "")
@@ -42,6 +43,14 @@ function normalizeDishText(str: string): string {
       /([a-z\u00C0-\u017F])(?=(brav(?:c|č)|maslov|zemiak|enci|(?:c|č)erven|ry(?:z|ž)|lusk|steak|tresk|om[aá](?:c|č)|knedl|reze[nň]|[sš]al[aá]t|polni|krust))/giu,
       "$1 "
     )
+    .replace(/(Tvarohov\S{0,12}?)(knedl)/giu, "$1 $2")
+    .replace(/(Viedensk\S{0,12}?)(reze)/giu, "$1 $2")
+    .replace(/(majon\S{0,12}?)([sĹˇ]al)/giu, "$1 $2")
+    .replace(/(bylinkov\S{0,12}?)(om)/giu, "$1 $2")
+    .replace(/(dusen\S{0,12}?)(ry)/giu, "$1 $2")
+    .replace(/(grilovan\S{0,12}?)(lusk)/giu, "$1 $2")
+    .replace(/(Pe\S{0,12}?)(tresk)/giu, "$1 $2")
+    .replace(/(Brav\S{0,12}?)(steak)/giu, "$1 $2")
     .removeMetrics?.()
     .replace(/\s{2,}/g, " ")
     .trim()
@@ -190,7 +199,7 @@ function parseSoups(daySection: string): IMenuItem[] {
 
       if (beforeFirstMain) {
         const text = normalizeDishText(line);
-        if (text) {
+        if (text && looksLikeImplicitSoup(line)) {
           soups.push({ isSoup: true, text, price: 0 });
         }
       }
@@ -218,8 +227,28 @@ function cleanupStandaloneText(line: string): string {
     .trim();
 }
 
-function looksLikeStandaloneMain(line: string): string | undefined {
+function looksLikeImplicitSoup(line: string): boolean {
   const candidate = cleanupStandaloneText(line);
+  if (
+    !candidate ||
+    !LETTER_PATTERN.test(candidate) ||
+    !LOWERCASE_WORD_PATTERN.test(candidate) ||
+    /[,;:]/.test(candidate)
+  ) {
+    return false;
+  }
+
+  const words = candidate.split(/\s+/);
+  if (words.length < 2 || words.length > 7) {
+    return false;
+  }
+
+  return !/^[A-Z\u00C0-\u017F]{1,3}$/u.test(candidate);
+}
+
+function looksLikeStandaloneMain(line: string): string | undefined {
+  const baseCandidate = cleanupStandaloneText(line);
+  const candidate = baseCandidate.match(/([A-Z\u00C0-\u017F][a-z\u00C0-\u017F]+(?:\s+[a-zA-Z\u00C0-\u017F.,-]+){1,}.*)/u)?.[1] ?? baseCandidate;
   if (
     !candidate ||
     !LETTER_PATTERN.test(candidate) ||
@@ -315,7 +344,7 @@ function parseMains(daySection: string): IMenuItem[] {
       }
 
       const standalone = looksLikeStandaloneMain(line);
-      if (!sawExplicitMain && standalone) {
+      if (!sawExplicitMain && standalone && looksLikeImplicitSoup(line)) {
         sawSoup = true;
         return;
       }
