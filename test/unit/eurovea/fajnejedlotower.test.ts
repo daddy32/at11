@@ -31,7 +31,11 @@ ms UTOROK 31.marec
         const chicken = items.find(item => !item.isSoup && item.text.startsWith("Kurací steak s citrónovou omáčkou"));
         expect(chicken).to.not.equal(undefined);
 
-        const pork = items.find(item => !item.isSoup && item.text.startsWith("Bravčové ragú na hrášku"));
+        const pork = items.find(item =>
+            !item.isSoup &&
+            item.text.includes("rag") &&
+            item.text.includes("tarho")
+        );
         expect(pork).to.not.equal(undefined);
         expect(pork?.text).to.not.include("Kurací steak");
 
@@ -44,5 +48,42 @@ ms UTOROK 31.marec
         const wrap = items.find(item => !item.isSoup && item.text.startsWith("BBO Ranch wrap"));
         expect(wrap).to.not.equal(undefined);
         expect(wrap?.text).to.include("jogurtový dip");
+    });
+
+    it("keeps Monday Tower items when OCR mangles menu labels and next-day date separators", () => {
+        const date = new Date("2026-06-01T00:00:00.000Z");
+        const ocrText = `
+ži Á A
+a VANÝ sú SJ SY Z
+ve PONDELOK | 1.jún S
+a Polievka 1: Mrkvová s kalerábom a hráškom S a
+S „Polievka 2: Gulášová polievka (1,12) s
+a So aje MENU T Kuracie prsia Peri-peri - pikantná citrusovo bylinková omáčka, pečené zemiaký (12) "
+m PENU > Restovaná kuracia pečienka na cibuľke, ryža s hráškom (1) Sž
+a A Pra MENU $3: Thajské morčacie kari s mangom a citrónovou trávou, basmati ryža (6,9)
+va JAKY MENU 4: Grilovaný hermelín, maslové zemiaky s vňaťou, brusnicová omáčka (7,12)
+ad Bxkluslý: Pizza salami s olivami (1,7)
+ks UTOROK 2jún
+S Polievka 1: Talianska paradajková s čerstvou bazalkou
+Polievka 2: Zemiaková mliečna na kyslo s čerstvým kôprom (1,7)
+MENU: Vypr. kurací rezeň v cereálnom obale so sezamom, zemiaková kaša (1,3,7,11)
+MENU 2: Bravčové čevapčiči s cibuľou, horčicou, zemiaky s vňaťou (1,3,10)
+MENU 3: Hovädzie na hubách a kyslej uhorke, ryža
+MENU 4: Batatový bow -cícer, uhorka, kus-kus, vajíčko a cherry rajčinky, jogurtový dresing (1,5,7)
+Exklusiv: Morčacie rezančeky gyros, tzatziky, hranolky, šalát (7)
+`;
+
+        const items = extractTowerMenuFromText(ocrText, date);
+
+        expect(items).to.have.length(7);
+        expect(items.map(item => item.text)).to.deep.equal([
+            "Mrkvová s kalerábom a hráškom",
+            "Gulášová polievka",
+            "Kuracie prsia Peri-peri - pikantná citrusovo bylinková omáčka, pečené zemiaký",
+            "Restovaná kuracia pečienka na cibuľke, ryža s hráškom",
+            "Thajské morčacie kari s mangom a citrónovou trávou, basmati ryža",
+            "Grilovaný hermelín, maslové zemiaky s vňaťou, brusnicová omáčka",
+            "Pizza salami s olivami"
+        ]);
     });
 });

@@ -9,8 +9,8 @@ import { IParser } from "../IParser";
 import "../parserUtil";
 
 const DAY_NAMES = ["Pondelok", "Utorok", "Streda", "Stvrtok", "Štvrtok", "Piatok"];
-const LETTER_PATTERN = /[A-Za-zÀ-ž]/u;
-const LOWERCASE_WORD_PATTERN = /[a-zà-ž]/u;
+const LETTER_PATTERN = /\p{L}/u;
+const LOWERCASE_WORD_PATTERN = /\p{Ll}/u;
 
 function normalizeDishText(str: string): string {
     if (!str) {
@@ -20,13 +20,14 @@ function normalizeDishText(str: string): string {
     return str
         .replace(/["]+$/g, "")
         .replace(/\s+a$/g, "")
-        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:[A-Za-zÀ-ž]{1,6})?\s*$/g, "")
-        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:[A-Za-zÀ-ž]{1,3})?\s*$/g, "")
+        .replace(/^\p{Lu}\p{Ll}{0,2}\s+(?=\p{Lu}\p{Ll}{2,})/u, "")
+        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:\p{L}{1,6})?\s*$/gu, "")
+        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:\p{L}{1,3})?\s*$/gu, "")
         .replace(/\s+\d{1,2}(?:\s*,\s*\d{1,2})+\s*$/g, "")
         .removeAlergens?.()
         .removeOCRArtifacts?.()
-        .replace(/\s+(?:[A-ZÀ-Ž]{2,})(?:\s+[A-ZÀ-Ž][a-zà-ž]{1,2})?\s*$/g, "")
-        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:[A-Za-zÀ-ž]{1,3})?\s*$/g, "")
+        .replace(/\s+(?:\p{Lu}{2,})(?:\s+\p{Lu}\p{Ll}{1,2})?\s*$/gu, "")
+        .replace(/\s*\((?:\d{1,2}\s*,\s*)*\d{1,2}\)\s*(?:\p{L}{1,3})?\s*$/gu, "")
         .replace(/\s+\d{1,2}(?:\s*,\s*\d{1,2})+\s*$/g, "")
         .removeMetrics?.()
         .replace(/\s{2,}/g, " ")
@@ -37,11 +38,12 @@ function normalizeDishText(str: string): string {
 function findDaySection(rawText: string, date: Date): string {
     const dayNum = date.getDate();
     const dayName = format(date, "EEEE", { locale: sk });
+    const dateToken = `${dayNum}\\s*\\.?\\s*\\p{L}+`;
     const dayRegex = new RegExp(
-        `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*${dayNum}\\s*\\.\\s*[A-Za-zÀ-ž]+`,
-        "i"
+        `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*${dateToken}`,
+        "iu"
     );
-    const dateOnlyRegex = new RegExp(`\\b${dayNum}\\s*\\.\\s*[A-Za-zÀ-ž]+`, "i");
+    const dateOnlyRegex = new RegExp(`\\b${dateToken}`, "iu");
     const dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
 
     if (!dayMatch) {
@@ -58,8 +60,8 @@ function findDaySection(rawText: string, date: Date): string {
         }
 
         const nextDayRegex = new RegExp(
-            `${day}\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*\\d+\\s*\\.\\s*[A-Za-zÀ-ž]+`,
-            "i"
+            `${day}\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*\\d+\\s*\\.?\\s*\\p{L}+`,
+            "iu"
         );
         const nextDayMatch = nextDayRegex.exec(rawText.slice(startIdx + 1));
         if (nextDayMatch) {
@@ -69,7 +71,7 @@ function findDaySection(rawText: string, date: Date): string {
 
     const nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1);
-    const nextDateRegex = new RegExp(`\\b${nextDate.getDate()}\\s*\\.\\s*[A-Za-zÀ-ž]+`, "i");
+    const nextDateRegex = new RegExp(`\\b${nextDate.getDate()}\\s*\\.?\\s*\\p{L}+`, "iu");
     const nextDateMatch = nextDateRegex.exec(rawText.slice(startIdx + 1));
     if (nextDateMatch) {
         endIdx = Math.min(endIdx, startIdx + 1 + nextDateMatch.index);
@@ -82,23 +84,26 @@ function normalizeLine(line: string): string {
     return line
         .replace(/[\u201C\u201D\u201E"]/g, "")
         .replace(/\bRolievka\b/gi, "Polievka")
+        .replace(/\bPENU\b/gi, "MENU")
         .replace(/ExKlus[^\s:]*/giu, "Exklusiv")
+        .replace(/Bxklus[^\s:]*/giu, "Exklusiv")
         .replace(/\bMENU\s*T:/gi, "MENU 1:")
+        .replace(/\bMENU\s*T\b/gi, "MENU 1")
         .replace(/\bMENU\s*\$?3:/gi, "MENU 3:")
         .replace(/\bMENU\s*4:/gi, "MENU 4:")
         .replace(/^.*?\bPolievka\b/i, "Polievka")
         .replace(/^.*?\bMENU\b/i, "MENU")
         .replace(/^.*?\bExklusiv\b/i, "Exklusiv")
-        .replace(/^[^A-Za-zÀ-ž0-9]+/gu, "")
+        .replace(/^[^\p{L}0-9]+/gu, "")
         .replace(/\s{2,}/g, " ")
         .trim();
 }
 
 function extractLabeledText(line: string, type: "soup" | "main" | "special"): string | undefined {
     const patterns = {
-        soup: /^Polievka\s*\d*:\s*(.+)$/i,
-        main: /^MENU(?:\s*\d+)?:\s*(.+)$/i,
-        special: /^Exklusiv:\s*(.+)$/i
+        soup: /^Polievka\s*\d*\s*[:>]?\s*(.+)$/i,
+        main: /^MENU(?:\s*(?:\d+|[TI]))?\s*[:>]?\s+(.+)$/i,
+        special: /^Exklusiv\s*[:>]?\s*(.+)$/i
     };
 
     const match = line.match(patterns[type]);
@@ -107,24 +112,26 @@ function extractLabeledText(line: string, type: "soup" | "main" | "special"): st
 
 function cleanupContinuationPrefix(line: string): string {
     return line
-        .replace(/^[^A-Za-zÀ-ž]+/gu, "")
-        .replace(/^(?:[A-ZÀ-Ž]{1,6}\s+){1,4}/u, "")
+        .replace(/^[^\p{L}]+/gu, "")
+        .replace(/^(?:\p{Lu}{1,6}\s+){1,4}/u, "")
         .replace(/\s{2,}/g, " ")
         .trim();
 }
 
 function looksLikeStandaloneMain(line: string): string | undefined {
-    const candidateMatch = line.match(/([A-ZÀ-Ž][a-zà-ž]+(?:\s+[a-zà-ž]+){1,}.*)/u);
+    const candidate = cleanupContinuationPrefix(line)
+        .replace(/^\p{Lu}\p{Ll}{0,2}\s+(?=\p{Lu}\p{Ll}{2,})/u, "");
+    const candidateMatch = candidate.match(/(\p{Lu}\p{Ll}+(?:\s+[\p{L}\-.,]+){1,}.*)/u);
     if (!candidateMatch) {
         return undefined;
     }
 
-    const candidate = candidateMatch[1].trim();
-    if (!candidate || !LETTER_PATTERN.test(candidate)) {
+    const standalone = candidateMatch[1].trim();
+    if (!standalone || !LETTER_PATTERN.test(standalone)) {
         return undefined;
     }
 
-    const firstWord = candidate.split(/\s+/)[0].toLocaleLowerCase("sk");
+    const firstWord = standalone.split(/\s+/)[0].toLocaleLowerCase("sk");
     const continuationStarters = new Set([
         "pečenou",
         "pečené",
@@ -149,7 +156,7 @@ function looksLikeStandaloneMain(line: string): string | undefined {
         return undefined;
     }
 
-    return candidate;
+    return standalone;
 }
 
 function finalizeItem(item: IMenuItem | undefined, items: IMenuItem[]): IMenuItem | undefined {
