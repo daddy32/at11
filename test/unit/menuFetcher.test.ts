@@ -120,6 +120,42 @@ describe("MenuFetcher", () => {
         expect((result.value as IMenuItem[])[0].text).to.equal("Browser menu");
     });
 
+    it("falls back to browser fetch when SME blocks the request with a generic 403 page", async () => {
+        const config = createConfig();
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache);
+        const date = new Date("2026-06-12T09:00:00.000Z");
+        const url = "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu";
+        const parser: IParser = {
+            parse(html: string, _: Date, doneCallback: (menu: IMenuItem[]) => void): void {
+                doneCallback([{ text: html.includes("browser-fetched-menu") ? "Browser menu" : "Wrong source", price: 8.4, isSoup: false }]);
+            }
+        };
+
+        sinon.stub(axios, "get").rejects({
+            message: "Request failed with status code 403",
+            response: {
+                status: 403,
+                data: "<html><body>Forbidden</body></html>"
+            }
+        });
+
+        let browserFetchCalls = 0;
+        const menuFetcherWithBrowser = menuFetcher as unknown as {
+            fetchHtmlWithBrowser: (_url: string) => Promise<string>;
+        };
+        menuFetcherWithBrowser.fetchHtmlWithBrowser = async (_url: string) => {
+            browserFetchCalls += 1;
+            return "<html><body>browser-fetched-menu</body></html>";
+        };
+
+        const result = await fetchMenu(menuFetcher, () => url, date, parser, true);
+
+        expect(browserFetchCalls).to.equal(1);
+        expect(result.value).to.be.an("array");
+        expect((result.value as IMenuItem[])[0].text).to.equal("Browser menu");
+    });
+
     it("reuses a single browser instance for concurrent SME browser fetches", async () => {
         const config = { ...createConfig(), requestTimeout: 15000 };
         const cache = new NodeCache({ useClones: false });

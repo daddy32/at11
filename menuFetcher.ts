@@ -165,9 +165,9 @@ export class MenuFetcher {
                 data?: unknown;
             };
         };
+        const status = axiosError.response?.status;
 
-        return axiosError.response?.status === 403
-            && String(axiosError.response?.data ?? "").includes("Security Verification | SME");
+        return status === 403 || status === 429;
     }
 
     private async fetchHtmlWithBrowser(url: string): Promise<string> {
