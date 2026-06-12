@@ -42,8 +42,10 @@ export class MenuFetcher {
         const cacheKey = date + ":" + url;
         const cached = this._cache.get<IMenuResult>(cacheKey);
         if (cached && !this._config.bypassCache && !options.forceRefresh) {
+            this.logInfo("Cache hit", { url, date, forceRefresh: options.forceRefresh === true });
             doneCallback(cached);
         } else {
+            this.logInfo("Cache miss", { url, date, forceRefresh: options.forceRefresh === true, skipFetch: options.skipFetch === true });
             if (options.skipFetch) {
                 this.parseFetchedHtml("", date, parser, (error: Error, menu: IMenuItem[]) => {
                     if (!error) {
@@ -83,6 +85,7 @@ export class MenuFetcher {
             return;
         }
         this._runningRequests[url] = [doneCallback];
+        this.logInfo("Starting HTTP fetch", { url, date });
 
         const done = (e: Error, m: IMenuItem[]) => {
             const doneCallbacks = this._runningRequests[url];
@@ -105,12 +108,20 @@ export class MenuFetcher {
             timeout: this._config.requestTimeout
         }).then(response => {
             if (response.status === 200) {
+                this.logInfo("HTTP fetch succeeded", { url, date, status: response.status });
                 this.parseFetchedHtml(response.data, date, parser, done);
             }
         }).catch(error => {
             if (this.shouldUseBrowserFallback(url, error)) {
+                const fallbackError = error as {
+                    response?: {
+                        status?: number;
+                    };
+                };
+                this.logInfo("Using browser fallback", { url, date, status: fallbackError.response?.status });
                 this.fetchHtmlWithBrowser(url)
                     .then(html => {
+                        this.logInfo("Browser fallback fetched HTML", { url, date, htmlLength: html.length });
                         this.parseFetchedHtml(html, date, parser, done);
                     })
                     .catch(browserError => {
@@ -145,6 +156,7 @@ export class MenuFetcher {
                 clearTimeout(timer);
                 timer = null;
 
+                this.logInfo("Parser completed", { date, itemCount: menu.length });
                 done(null, menu);
             });
         } catch (err) {
@@ -186,6 +198,7 @@ export class MenuFetcher {
 
     private async getBrowser(): Promise<Browser> {
         if (!this._browserPromise) {
+            this.logInfo("Launching browser fallback", {});
             this._browserPromise = puppeteer.launch({
                 headless: true,
                 args: ["--no-sandbox", "--disable-setuid-sandbox"]
@@ -198,5 +211,9 @@ export class MenuFetcher {
             this._browserPromise = undefined;
             throw error;
         }
+    }
+
+    private logInfo(message: string, details: Record<string, unknown>): void {
+        console.info(`[MenuFetcher] ${message}`, details);
     }
 }

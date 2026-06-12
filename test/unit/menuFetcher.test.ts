@@ -52,6 +52,25 @@ describe("MenuFetcher", () => {
         sinon.restore();
     });
 
+    it("logs when serving a cached menu result", async () => {
+        const config = createConfig();
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache);
+        const parser = new NoopParser();
+        const date = new Date("2026-02-09T09:00:00.000Z");
+        const url = "https://example.com/menu";
+        const urlFactory = () => url;
+        const cacheKey = date + ":" + url;
+        const infoStub = sinon.stub(console, "info");
+
+        cache.set(cacheKey, { value: [{ text: "Cached menu", price: 7.5, isSoup: false }], timestamp: new Date("2026-02-09T08:00:00.000Z") }, 60);
+
+        const result = await fetchMenu(menuFetcher, urlFactory, date, parser, false);
+
+        expect(result.value).to.be.an("array");
+        expect(infoStub.calledWithMatch("[MenuFetcher] Cache hit")).to.equal(true);
+    });
+
     it("should bypass cached error when forceRefresh is true", async () => {
         const config = createConfig();
         const cache = new NodeCache({ useClones: false });

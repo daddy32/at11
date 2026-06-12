@@ -83,24 +83,39 @@ app.get("/:locationSlug", (req, res) => {
 app.get("/menu/:id", (req, res) => {
     const date = parse(req.query.date as string, "yyyy-M-d", new Date());
     if (!isValid(date)) {
+        console.warn("[MenuRoute] Invalid date parameter", { id: req.params.id, date: req.query.date });
         res.statusCode = 400;
         res.send("Missing/incorrect 'date' query parameter");
         return;
     }
 
     if (!actions.has(req.params.id)) {
+        console.warn("[MenuRoute] Restaurant not found", { id: req.params.id, date: req.query.date });
         res.statusCode = 404;
         res.send("Restaurant " + req.params.id + " not found");
         return;
     }
 
     const forceRefresh = req.query.forceRefresh === "1" || req.query.forceRefresh === "true";
+    console.info("[MenuRoute] Request received", { id: req.params.id, date: req.query.date, forceRefresh });
 
     actions.get(req.params.id)(date, forceRefresh, result => {
         const timeago = formatDistance(result.timestamp, new Date(), { addSuffix: true, locale: sk });
         if (isError(result.value)) {
+            console.warn("[MenuRoute] Returning error response", {
+                id: req.params.id,
+                date: req.query.date,
+                forceRefresh,
+                error: result.value.toString()
+            });
             res.status(500).json({ error: result.value.toString(), timeago });
         } else {
+            console.info("[MenuRoute] Returning menu response", {
+                id: req.params.id,
+                date: req.query.date,
+                forceRefresh,
+                itemCount: result.value.length
+            });
             res.json({ menu: result.value, timeago });
         }
     });
