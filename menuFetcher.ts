@@ -188,8 +188,26 @@ export class MenuFetcher {
         try {
             await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
             await page.setExtraHTTPHeaders({ "Accept-Language": "sk" });
-            await page.goto(url, { waitUntil: "domcontentloaded", timeout: this._config.requestTimeout });
-            await page.waitForSelector(".dnesne_menu, .ostatne_menu", { timeout: this._config.requestTimeout }).catch(() => undefined);
+            const menuRowTimeout = Math.min(this._config.requestTimeout, 5000);
+
+            for (let attempt = 0; attempt < 2; attempt += 1) {
+                await page.goto(url, { waitUntil: "domcontentloaded", timeout: this._config.requestTimeout });
+                await page.waitForSelector(".jedlo_polozka", { timeout: menuRowTimeout }).catch(() => undefined);
+
+                const html = await page.content();
+                const title = await page.title().catch(() => "");
+                const menuRowCount = (html.match(/jedlo_polozka/g) || []).length;
+                this.logInfo("Browser page snapshot", { url, attempt: attempt + 1, title, menuRowCount, htmlLength: html.length });
+
+                if (menuRowCount > 0) {
+                    return html;
+                }
+
+                if (attempt === 0) {
+                    await this.waitForDelay(1000);
+                }
+            }
+
             return await page.content();
         } finally {
             await page.close().catch(() => undefined);
@@ -215,5 +233,9 @@ export class MenuFetcher {
 
     private logInfo(message: string, details: Record<string, unknown>): void {
         console.info(`[MenuFetcher] ${message}`, details);
+    }
+
+    private async waitForDelay(ms: number): Promise<void> {
+        await new Promise(resolve => setTimeout(resolve, ms));
     }
 }

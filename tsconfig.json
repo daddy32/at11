@@ -5,6 +5,12 @@
         "allowSyntheticDefaultImports": true,
         "target": "ES2022",
         "noImplicitAny": false,
+        // TypeScript 6.x warns that "moduleResolution": "node" (legacy node10) and
+        // "baseUrl" are deprecated and are expected to stop working in TS 7.x.
+        // When this repo upgrades to TS 6.x, a temporary
+        // "ignoreDeprecations": "6.0" can safely silence editor noise because it only
+        // suppresses diagnostics and does not affect emitted JS or runtime behavior.
+        // We should still migrate off these deprecated options before adopting TS 7.x.
         "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",

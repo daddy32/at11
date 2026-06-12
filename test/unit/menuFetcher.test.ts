@@ -184,7 +184,8 @@ describe("MenuFetcher", () => {
 
         const gotoSpy = sinon.spy(async (_url: string, _options: unknown) => undefined);
         const waitForSelectorSpy = sinon.spy(async (_selector: string, _options: unknown) => undefined);
-        const contentStub = sinon.stub().resolves("<html><body>ok</body></html>");
+        const contentStub = sinon.stub().resolves("<html><body><div class='jedlo_polozka'>ok</div></body></html>");
+        const titleStub = sinon.stub().resolves("Denné menu");
         const closeSpy = sinon.spy(async () => undefined);
         const setUserAgentSpy = sinon.spy(async (_ua: string) => undefined);
         const setExtraHTTPHeadersSpy = sinon.spy(async (_headers: Record<string, string>) => undefined);
@@ -197,6 +198,7 @@ describe("MenuFetcher", () => {
                     goto: gotoSpy,
                     waitForSelector: waitForSelectorSpy,
                     content: contentStub,
+                    title: titleStub,
                     close: closeSpy
                 })
                 .onSecondCall().resolves({
@@ -205,6 +207,7 @@ describe("MenuFetcher", () => {
                     goto: gotoSpy,
                     waitForSelector: waitForSelectorSpy,
                     content: contentStub,
+                    title: titleStub,
                     close: closeSpy
                 }),
             close: sinon.spy(async () => undefined)
@@ -227,6 +230,54 @@ describe("MenuFetcher", () => {
         expect(gotoSpy.calledTwice).to.equal(true);
         expect(gotoSpy.firstCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
         expect(gotoSpy.secondCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
+    });
+
+    it("retries SME browser fetch once when the first rendered page has no menu rows", async () => {
+        const config = { ...createConfig(), requestTimeout: 15000 };
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache) as unknown as {
+            fetchHtmlWithBrowser: (url: string) => Promise<string>;
+        };
+
+        const gotoSpy = sinon.spy(async (_url: string, _options: unknown) => undefined);
+        const waitForSelectorStub = sinon.stub()
+            .onFirstCall().rejects(new Error("Timeout waiting for menu rows"))
+            .onSecondCall().resolves(undefined);
+        const contentStub = sinon.stub()
+            .onFirstCall().resolves("<html><body><div class='dnesne_menu'></div></body></html>")
+            .onSecondCall().resolves("<html><body><div class='dnesne_menu'><div class='jedlo_polozka'>ok</div></div></body></html>");
+        const titleStub = sinon.stub()
+            .onFirstCall().resolves("Denné menu Kolkovna Eurovea")
+            .onSecondCall().resolves("Denné menu Kolkovna Eurovea");
+        const closeSpy = sinon.spy(async () => undefined);
+        const setUserAgentSpy = sinon.spy(async (_ua: string) => undefined);
+        const setExtraHTTPHeadersSpy = sinon.spy(async (_headers: Record<string, string>) => undefined);
+        const waitStub = sinon.stub().resolves(undefined);
+
+        const browser = {
+            newPage: sinon.stub().resolves({
+                setUserAgent: setUserAgentSpy,
+                setExtraHTTPHeaders: setExtraHTTPHeadersSpy,
+                goto: gotoSpy,
+                waitForSelector: waitForSelectorStub,
+                content: contentStub,
+                title: titleStub,
+                close: closeSpy
+            }),
+            close: sinon.spy(async () => undefined)
+        };
+
+        sinon.stub(puppeteer, "launch").callsFake(async () => browser as never);
+        const waitForMenuFetcher = menuFetcher as unknown as {
+            waitForDelay: (_ms: number) => Promise<void>;
+        };
+        waitForMenuFetcher.waitForDelay = async (_ms: number) => waitStub();
+
+        const html = await menuFetcher.fetchHtmlWithBrowser("https://restauracie.sme.sk/a");
+
+        expect(gotoSpy.callCount).to.equal(2);
+        expect(waitStub.calledOnce).to.equal(true);
+        expect(html).to.include("jedlo_polozka");
     });
 
     it("skips the HTTP request entirely for dummy menus and parses immediately", async () => {
