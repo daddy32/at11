@@ -186,7 +186,10 @@ export class MenuFetcher {
 
     private async getBrowser(): Promise<Browser> {
         if (!this._browserPromise) {
-            this._browserPromise = puppeteer.launch({ headless: true });
+            this._browserPromise = puppeteer.launch({
+                headless: true,
+                args: ["--no-sandbox", "--disable-setuid-sandbox"]
+            });
         }
 
         try {

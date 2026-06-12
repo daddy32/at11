@@ -199,6 +199,12 @@ describe("MenuFetcher", () => {
         ]);
 
         expect(launchStub.callCount).to.equal(1);
+        expect(launchStub.firstCall.args[0]).to.deep.include({
+            headless: true
+        });
+        expect(launchStub.firstCall.args[0]).to.deep.include({
+            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        });
         expect(gotoSpy.calledTwice).to.equal(true);
         expect(gotoSpy.firstCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
         expect(gotoSpy.secondCall.args[1]).to.deep.include({ waitUntil: "domcontentloaded", timeout: 15000 });
