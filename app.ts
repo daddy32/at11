@@ -1,8 +1,8 @@
 import * as appInsights from "applicationinsights";
 import express from "express";
 import hbs from "hbs";
-import NodeCache from "node-cache";
 
+import { createStartupCache } from "./cacheFactory";
 import { Config } from "./config";
 import { buildPageModel } from "./locations/buildPageModel";
 import { MenuFetcher, IMenuResult } from "./menuFetcher";
@@ -18,10 +18,7 @@ import { formatDistance, parse, isValid } from "date-fns";
 
 console.debug("Initializing...");
 const config = new Config();
-const cache =  new NodeCache({
-    checkperiod: (config.cacheExpiration / 2),
-    useClones: false
-});
+const cache = createStartupCache(config.cacheExpiration);
 const menuFetcher = new MenuFetcher(config, cache);
 
 if (config.appInsightsInstrumentationKey) {
