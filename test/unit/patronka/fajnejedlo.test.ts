@@ -131,6 +131,35 @@ Exklusiv Viedensky rezen, slovensky zemiakovy salat
       expect(normalizedTexts.some((text) => text.startsWith("grilo. haloumi"))).to.equal(true);
       expect(normalizedTexts.some((text) => text.startsWith("grilovana tortilla plnena hovadzim masom"))).to.equal(true);
     });
+
+    it("should drop 1-2 letter OCR junk items from Monday menu in JEDLIS-BISTRO-0706_0710.jpg", async function() {
+      this.timeout(180000);
+
+      const date = new Date("2026-07-06T00:00:00.000Z");
+      const imagePath = path.resolve(process.cwd(), "test/samples/JEDLIS-BISTRO-0706_0710.jpg");
+      const ocrResult = await Tesseract.recognize(imagePath, "slk");
+      const items = extractMenuFromText(ocrResult.data.text, date);
+      const normalizedTexts = items.map((item) =>
+        item.text
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      );
+
+      expect(items).to.have.length(7);
+      expect(items.every((item) => item.text.trim().length > 2)).to.equal(true);
+      expect(normalizedTexts).to.include("hovadzi vyvar s cestovinou");
+      expect(normalizedTexts).to.include("sampinonova so smotanou a zemiakmi");
+      expect(normalizedTexts.some((text) => text.startsWith("kuraci steak na bylinkach"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("bravcove na sampinonoch"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("spagety ala amatriciana"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("grilovany camembert na bulgurovom salate"))).to.equal(true);
+      expect(normalizedTexts.some((text) => text.startsWith("pecena bravcova panenka"))).to.equal(true);
+      expect(normalizedTexts).to.not.include("c");
+      expect(normalizedTexts).to.not.include("z");
+      expect(normalizedTexts).to.not.include("sk");
+      expect(normalizedTexts).to.not.include("a");
+    });
   });
 
   describe("Single-line OCR fallback parsing", () => {

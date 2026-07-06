@@ -440,7 +440,7 @@ export function extractMenuFromText(text: string, date: Date): IMenuItem[] {
     mains.unshift({ isSoup: false, text: special, price: 0 });
   }
 
-  const result = [...soups, ...mains].filter((item) => item.text.length > 0);
+  const result = [...soups, ...mains].filter((item) => item.text.trim().length > 2);
   if (result.length === 0) {
     console.error(`[FajneJedlo parser] Day section found but no menu items parsed for ${format(date, "yyyy-MM-dd")}.`);
   }
