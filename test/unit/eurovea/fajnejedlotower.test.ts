@@ -114,4 +114,32 @@ Exklusiv: Morčacie rezančeky gyros, tzatziky, hranolky, šalát (7)
         expect(normalizedTexts.some(text => text.includes("pizza salami s olivami"))).to.equal(true);
         expect(normalizedTexts.some(text => text.includes("talianska paradajkova"))).to.equal(false);
     });
+
+    it("parses Monday menu from JEDLIS-TOWER-0706_0710.jpg", async function() {
+        this.timeout(180000);
+
+        const date = new Date("2026-07-06T00:00:00.000Z");
+        const imagePath = path.resolve(process.cwd(), "test/samples/JEDLIS-TOWER-0706_0710.jpg");
+        const ocrResult = await Tesseract.recognize(imagePath, "slk");
+        const items = extractTowerMenuFromText(ocrResult.data.text, date);
+        const mains = items.filter(item => !item.isSoup);
+        const normalizedTexts = items.map(item =>
+            item.text
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+        );
+
+        expect(items).to.have.length(7);
+        expect(items.filter(item => item.isSoup)).to.have.length(2);
+        expect(mains).to.have.length(5);
+        expect(normalizedTexts.some(text => text.includes("kapustova s pecenou klobasou"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("kremova batatova s kozim syrom"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("zapekane kuracie prsia so sunkou a udenym syrom"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("bravcove rizoto so zahradnou zeleninou a cuketou"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("pecene morc. rezance na spagetach"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("grilovany halloumi na bulgure so zeleninou"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("kuraci gyros na trhanom salate"))).to.equal(true);
+        expect(normalizedTexts.some(text => text.includes("cuketovy krem"))).to.equal(false);
+    });
 });

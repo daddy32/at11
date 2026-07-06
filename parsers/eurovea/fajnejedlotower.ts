@@ -12,6 +12,10 @@ const DAY_NAMES = ["Pondelok", "Utorok", "Streda", "Stvrtok", "Štvrtok", "Piato
 const LETTER_PATTERN = /\p{L}/u;
 const LOWERCASE_WORD_PATTERN = /\p{Ll}/u;
 
+function buildTowerDatePattern(dayNum: number | string): string {
+    return `${dayNum}\\s*\\.?\\s*(?:\\p{L}+|\\d{1,2}(?:\\s*\\.\\s*\\d{4})?)`;
+}
+
 function normalizeDishText(str: string): string {
     if (!str) {
         return "";
@@ -38,12 +42,12 @@ function normalizeDishText(str: string): string {
 function findDaySection(rawText: string, date: Date): string {
     const dayNum = date.getDate();
     const dayName = format(date, "EEEE", { locale: sk });
-    const dateToken = `${dayNum}\\s*\\.?\\s*\\p{L}+`;
+    const dateToken = buildTowerDatePattern(dayNum);
     const dayRegex = new RegExp(
         `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*${dateToken}`,
         "iu"
     );
-    const dateOnlyRegex = new RegExp(`\\b${dateToken}`, "iu");
+    const dateOnlyRegex = new RegExp(`(?:^|[\\r\\n])[^\\d.\\r\\n]{0,24}\\b${dateToken}`, "iu");
     const dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
 
     if (!dayMatch) {
@@ -60,7 +64,7 @@ function findDaySection(rawText: string, date: Date): string {
         }
 
         const nextDayRegex = new RegExp(
-            `${day}\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*\\d+\\s*\\.?\\s*\\p{L}+`,
+            `${day}\\s*[^\\d\\r\\n|]{0,8}\\|?\\s*${buildTowerDatePattern("\\d+")}`,
             "iu"
         );
         const nextDayMatch = nextDayRegex.exec(rawText.slice(startIdx + 1));
@@ -71,7 +75,10 @@ function findDaySection(rawText: string, date: Date): string {
 
     const nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1);
-    const nextDateRegex = new RegExp(`\\b${nextDate.getDate()}\\s*\\.?\\s*\\p{L}+`, "iu");
+    const nextDateRegex = new RegExp(
+        `(?:^|[\\r\\n])[^\\d.\\r\\n]{0,24}\\b${buildTowerDatePattern(nextDate.getDate())}`,
+        "iu"
+    );
     const nextDateMatch = nextDateRegex.exec(rawText.slice(startIdx + 1));
     if (nextDateMatch) {
         endIdx = Math.min(endIdx, startIdx + 1 + nextDateMatch.index);
@@ -84,6 +91,7 @@ function normalizeLine(line: string): string {
     return line
         .replace(/[\u201C\u201D\u201E"]/g, "")
         .replace(/\bRolievka\b/gi, "Polievka")
+        .replace(/\bME\s*NU\b/gi, "MENU")
         .replace(/\bPENU\b/gi, "MENU")
         .replace(/ExKlus[^\s:]*/giu, "Exklusiv")
         .replace(/Bxklus[^\s:]*/giu, "Exklusiv")
