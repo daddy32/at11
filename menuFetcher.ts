@@ -1,4 +1,3 @@
-import get, { isAxiosError } from "axios";
 import NodeCache from "node-cache";
 
 import { IConfig } from "./config.js";
@@ -41,10 +40,7 @@ export class MenuFetcher {
                     this._config.cacheExpiration,
                 );
             } catch (error) {
-                console.error(
-                    `Error loading menu from ${url}`,
-                    isAxiosError(error) ? error.message : error,
-                );
+                console.error(`Error loading menu from ${url}`, error);
                 this._cache.set<IMenuResult>(
                     cacheKey,
                     {
@@ -70,21 +66,25 @@ export class MenuFetcher {
         }
 
         if (this._runningRequests[url] === undefined) {
-            this._runningRequests[url] = get<string>(url, {
-                method: "get",
+            this._runningRequests[url] = fetch(url, {
+                method: "GET",
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
                     Accept: "text/html,*/*",
                     "Accept-Language": "sk", // we want response in slovak (useful for menu portals that use localization, like zomato)
                 },
-                timeout: this._config.requestTimeout,
+                signal: AbortSignal.timeout(this._config.requestTimeout),
             })
                 .then((response) => {
                     if (response.status === 200) {
-                        return Promise.race([
-                            parserTimeout(this._config.parserTimeout),
-                            parser.parse(response.data, date),
-                        ]);
+                        return response
+                            .text()
+                            .then((text) =>
+                                Promise.race([
+                                    parserTimeout(this._config.parserTimeout),
+                                    parser.parse(text, date),
+                                ]),
+                            );
                     }
                     throw new Error(
                         `Wrong response status ${response.status} for ${url}`,
