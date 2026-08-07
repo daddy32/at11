@@ -42,8 +42,8 @@ describe("PomodoroRosso", () => {
         });
     });
 
-    describe("parsing sample 1", () => {
-        const html = fs.readFileSync("./test/samples/pomodoro-rosso1.html", {
+    describe("parsing new format", () => {
+        const html = fs.readFileSync("./test/samples/Pomodoro Rosso.html", {
             encoding: "utf-8",
         });
 
@@ -52,14 +52,14 @@ describe("PomodoroRosso", () => {
 
             before(() => {
                 return parser
-                    .parse(html, new Date(2025, 2, 17))
+                    .parse(html, new Date(2026, 7, 3))
                     .then((menuItems) => {
                         menu = menuItems;
                     });
             });
 
             it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
+                assert.equal(menu.length, 5);
             });
 
             it("1st item correct", () => {
@@ -72,27 +72,36 @@ describe("PomodoroRosso", () => {
                 assert.equal(menu[1].isSoup, false);
                 assert.equal(
                     menu[1].text,
-                    "Kuracie prsia na prírodno, bylinková omáčka, ryža s kukuricou",
+                    "Kurací steak, anglická zelenina, ryža",
                 );
-                assert.equal(menu[1].price, 7.9);
+                assert.equal(menu[1].price, 9.5);
             });
 
             it("3rd item correct", () => {
                 assert.equal(menu[2].isSoup, false);
                 assert.equal(
                     menu[2].text,
-                    "Zeleninové rizoto so syrom, mrkvový šalát",
+                    "Cviklové rizoto s kozím syrom, rukola",
                 );
-                assert.equal(menu[2].price, 7.9);
+                assert.equal(menu[2].price, 8.5);
             });
 
             it("4th item correct", () => {
                 assert.equal(menu[3].isSoup, false);
                 assert.equal(
                     menu[3].text,
-                    "Poľovnícky guláš z daniela, domáca karlovarská knedľa",
+                    "Bažantie stehná na tymiáne, krémové hubové krupoto, píniové oriešky, zavárané brusnice",
                 );
-                assert.equal(menu[3].price, 9.9);
+                assert.equal(menu[3].price, 12.9);
+            });
+
+            it("5th item correct", () => {
+                assert.equal(menu[4].isSoup, false);
+                assert.equal(
+                    menu[4].text,
+                    "Caesar šalát s kuracím mäsom alebo mozzarellou, slaninkové chipsy, pizza tyčinka",
+                );
+                assert.equal(menu[4].price, 9.9);
             });
         });
 
@@ -101,19 +110,19 @@ describe("PomodoroRosso", () => {
 
             before(() => {
                 return parser
-                    .parse(html, new Date(2025, 2, 18))
+                    .parse(html, new Date(2026, 7, 4))
                     .then((menuItems) => {
                         menu = menuItems;
                     });
             });
 
             it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
+                assert.equal(menu.length, 5);
             });
 
             it("1st item correct", () => {
                 assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Zemiaková na kyslo");
+                assert.equal(menu[0].text, "Hrachová");
                 assert.equal(isNaN(menu[0].price), true);
             });
 
@@ -121,24 +130,33 @@ describe("PomodoroRosso", () => {
                 assert.equal(menu[1].isSoup, false);
                 assert.equal(
                     menu[1].text,
-                    "Sviečková na smotane z bravčového karé, domáca knedľa",
+                    "Bravčové stehno na šípkovej omáčke, zemiaková kaša, listový šalát",
                 );
-                assert.equal(menu[1].price, 7.9);
+                assert.equal(menu[1].price, 9.5);
             });
 
             it("3rd item correct", () => {
                 assert.equal(menu[2].isSoup, false);
-                assert.equal(menu[2].text, "Špenátové lasagne s mozzarellou");
-                assert.equal(isNaN(menu[2].price), true);
+                assert.equal(menu[2].text, "Linguine Carbonara");
+                assert.equal(menu[2].price, 8.5);
             });
 
             it("4th item correct", () => {
                 assert.equal(menu[3].isSoup, false);
                 assert.equal(
                     menu[3].text,
-                    "Poľovnícky guláš z daniela, domáca karlovarská knedľa",
+                    "Bažantie stehná na tymiáne, krémové hubové krupoto, píniové oriešky, zavárané brusnice",
                 );
-                assert.equal(menu[3].price, 9.9);
+                assert.equal(menu[3].price, 12.9);
+            });
+
+            it("5th item correct", () => {
+                assert.equal(menu[4].isSoup, false);
+                assert.equal(
+                    menu[4].text,
+                    "Caesar šalát s kuracím mäsom alebo mozzarellou, slaninkové chipsy, pizza tyčinka",
+                );
+                assert.equal(menu[4].price, 9.9);
             });
         });
 
@@ -147,19 +165,19 @@ describe("PomodoroRosso", () => {
 
             before(() => {
                 return parser
-                    .parse(html, new Date(2025, 2, 19))
+                    .parse(html, new Date(2026, 7, 5))
                     .then((menuItems) => {
                         menu = menuItems;
                     });
             });
 
             it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
+                assert.equal(menu.length, 5);
             });
 
             it("1st item correct", () => {
                 assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Hŕstková");
+                assert.equal(menu[0].text, "Cesnaková krémová s krutónmi");
                 assert.equal(isNaN(menu[0].price), true);
             });
 
@@ -167,27 +185,36 @@ describe("PomodoroRosso", () => {
                 assert.equal(menu[1].isSoup, false);
                 assert.equal(
                     menu[1].text,
-                    "Vyprážaný kurací rezeň, zemiaková kaša, miešaný šalát",
+                    "Balkánska pleskavica, pečené zemiaky, ajvar, ľadový šalát",
                 );
-                assert.equal(menu[1].price, 7.9);
+                assert.equal(menu[1].price, 9.5);
             });
 
             it("3rd item correct", () => {
                 assert.equal(menu[2].isSoup, false);
                 assert.equal(
                     menu[2].text,
-                    "Zemiaková placka plnená bryndzou, smažená cibuľka",
+                    "Cuketové placky s bryndzou a pažitkou",
                 );
-                assert.equal(menu[2].price, 7.9);
+                assert.equal(menu[2].price, 8.5);
             });
 
             it("4th item correct", () => {
                 assert.equal(menu[3].isSoup, false);
                 assert.equal(
                     menu[3].text,
-                    "Poľovnícky guláš z daniela, domáca karlovarská knedľa",
+                    "Bažantie stehná na tymiáne, krémové hubové krupoto, píniové oriešky, zavárané brusnice",
                 );
-                assert.equal(menu[3].price, 9.9);
+                assert.equal(menu[3].price, 12.9);
+            });
+
+            it("5th item correct", () => {
+                assert.equal(menu[4].isSoup, false);
+                assert.equal(
+                    menu[4].text,
+                    "Caesar šalát s kuracím mäsom alebo mozzarellou, slaninkové chipsy, pizza tyčinka",
+                );
+                assert.equal(menu[4].price, 9.9);
             });
         });
 
@@ -196,19 +223,19 @@ describe("PomodoroRosso", () => {
 
             before(() => {
                 return parser
-                    .parse(html, new Date(2025, 2, 20))
+                    .parse(html, new Date(2026, 7, 6))
                     .then((menuItems) => {
                         menu = menuItems;
                     });
             });
 
             it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
+                assert.equal(menu.length, 5);
             });
 
             it("1st item correct", () => {
                 assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Šošovicová s párkom");
+                assert.equal(menu[0].text, "Tekvicová");
                 assert.equal(isNaN(menu[0].price), true);
             });
 
@@ -216,27 +243,36 @@ describe("PomodoroRosso", () => {
                 assert.equal(menu[1].isSoup, false);
                 assert.equal(
                     menu[1].text,
-                    "Bravčové ražniči, pečené zemiaky, čalamáda",
+                    "Hovädzie varené, kôprová omáčka, domáca knedľa",
                 );
-                assert.equal(menu[1].price, 7.9);
+                assert.equal(menu[1].price, 9.5);
             });
 
             it("3rd item correct", () => {
                 assert.equal(menu[2].isSoup, false);
                 assert.equal(
                     menu[2].text,
-                    "Lekvárové pirohy a šúľance s makom",
+                    "Palacinky s lesným ovocím a zmrzlinou",
                 );
-                assert.equal(menu[2].price, 7.9);
+                assert.equal(menu[2].price, 8.5);
             });
 
             it("4th item correct", () => {
                 assert.equal(menu[3].isSoup, false);
                 assert.equal(
                     menu[3].text,
-                    "Poľovnícky guláš z daniela, domáca karlovarská knedľa",
+                    "Bažantie stehná na tymiáne, krémové hubové krupoto, píniové oriešky, zavárané brusnice",
                 );
-                assert.equal(menu[3].price, 9.9);
+                assert.equal(menu[3].price, 12.9);
+            });
+
+            it("5th item correct", () => {
+                assert.equal(menu[4].isSoup, false);
+                assert.equal(
+                    menu[4].text,
+                    "Caesar šalát s kuracím mäsom alebo mozzarellou, slaninkové chipsy, pizza tyčinka",
+                );
+                assert.equal(menu[4].price, 9.9);
             });
         });
 
@@ -245,71 +281,19 @@ describe("PomodoroRosso", () => {
 
             before(() => {
                 return parser
-                    .parse(html, new Date(2025, 2, 21))
+                    .parse(html, new Date(2026, 7, 7))
                     .then((menuItems) => {
                         menu = menuItems;
                     });
             });
 
             it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
+                assert.equal(menu.length, 5);
             });
 
             it("1st item correct", () => {
                 assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Šampiňónová");
-                assert.equal(isNaN(menu[0].price), true);
-            });
-
-            it("2nd item correct", () => {
-                assert.equal(menu[1].isSoup, false);
-                assert.equal(menu[1].text, "Kurací gyros s ryžou, tzatziki");
-                assert.equal(menu[1].price, 7.9);
-            });
-
-            it("3rd item correct", () => {
-                assert.equal(menu[2].isSoup, false);
-                assert.equal(
-                    menu[2].text,
-                    "Hlivový perkelt, domáce maslové halušky",
-                );
-                assert.equal(menu[2].price, 7.9);
-            });
-
-            it("4th item correct", () => {
-                assert.equal(menu[3].isSoup, false);
-                assert.equal(
-                    menu[3].text,
-                    "Poľovnícky guláš z daniela, domáca karlovarská knedľa",
-                );
-                assert.equal(menu[3].price, 9.9);
-            });
-        });
-    });
-
-    describe("parsing sample 2", () => {
-        const html = fs.readFileSync("./test/samples/pomodoro-rosso2.html", {
-            encoding: "utf-8",
-        });
-
-        describe("menu for 'pondelok'", () => {
-            let menu: IMenuItem[];
-
-            before(() => {
-                return parser
-                    .parse(html, new Date(2025, 2, 10))
-                    .then((menuItems) => {
-                        menu = menuItems;
-                    });
-            });
-
-            it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
-            });
-
-            it("1st item correct", () => {
-                assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Slepačí vývar s rezancami");
+                assert.equal(menu[0].text, "Frankfurtská s párkom");
                 assert.equal(isNaN(menu[0].price), true);
             });
 
@@ -317,223 +301,36 @@ describe("PomodoroRosso", () => {
                 assert.equal(menu[1].isSoup, false);
                 assert.equal(
                     menu[1].text,
-                    "Kuracie rezance na čerstvej zelenine, jasmínová ryža",
+                    "Pečené vykostené kuracie stehno, barbecue omáčka, pečené parmezánové hranolky",
                 );
-                assert.equal(menu[1].price, 7.9);
-            });
-
-            it("3rd item correct", () => {
-                assert.equal(menu[2].isSoup, false);
-                assert.equal(menu[2].text, "Linguine Arabiatta");
-                assert.equal(menu[2].price, 7.9);
-            });
-
-            it("4th item correct", () => {
-                assert.equal(menu[3].isSoup, false);
-                assert.equal(
-                    menu[3].text,
-                    "Filé z tresky v trojobale, zemiakový majonezový šalát",
-                );
-                assert.equal(menu[3].price, 8.9);
-            });
-        });
-
-        describe("menu for 'utorok'", () => {
-            let menu: IMenuItem[];
-
-            before(() => {
-                return parser
-                    .parse(html, new Date(2025, 2, 11))
-                    .then((menuItems) => {
-                        menu = menuItems;
-                    });
-            });
-
-            it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
-            });
-
-            it("1st item correct", () => {
-                assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Šošovicová so zeleninou");
-                assert.equal(isNaN(menu[0].price), true);
-            });
-
-            it("2nd item correct", () => {
-                assert.equal(menu[1].isSoup, false);
-                assert.equal(
-                    menu[1].text,
-                    "Rezníky z bravčovej panenky, zemiaková kaša, kyslá uhorka",
-                );
-                assert.equal(menu[1].price, 7.9);
+                assert.equal(menu[1].price, 9.5);
             });
 
             it("3rd item correct", () => {
                 assert.equal(menu[2].isSoup, false);
                 assert.equal(
                     menu[2].text,
-                    "Domáce pečené buchty plnené slivkovým lekvárom a makom",
+                    "Tagliatelle s gorgonzolovou omáčkou, orechy, rukola",
                 );
-                assert.equal(menu[2].price, 7.9);
+                assert.equal(menu[2].price, 8.5);
             });
 
             it("4th item correct", () => {
                 assert.equal(menu[3].isSoup, false);
                 assert.equal(
                     menu[3].text,
-                    "Filé z tresky v trojobale, zemiakový majonezový šalát",
+                    "Bažantie stehná na tymiáne, krémové hubové krupoto, píniové oriešky, zavárané brusnice",
                 );
-                assert.equal(menu[3].price, 8.9);
-            });
-        });
-
-        describe("menu for 'streda'", () => {
-            let menu: IMenuItem[];
-
-            before(() => {
-                return parser
-                    .parse(html, new Date(2025, 2, 12))
-                    .then((menuItems) => {
-                        menu = menuItems;
-                    });
+                assert.equal(menu[3].price, 12.9);
             });
 
-            it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
-            });
-
-            it("1st item correct", () => {
-                assert.equal(menu[0].isSoup, true);
+            it("5th item correct", () => {
+                assert.equal(menu[4].isSoup, false);
                 assert.equal(
-                    menu[0].text,
-                    "Zeleninová s krupicovými haluškami",
+                    menu[4].text,
+                    "Caesar šalát s kuracím mäsom alebo mozzarellou, slaninkové chipsy, pizza tyčinka",
                 );
-                assert.equal(isNaN(menu[0].price), true);
-            });
-
-            it("2nd item correct", () => {
-                assert.equal(menu[1].isSoup, false);
-                assert.equal(
-                    menu[1].text,
-                    "Zapečený kurací steak so sušenými paradajkami a mozzarellou, tarhoňa",
-                );
-                assert.equal(menu[1].price, 7.9);
-            });
-
-            it("3rd item correct", () => {
-                assert.equal(menu[2].isSoup, false);
-                assert.equal(
-                    menu[2].text,
-                    "Vyprážané tofu v zemiakovom cestičku, zemiaková kaša, miešaný listový šalát",
-                );
-                assert.equal(menu[2].price, 7.9);
-            });
-
-            it("4th item correct", () => {
-                assert.equal(menu[3].isSoup, false);
-                assert.equal(
-                    menu[3].text,
-                    "Filé z tresky v trojobale, zemiakový majonezový šalát",
-                );
-                assert.equal(menu[3].price, 8.9);
-            });
-        });
-
-        describe("menu for 'štvrtok'", () => {
-            let menu: IMenuItem[];
-
-            before(() => {
-                return parser
-                    .parse(html, new Date(2025, 2, 13))
-                    .then((menuItems) => {
-                        menu = menuItems;
-                    });
-            });
-
-            it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
-            });
-
-            it("1st item correct", () => {
-                assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Brokolicý krém");
-                assert.equal(isNaN(menu[0].price), true);
-            });
-
-            it("2nd item correct", () => {
-                assert.equal(menu[1].isSoup, false);
-                assert.equal(
-                    menu[1].text,
-                    "Pečená kuracia 1/4, ryža, cherry šalát",
-                );
-                assert.equal(menu[1].price, 7.9);
-            });
-
-            it("3rd item correct", () => {
-                assert.equal(menu[2].isSoup, false);
-                assert.equal(
-                    menu[2].text,
-                    "Parmezánové krémové rizoto so špenátom",
-                );
-                assert.equal(menu[2].price, 7.9);
-            });
-
-            it("4th item correct", () => {
-                assert.equal(menu[3].isSoup, false);
-                assert.equal(
-                    menu[3].text,
-                    "Filé z tresky v trojobale, zemiakový majonezový šalát",
-                );
-                assert.equal(menu[3].price, 8.9);
-            });
-        });
-
-        describe("menu for 'štvrtok'", () => {
-            let menu: IMenuItem[];
-
-            before(() => {
-                return parser
-                    .parse(html, new Date(2025, 2, 14))
-                    .then((menuItems) => {
-                        menu = menuItems;
-                    });
-            });
-
-            it("should return correct number of items", () => {
-                assert.equal(menu.length, 4);
-            });
-
-            it("1st item correct", () => {
-                assert.equal(menu[0].isSoup, true);
-                assert.equal(menu[0].text, "Držková s rozhlíkom");
-                assert.equal(isNaN(menu[0].price), true);
-            });
-
-            it("2nd item correct", () => {
-                assert.equal(menu[1].isSoup, false);
-                assert.equal(
-                    menu[1].text,
-                    "Živánska v alobale, opekané zemiaky, kapustový šalát",
-                );
-                assert.equal(menu[1].price, 7.9);
-            });
-
-            it("3rd item correct", () => {
-                assert.equal(menu[2].isSoup, false);
-                assert.equal(
-                    menu[2].text,
-                    "Vyprážaná cuketa v cestíčku, zemiaková kaša, bylinkový dressing",
-                );
-                assert.equal(menu[2].price, 7.9);
-            });
-
-            it("4th item correct", () => {
-                assert.equal(menu[3].isSoup, false);
-                assert.equal(
-                    menu[3].text,
-                    "Filé z tresky v trojobale, zemiakový majonezový šalát",
-                );
-                assert.equal(menu[3].price, 8.9);
+                assert.equal(menu[4].price, 9.9);
             });
         });
     });

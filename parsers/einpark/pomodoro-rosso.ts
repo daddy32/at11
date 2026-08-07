@@ -1,9 +1,8 @@
 import { load } from "cheerio";
 
 import { IMenuItem, IParser } from "../types.js";
-import { addDays, endOfWeek, format, startOfWeek, subDays } from "date-fns";
+import { endOfWeek, format, startOfWeek, subDays } from "date-fns";
 import { sk } from "date-fns/locale";
-import { parsePrice } from "../parserUtil.js";
 
 export class PomodoroRosso implements IParser {
     public urlFactory(d: Date): string {
@@ -21,66 +20,35 @@ export class PomodoroRosso implements IParser {
     public parse(html: string, date: Date): Promise<IMenuItem[]> {
         const $ = load(html);
         const currentDayName = format(date, "eeee", { locale: sk });
-        const nextDayName = format(addDays(date, 1), "eeee", { locale: sk });
 
-        const allMenuText = $("article.post.tag-denne-menu .entry-content")
-            .find("br")
-            .replaceWith("\n")
-            .end()
-            .text()
-            .split("\n")
-            .map((t) => t.trim())
-            .filter(Boolean);
-
-        return Promise.resolve(
-            this.parseDailyMenu(allMenuText, currentDayName, nextDayName),
-        );
-    }
-
-    private parseDailyMenu(
-        rows: string[],
-        currentDay: string,
-        nextDay: string,
-    ): IMenuItem[] {
-        const menu: IMenuItem[] = [];
-
-        const current = new RegExp(currentDay, "i");
-        const next = new RegExp(nextDay, "i");
-        const note = new RegExp("Cena denného menu", "i");
-
-        let dailyMenuStarted = false;
-        for (const r of rows) {
-            if (!dailyMenuStarted && current.test(r)) {
-                dailyMenuStarted = true;
-                continue;
-            }
-            if (dailyMenuStarted && (next.test(r) || note.test(r))) {
-                break;
-            }
-            if (dailyMenuStarted) {
-                if (/Polievka/i.test(r)) {
-                    menu.push(this.parseSoup(r));
-                } else {
-                    menu.push(this.parseOther(r));
-                }
-            }
+        // New format: structured day panels
+        const panelId = `panel-${currentDayName.charAt(0).toUpperCase() + currentDayName.slice(1)}`;
+        const panel = $(`#${panelId}`);
+        if (panel.length > 0) {
+            const menu: IMenuItem[] = [];
+            panel.find(".soup").each((_, el) => {
+                const text = $(el)
+                    .text()
+                    .replace(/Polievka:?/i, "")
+                    .trim();
+                menu.push({
+                    isSoup: true,
+                    text: this.normalize(text),
+                    price: NaN,
+                });
+            });
+            panel.find(".meal-row").each((_, el) => {
+                const text = $(el).find("strong").text().trim();
+                const priceStr = $(el).find(".price").text().trim();
+                const price = parseFloat(
+                    priceStr.replace(",", ".").replace(/[€\s]/g, ""),
+                );
+                menu.push({ isSoup: false, text: this.normalize(text), price });
+            });
+            return Promise.resolve(menu);
         }
 
-        return menu;
-    }
-
-    private parseSoup(row: string): IMenuItem {
-        const text = row.replace(/Polievka:?/i, "").trim();
-        return { isSoup: true, text: this.normalize(text), price: NaN };
-    }
-
-    private parseOther(row: string): IMenuItem {
-        const { text, price } = parsePrice(row);
-        return {
-            isSoup: false,
-            text: this.normalize(text.replace("//", "").trim()),
-            price,
-        };
+        return Promise.resolve([]);
     }
 
     private normalize(str: string) {
