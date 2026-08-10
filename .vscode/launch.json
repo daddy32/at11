@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug at11",
-            "program": "${workspaceFolder}/app.ts",
+            "program": "${workspaceFolder}/dist/app.js",
             "preLaunchTask": "${defaultBuildTask}",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
@@ -20,7 +20,8 @@
             },
             "runtimeArgs": [
                 "--no-deprecation"
-            ]
+            ],
+            "console": "integratedTerminal"
         },
         {
             "type": "node",
