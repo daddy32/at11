@@ -60,8 +60,11 @@ export class MenuFetcher {
         date: Date,
         parser: IParser,
     ): Promise<IMenuItem[]> {
-        // on production (azure) use scraper api for zomato requests, otherwise zomato blocks them
-        if (this._config.isProduction && url.search("zomato") >= 0) {
+        // use Scraper API for loading pages, otherwise they might be blocked (some block Azure, some use Cloudflare bot protection etc.)
+        if (!this._config.skipScraperApi) {
+            if (!this._config.scraperApiKey) {
+                throw new Error("Scraper API key is missing");
+            }
             url = `http://api.scraperapi.com?api_key=${this._config.scraperApiKey}&url=${encodeURIComponent(url)}`;
         }
 
@@ -71,7 +74,7 @@ export class MenuFetcher {
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
                     Accept: "text/html,*/*",
-                    "Accept-Language": "sk", // we want response in slovak (useful for menu portals that use localization, like zomato)
+                    "Accept-Language": "sk", // we want response in slovak (useful for menu portals that use localization)
                 },
                 signal: AbortSignal.timeout(this._config.requestTimeout),
             })

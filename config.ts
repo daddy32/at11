@@ -4,7 +4,7 @@ import { MKMRestaurant } from "./parsers/einpark/mkmrestaurant.js";
 import { PomodoroRosso } from "./parsers/einpark/pomodoro-rosso.js";
 
 export interface IConfig {
-    readonly isProduction: boolean;
+    readonly skipScraperApi: boolean;
     readonly scraperApiKey?: string;
     readonly appInsightsConnectionString?: string;
     readonly port: number;
@@ -16,7 +16,7 @@ export interface IConfig {
 }
 
 export class Config implements IConfig {
-    public readonly isProduction = process.env.NODE_ENV === "production";
+    public readonly skipScraperApi = process.env.SKIP_SCRAPER_API === "true";
     public readonly scraperApiKey = process.env.SCRAPER_API_KEY;
     public readonly appInsightsConnectionString =
         process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
