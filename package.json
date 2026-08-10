@@ -18,13 +18,13 @@
         "@types/hbs": "^4.0.5",
         "@types/mocha": "^10.0.10",
         "@types/node": "^24.0.0",
-        "eslint": "^10.8.0",
+        "eslint": "^10.8.1",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^17.9.0",
         "mocha": "^11.8.0",
         "prettier": "^3.9.6",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.66.0"
+        "typescript-eslint": "^8.67.0"
     },
     "scripts": {
         "build": "tsc",
