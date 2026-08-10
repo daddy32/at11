@@ -8,40 +8,6 @@ import { PomodoroRosso } from "../parsers/einpark/pomodoro-rosso.js";
 describe("PomodoroRosso", () => {
     const parser = new PomodoroRosso();
 
-    describe("URL factory", () => {
-        [
-            "2025-03-17",
-            "2025-03-18",
-            "2025-03-19",
-            "2025-03-20",
-            "2025-03-21",
-        ].forEach((date) => {
-            it(`should return correct url for ${date}`, () => {
-                const url = parser.urlFactory(new Date(date));
-                assert.equal(
-                    url,
-                    "https://www.pizzeriapomodororosso.sk/2025/03/16/denne-menu-17-3-2025-21-3-2025/",
-                );
-            });
-        });
-
-        [
-            "2025-03-10",
-            "2025-03-11",
-            "2025-03-12",
-            "2025-03-13",
-            "2025-03-14",
-        ].forEach((date) => {
-            it(`should return correct url for ${date}`, () => {
-                const url = parser.urlFactory(new Date(date));
-                assert.equal(
-                    url,
-                    "https://www.pizzeriapomodororosso.sk/2025/03/09/denne-menu-10-3-2025-14-3-2025/",
-                );
-            });
-        });
-    });
-
     describe("parsing new format", () => {
         const html = fs.readFileSync("./test/samples/Pomodoro Rosso.html", {
             encoding: "utf-8",

@@ -3,12 +3,12 @@ import express from "express";
 import hbs from "hbs";
 import NodeCache from "node-cache";
 
-import { Config } from "./config.js";
+import { Config, IConfig } from "./config.js";
 import { MenuFetcher, IMenuResult } from "./menuFetcher.js";
 import { sk } from "date-fns/locale";
 import { formatDistance, parse, isValid } from "date-fns";
 
-const config = new Config();
+const config: IConfig = new Config();
 if (config.appInsightsConnectionString) {
     appInsights
         .setup(config.appInsightsConnectionString)

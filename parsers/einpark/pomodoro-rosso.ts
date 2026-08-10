@@ -1,21 +1,12 @@
 import { load } from "cheerio";
 
 import { IMenuItem, IParser } from "../types.js";
-import { endOfWeek, format, startOfWeek, subDays } from "date-fns";
+import { format } from "date-fns";
 import { sk } from "date-fns/locale";
 
 export class PomodoroRosso implements IParser {
-    public urlFactory(d: Date): string {
-        const weekStart = startOfWeek(d, { locale: sk });
-        const dayBeforeStart = subDays(weekStart, 1);
-        const weekEnd = endOfWeek(d, { locale: sk });
-        const fridayBeforeEnd = subDays(weekEnd, 2);
-        return (
-            "https://www.pizzeriapomodororosso.sk/" +
-            format(dayBeforeStart, "yyyy/MM/dd", { locale: sk }) +
-            `/denne-menu-${format(weekStart, "d-M-yyyy", { locale: sk })}-${format(fridayBeforeEnd, "d-M-yyyy", { locale: sk })}/`
-        );
-    }
+    public urlFactory = () =>
+        "https://www.pizzeriapomodororosso.sk/#denne-menu";
 
     public parse(html: string, date: Date): Promise<IMenuItem[]> {
         const $ = load(html);
