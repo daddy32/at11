@@ -192,4 +192,22 @@ Paradajková minestrone mI: Kuracie soté s koreňovou zeleninou, dusenáryža, 
       expect(normalizedTexts).to.not.include("za see");
     });
   });
+
+  describe("OCR date header parsing", () => {
+    it("parses a day header when OCR drops the period after the day number", () => {
+      const date = new Date("2026-08-24T00:00:00.000Z");
+      const ocrText = `
+PONDELOK 24august S
+Polievka: Kačací vývar s mäsom
+MENU 1: Zapekané kuracie prsia so syrom a slaninou, ryža
+UTOROK 25august
+Polievka 1: Zeleninová s písmenkami
+`;
+
+      const items = extractMenuFromText(ocrText, date);
+
+      expect(items.some((item) => item.isSoup && item.text.includes("Kačací vývar"))).to.equal(true);
+      expect(items.some((item) => !item.isSoup && item.text.includes("Zapekané kuracie prsia"))).to.equal(true);
+    });
+  });
 });

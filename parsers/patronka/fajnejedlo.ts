@@ -108,7 +108,7 @@ function findDaySection(rawText: string, date: Date): string {
   const dayNum = date.getDate();
   const dayName = format(date, "EEEE", { locale: sk });
   const dayRegex = new RegExp(
-    `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n]{0,8}\\s*${dayNum}\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`,
+    `(${DAY_NAMES.join("|")})\\s*[^\\d\\r\\n]{0,8}\\s*${dayNum}\\s*\\.?\\s*[A-Za-z\\u00C0-\\u017F]+`,
     "i"
   );
   const dateOnlyRegex = new RegExp(`\\b${dayNum}\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`, "i");
@@ -127,7 +127,7 @@ function findDaySection(rawText: string, date: Date): string {
     }
 
     const nextDayRegex = new RegExp(
-      `${day}\\s*[^\\d\\r\\n]{0,8}\\s*\\d+\\s*\\.\\s*[A-Za-z\\u00C0-\\u017F]+`,
+      `${day}\\s*[^\\d\\r\\n]{0,8}\\s*\\d+\\s*\\.?\\s*[A-Za-z\\u00C0-\\u017F]+`,
       "i"
     );
     const match = nextDayRegex.exec(rawText.slice(startIdx + 1));
