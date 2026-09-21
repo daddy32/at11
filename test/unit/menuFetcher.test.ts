@@ -316,6 +316,42 @@ describe("MenuFetcher", () => {
         expect(html).to.include("jedlo_polozka");
     });
 
+    it("rejects the SME challenge page instead of returning empty menu HTML", async () => {
+        const config = { ...createConfig(), requestTimeout: 15000 };
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache) as unknown as {
+            fetchHtmlWithBrowser: (url: string) => Promise<string>;
+            waitForDelay: (_ms: number) => Promise<void>;
+        };
+
+        const challengeHtml = "<html><head><title>Len chvíľu...</title></head><body></body></html>";
+        const browser = {
+            newPage: sinon.stub().resolves({
+                setUserAgent: sinon.stub().resolves(undefined),
+                setExtraHTTPHeaders: sinon.stub().resolves(undefined),
+                goto: sinon.stub().resolves(undefined),
+                waitForSelector: sinon.stub().rejects(new Error("Timeout waiting for menu rows")),
+                content: sinon.stub().resolves(challengeHtml),
+                title: sinon.stub().resolves("Len chvíľu..."),
+                close: sinon.stub().resolves(undefined)
+            }),
+            close: sinon.stub().resolves(undefined)
+        };
+
+        sinon.stub(puppeteer, "launch").callsFake(async () => browser as never);
+        menuFetcher.waitForDelay = async (_ms: number) => undefined;
+
+        let error: Error | undefined;
+        try {
+            await menuFetcher.fetchHtmlWithBrowser("https://restauracie.sme.sk/restauracia/example/denne-menu");
+        } catch (caughtError) {
+            error = caughtError as Error;
+        }
+
+        expect(error).to.be.instanceOf(Error);
+        expect(error?.message).to.include("did not return menu content");
+    });
+
     it("waits for Menučka day titles in the browser fallback", async () => {
         const config = createConfig();
         const cache = new NodeCache({ useClones: false });

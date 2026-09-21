@@ -230,7 +230,8 @@ export class MenuFetcher {
                 }
             }
 
-            return await page.content();
+            this.logInfo("Browser fallback returned no menu content", { url });
+            throw new Error(`Browser fallback did not return menu content for ${url}`);
         } finally {
             await page.close().catch(() => undefined);
         }
