@@ -206,12 +206,31 @@ export class MenuFetcher {
     }
 
     private async fetchHtmlWithBrowser(url: string): Promise<string> {
+        const smeExportUrl = this.getSmeExportUrl(url);
+        let scraperApiTried = false;
+        if (smeExportUrl && this._config.isProduction && this._config.scraperApiKey) {
+            scraperApiTried = true;
+            try {
+                const pdfText = await this.fetchSmeExportTextWithScraperApi(smeExportUrl);
+                if (pdfText.trim()) {
+                    this.logInfo("SME export PDF fetched via ScraperAPI", { url, exportUrl: smeExportUrl, textLength: pdfText.length });
+                    return SME_PDF_TEXT_PREFIX + pdfText;
+                }
+            } catch (error) {
+                this.logInfo("SME export ScraperAPI preflight failed", {
+                    url,
+                    exportUrl: smeExportUrl,
+                    error: error instanceof Error ? error.message : String(error)
+                });
+            }
+        }
+
         const browser = await this.getBrowser();
         const page = await browser.newPage();
         try {
             await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
             await page.setExtraHTTPHeaders({ "Accept-Language": "sk" });
-            const menuRowTimeout = Math.min(this._config.requestTimeout, 5000);
+            const menuRowTimeout = Math.min(this._config.requestTimeout, 15000);
             const contentMarker = this.getBrowserContentMarker(url);
 
             for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -232,7 +251,6 @@ export class MenuFetcher {
                 }
             }
 
-            const smeExportUrl = this.getSmeExportUrl(url);
             if (smeExportUrl) {
                 try {
                     const pdfText = await this.fetchSmeExportTextWithBrowser(page, smeExportUrl);
@@ -246,6 +264,25 @@ export class MenuFetcher {
                         exportUrl: smeExportUrl,
                         error: error instanceof Error ? error.message : String(error)
                     });
+                }
+
+                if (this._config.scraperApiKey && !scraperApiTried) {
+                    scraperApiTried = true;
+                    try {
+                        const pdfText = await this.fetchSmeExportTextWithScraperApi(smeExportUrl);
+                        if (pdfText.trim()) {
+                            this.logInfo("SME export PDF fetched via ScraperAPI", { url, exportUrl: smeExportUrl, textLength: pdfText.length });
+                            return SME_PDF_TEXT_PREFIX + pdfText;
+                        }
+                    } catch (error) {
+                        this.logInfo("SME export ScraperAPI fallback failed", {
+                            url,
+                            exportUrl: smeExportUrl,
+                            error: error instanceof Error ? error.message : String(error)
+                        });
+                    }
+                } else if (!this._config.scraperApiKey) {
+                    this.logInfo("SME export ScraperAPI fallback skipped", { url, reason: "SCRAPER_API_KEY is not configured" });
                 }
             }
 
@@ -283,6 +320,25 @@ export class MenuFetcher {
         }, exportUrl);
 
         return (await pdf(Buffer.from(pdfBase64, "base64"))).text;
+    }
+
+    private async fetchSmeExportTextWithScraperApi(exportUrl: string): Promise<string> {
+        const scraperUrl = "https://api.scraperapi.com"
+            + `?api_key=${encodeURIComponent(this._config.scraperApiKey)}`
+            + "&render=true&premium=true&country_code=sk"
+            + `&url=${encodeURIComponent(exportUrl)}`;
+        const response = await Axios.get<ArrayBuffer>(scraperUrl, {
+            responseType: "arraybuffer",
+            timeout: this._config.requestTimeout,
+            headers: { "Accept": "application/pdf" }
+        });
+        const buffer = Buffer.from(response.data);
+        const contentType = String(response.headers?.["content-type"] || "");
+        if (!contentType.includes("application/pdf") && buffer.subarray(0, 4).toString() !== "%PDF") {
+            throw new Error(`ScraperAPI returned ${response.status} ${contentType} instead of a PDF`);
+        }
+
+        return (await pdf(buffer)).text;
     }
 
     private async getBrowser(): Promise<Browser> {
