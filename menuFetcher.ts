@@ -167,7 +167,14 @@ export class MenuFetcher {
     }
 
     private shouldUseBrowserFallback(url: string, error: unknown): boolean {
-        if (!url.includes("restauracie.sme.sk")) {
+        let hostname: string;
+        try {
+            hostname = new URL(url).hostname;
+        } catch {
+            return false;
+        }
+
+        if (!this.isBrowserFallbackHost(hostname)) {
             return false;
         }
 
@@ -182,6 +189,20 @@ export class MenuFetcher {
         return status === 403 || status === 429;
     }
 
+    private getBrowserContentMarker(url: string): { selector: string; marker: string } {
+        const hostname = new URL(url).hostname;
+        return hostname === "menucka.sk" || hostname === "www.menucka.sk"
+            ? { selector: ".day-title, .restaurant-weekmenu", marker: "day-title|restaurant-weekmenu" }
+            : { selector: ".jedlo_polozka", marker: "jedlo_polozka" };
+    }
+
+    private isBrowserFallbackHost(hostname: string): boolean {
+        return hostname === "restauracie.sme.sk"
+            || hostname === "www.restauracie.sme.sk"
+            || hostname === "menucka.sk"
+            || hostname === "www.menucka.sk";
+    }
+
     private async fetchHtmlWithBrowser(url: string): Promise<string> {
         const browser = await this.getBrowser();
         const page = await browser.newPage();
@@ -189,14 +210,15 @@ export class MenuFetcher {
             await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
             await page.setExtraHTTPHeaders({ "Accept-Language": "sk" });
             const menuRowTimeout = Math.min(this._config.requestTimeout, 5000);
+            const contentMarker = this.getBrowserContentMarker(url);
 
             for (let attempt = 0; attempt < 2; attempt += 1) {
                 await page.goto(url, { waitUntil: "domcontentloaded", timeout: this._config.requestTimeout });
-                await page.waitForSelector(".jedlo_polozka", { timeout: menuRowTimeout }).catch(() => undefined);
+                await page.waitForSelector(contentMarker.selector, { timeout: menuRowTimeout }).catch(() => undefined);
 
                 const html = await page.content();
                 const title = await page.title().catch(() => "");
-                const menuRowCount = (html.match(/jedlo_polozka/g) || []).length;
+                const menuRowCount = (html.match(new RegExp(contentMarker.marker, "g")) || []).length;
                 this.logInfo("Browser page snapshot", { url, attempt: attempt + 1, title, menuRowCount, htmlLength: html.length });
 
                 if (menuRowCount > 0) {

@@ -8,6 +8,7 @@ import { getDateRegex, parsePrice } from "../parserUtil";
 interface IMenuRow {
     text: string;
     price: number;
+    isSoup?: boolean;
 }
 
 export class Dock7 implements IParser {
@@ -19,12 +20,9 @@ export class Dock7 implements IParser {
 
         const $ = cheerio.load(html);
         const currentDay = this.findCurrentDay($, date);
-        if (!currentDay) {
-            doneCallback([]);
-            return;
-        }
-
-        const rows = this.collectRows($, currentDay);
+        const rows = currentDay
+            ? this.collectRows($, currentDay)
+            : this.collectWeeklyRows($, date);
         const menu = this.buildMenu(rows);
         doneCallback(menu);
     }
@@ -76,9 +74,94 @@ export class Dock7 implements IParser {
         return rows;
     }
 
+    private collectWeeklyRows($: cheerio.CheerioAPI, date: Date): IMenuRow[] {
+        const weeklyOffer = $(".continuing-offer-block").filter((_i, elem) => {
+            const title = $(elem).find(".continuing-offer-title").text().trim();
+            return this.weeklyOfferIncludesDate(title, date);
+        }).first();
+
+        if (!weeklyOffer.length) {
+            return [];
+        }
+
+        const rows: IMenuRow[] = [];
+        let currentText = "";
+        let sectionKind: boolean | undefined;
+        const line = weeklyOffer.find(".continuing-offer-line").first();
+
+        const flushText = (price: number = Number.NaN) => {
+            const text = this.normalizeWeeklyText(currentText);
+            currentText = "";
+
+            if (!text) {
+                return;
+            }
+
+            if (/^polievka$/i.test(text)) {
+                sectionKind = true;
+                return;
+            }
+
+            if (/^hlavn[eé]\s+jedl[aá]$/i.test(text)) {
+                sectionKind = false;
+                return;
+            }
+
+            if (/s hlavným jedlom/i.test(text)) {
+                return;
+            }
+
+            rows.push({ text, price, isSoup: sectionKind });
+        };
+
+        line.contents().each((_i, elem) => {
+            if (elem.type === "tag" && $(elem).is("#cena")) {
+                flushText(parsePrice($(elem).text().trim()).price);
+                return;
+            }
+
+            if (elem.type === "tag" && elem.name === "br") {
+                flushText();
+                return;
+            }
+
+            if (elem.type === "text") {
+                currentText += elem.data;
+            }
+        });
+
+        flushText();
+        return rows;
+    }
+
+    private weeklyOfferIncludesDate(title: string, date: Date): boolean {
+        const rangeMatch = title.match(/(\d{1,2})\.\s*-\s*(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+        if (rangeMatch) {
+            const startDay = Number.parseInt(rangeMatch[1], 10);
+            const endDay = Number.parseInt(rangeMatch[2], 10);
+            const month = Number.parseInt(rangeMatch[3], 10);
+            const year = Number.parseInt(rangeMatch[4], 10);
+            return date.getFullYear() === year
+                && date.getMonth() + 1 === month
+                && date.getDate() >= startDay
+                && date.getDate() <= endDay;
+        }
+
+        return getDateRegex(date).test(title);
+    }
+
+    private normalizeWeeklyText(text: string): string {
+        return text
+            .replace(/\s+/g, " ")
+            .trim()
+            .replace(/\s+[–-]\s*$/, "")
+            .replace(/\s+[–-]\s*(?:\d+\s*[a-zA-Z]+(?:\s*\/\s*\d+\s*[a-zA-Z]+)?|\d+\s*\/\s*\d+\s*[a-zA-Z]+)$/, "");
+    }
+
     private buildMenu(rows: IMenuRow[]): IMenuItem[] {
         const menu: IMenuItem[] = [];
         let currentItem: IMenuItem | undefined;
+        let sectionKind: boolean | undefined;
 
         const flushCurrentItem = () => {
             if (!currentItem) {
@@ -89,6 +172,7 @@ export class Dock7 implements IParser {
                 .replace(/\[\s*\*\s*[\d,\s]+\]/g, " ")
                 .replace(/\s*\|\s*/g, " ")
                 .normalizeWhitespace()
+                .replace(/\s+[–-]\s*$/, "")
                 .removeAlergens()
                 .removeMetrics()
                 .replace(/[, ]+$/, "")
@@ -103,6 +187,20 @@ export class Dock7 implements IParser {
 
         rows.forEach(row => {
             if (!row.text) {
+                return;
+            }
+
+            if (/^polievka$/i.test(row.text)) {
+                sectionKind = true;
+                return;
+            }
+
+            if (/^hlavn[eé]\s+jedl[aá]$/i.test(row.text)) {
+                sectionKind = false;
+                return;
+            }
+
+            if (/s hlavným jedlom/i.test(row.text)) {
                 return;
             }
 
@@ -123,9 +221,10 @@ export class Dock7 implements IParser {
             }
 
             const isSoup = /polievka|krém|vývar/i.test(row.text);
+            const itemIsSoup = row.isSoup ?? sectionKind ?? isSoup;
             const hasPrice = !Number.isNaN(row.price);
 
-            if (hasPrice && !isSoup) {
+            if (hasPrice && !itemIsSoup) {
                 flushCurrentItem();
                 currentItem = {
                     text: row.text,
@@ -135,7 +234,7 @@ export class Dock7 implements IParser {
                 return;
             }
 
-            if (isSoup && currentItem && !currentItem.isSoup) {
+            if (itemIsSoup && currentItem && !currentItem.isSoup) {
                 flushCurrentItem();
                 currentItem = {
                     text: row.text,
@@ -145,7 +244,7 @@ export class Dock7 implements IParser {
                 return;
             }
 
-            if (isSoup && !currentItem) {
+            if (itemIsSoup && !currentItem) {
                 currentItem = {
                     text: row.text,
                     price: hasPrice ? row.price : NaN,
@@ -158,7 +257,7 @@ export class Dock7 implements IParser {
                 currentItem = {
                     text: row.text,
                     price: hasPrice ? row.price : NaN,
-                    isSoup
+                    isSoup: itemIsSoup
                 };
                 return;
             }

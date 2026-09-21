@@ -175,6 +175,42 @@ describe("MenuFetcher", () => {
         expect((result.value as IMenuItem[])[0].text).to.equal("Browser menu");
     });
 
+    it("falls back to browser fetch when Menučka returns 403", async () => {
+        const config = createConfig();
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache);
+        const date = new Date("2026-09-21T09:00:00.000Z");
+        const url = "https://menucka.sk/denne-menu/bratislava/dock7";
+        const parser: IParser = {
+            parse(html: string, _: Date, doneCallback: (menu: IMenuItem[]) => void): void {
+                doneCallback([{ text: html.includes("browser-fetched-menu") ? "Browser menu" : "Wrong source", price: 11.9, isSoup: false }]);
+            }
+        };
+
+        sinon.stub(axios, "get").rejects({
+            message: "Request failed with status code 403",
+            response: {
+                status: 403,
+                data: "<!DOCTYPE html><html><title>Just a moment...</title></html>"
+            }
+        });
+
+        let browserFetchCalls = 0;
+        const menuFetcherWithBrowser = menuFetcher as unknown as {
+            fetchHtmlWithBrowser: (_url: string) => Promise<string>;
+        };
+        menuFetcherWithBrowser.fetchHtmlWithBrowser = async (_url: string) => {
+            browserFetchCalls += 1;
+            return "<html><body>browser-fetched-menu</body></html>";
+        };
+
+        const result = await fetchMenu(menuFetcher, () => url, date, parser, true);
+
+        expect(browserFetchCalls).to.equal(1);
+        expect(result.value).to.be.an("array");
+        expect((result.value as IMenuItem[])[0].text).to.equal("Browser menu");
+    });
+
     it("reuses a single browser instance for concurrent SME browser fetches", async () => {
         const config = { ...createConfig(), requestTimeout: 15000 };
         const cache = new NodeCache({ useClones: false });
@@ -278,6 +314,39 @@ describe("MenuFetcher", () => {
         expect(gotoSpy.callCount).to.equal(2);
         expect(waitStub.calledOnce).to.equal(true);
         expect(html).to.include("jedlo_polozka");
+    });
+
+    it("waits for Menučka day titles in the browser fallback", async () => {
+        const config = createConfig();
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache) as unknown as {
+            fetchHtmlWithBrowser: (url: string) => Promise<string>;
+            waitForDelay: (_ms: number) => Promise<void>;
+        };
+
+        const waitForSelectorSpy = sinon.spy(async (_selector: string, _options: unknown) => undefined);
+        const contentStub = sinon.stub().resolves("<html><body><div class='day-title'>Pondelok</div></body></html>");
+        const closeSpy = sinon.spy(async () => undefined);
+        const browser = {
+            newPage: sinon.stub().resolves({
+                setUserAgent: sinon.stub().resolves(undefined),
+                setExtraHTTPHeaders: sinon.stub().resolves(undefined),
+                goto: sinon.stub().resolves(undefined),
+                waitForSelector: waitForSelectorSpy,
+                content: contentStub,
+                title: sinon.stub().resolves("Denné menu DOCK7"),
+                close: closeSpy
+            }),
+            close: sinon.spy(async () => undefined)
+        };
+
+        sinon.stub(puppeteer, "launch").callsFake(async () => browser as never);
+        menuFetcher.waitForDelay = async (_ms: number) => undefined;
+
+        const html = await menuFetcher.fetchHtmlWithBrowser("https://menucka.sk/denne-menu/bratislava/dock7");
+
+        expect(waitForSelectorSpy.firstCall.args[0]).to.equal(".day-title, .restaurant-weekmenu");
+        expect(html).to.include("day-title");
     });
 
     it("skips the HTTP request entirely for dummy menus and parses immediately", async () => {
