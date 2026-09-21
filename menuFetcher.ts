@@ -1,10 +1,12 @@
 import Axios from "axios";
+import pdf from "pdf-parse";
 import puppeteer from "puppeteer";
-import type { Browser } from "puppeteer";
+import type { Browser, Page } from "puppeteer";
 
 import { IConfig } from "./config";
 import { IMenuItem } from "./parsers/IMenuItem";
 import { IParser } from "./parsers/IParser";
+import { SME_PDF_TEXT_PREFIX } from "./parsers/sme";
 import { sanitizeUrl, isValidUrl } from "./parsers/parserUtil";
 import NodeCache from "node-cache";
 
@@ -230,11 +232,57 @@ export class MenuFetcher {
                 }
             }
 
+            const smeExportUrl = this.getSmeExportUrl(url);
+            if (smeExportUrl) {
+                try {
+                    const pdfText = await this.fetchSmeExportTextWithBrowser(page, smeExportUrl);
+                    if (pdfText.trim()) {
+                        this.logInfo("SME export PDF fetched", { url, exportUrl: smeExportUrl, textLength: pdfText.length });
+                        return SME_PDF_TEXT_PREFIX + pdfText;
+                    }
+                } catch (error) {
+                    this.logInfo("SME export PDF fallback failed", {
+                        url,
+                        exportUrl: smeExportUrl,
+                        error: error instanceof Error ? error.message : String(error)
+                    });
+                }
+            }
+
             this.logInfo("Browser fallback returned no menu content", { url });
             throw new Error(`Browser fallback did not return menu content for ${url}`);
         } finally {
             await page.close().catch(() => undefined);
         }
+    }
+
+    private getSmeExportUrl(url: string): string | undefined {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.hostname !== "restauracie.sme.sk" && parsedUrl.hostname !== "www.restauracie.sme.sk") {
+            return undefined;
+        }
+
+        const restaurantId = parsedUrl.pathname.match(/\/restauracia\/.*_(\d+)-/)?.[1];
+        return restaurantId ? `${parsedUrl.origin}/export/resmenu/${restaurantId}` : undefined;
+    }
+
+    private async fetchSmeExportTextWithBrowser(page: Page, exportUrl: string): Promise<string> {
+        const pdfBase64 = await page.evaluate(async (url) => {
+            const response = await fetch(url);
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.ok || !contentType.includes("application/pdf")) {
+                throw new Error(`SME export returned ${response.status} ${contentType}`);
+            }
+
+            const bytes = new Uint8Array(await response.arrayBuffer());
+            let binary = "";
+            for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+                binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+            }
+            return btoa(binary);
+        }, exportUrl);
+
+        return (await pdf(Buffer.from(pdfBase64, "base64"))).text;
     }
 
     private async getBrowser(): Promise<Browser> {

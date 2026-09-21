@@ -1,6 +1,8 @@
 import { expect } from "chai";
 import NodeCache from "node-cache";
 import axios from "axios";
+import fs from "fs";
+import path from "path";
 import puppeteer from "puppeteer";
 import sinon from "sinon";
 
@@ -8,6 +10,7 @@ import { IConfig } from "../../config";
 import { getDefaultLocation, getLocations } from "../../locations";
 import { IMenuItem } from "../../parsers/IMenuItem";
 import { IParser } from "../../parsers/IParser";
+import { SME_PDF_TEXT_PREFIX } from "../../parsers/sme";
 import { MenuFetcher, IMenuResult } from "../../menuFetcher";
 
 class NoopParser implements IParser {
@@ -350,6 +353,41 @@ describe("MenuFetcher", () => {
 
         expect(error).to.be.instanceOf(Error);
         expect(error?.message).to.include("did not return menu content");
+    });
+
+    it("uses the SME export PDF when the HTML page remains challenged", async () => {
+        const config = { ...createConfig(), requestTimeout: 15000 };
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache) as unknown as {
+            fetchHtmlWithBrowser: (url: string) => Promise<string>;
+            waitForDelay: (_ms: number) => Promise<void>;
+        };
+
+        const pdfBase64 = fs.readFileSync(path.join(__dirname, "../samples/jedalnylistok.pdf")).toString("base64");
+        const browser = {
+            newPage: sinon.stub().resolves({
+                setUserAgent: sinon.stub().resolves(undefined),
+                setExtraHTTPHeaders: sinon.stub().resolves(undefined),
+                goto: sinon.stub().resolves(undefined),
+                waitForSelector: sinon.stub().rejects(new Error("Timeout waiting for menu rows")),
+                content: sinon.stub().resolves("<html><head><title>Len chvíľu...</title></head><body></body></html>"),
+                title: sinon.stub().resolves("Len chvíľu..."),
+                evaluate: sinon.stub().resolves(pdfBase64),
+                close: sinon.stub().resolves(undefined)
+            }),
+            close: sinon.stub().resolves(undefined)
+        };
+
+        sinon.stub(puppeteer, "launch").callsFake(async () => browser as never);
+        menuFetcher.waitForDelay = async (_ms: number) => undefined;
+
+        const html = await menuFetcher.fetchHtmlWithBrowser(
+            "https://restauracie.sme.sk/restauracia/kolkovna-eurovea_4138-stare-mesto_2949/denne-menu"
+        );
+
+        expect(html.startsWith(SME_PDF_TEXT_PREFIX)).to.equal(true);
+        const page = await browser.newPage.firstCall.returnValue;
+        expect(page.evaluate.calledOnce).to.equal(true);
     });
 
     it("waits for Menučka day titles in the browser fallback", async () => {

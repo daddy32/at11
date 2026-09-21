@@ -5,11 +5,17 @@ import { getDateRegex, parsePrice } from "./parserUtil";
 
 type ExpectedKind = "soup" | "main" | undefined;
 
+export const SME_PDF_TEXT_PREFIX = "SME_PDF_TEXT:\n";
+
 export abstract class Sme {
     protected parseBase(html: string, date: Date): IMenuItem[] {
         if (!html || typeof html !== "string") {
             console.error("[Sme parser] Provided HTML is not a string or is undefined.");
             return [];
+        }
+
+        if (html.startsWith(SME_PDF_TEXT_PREFIX)) {
+            return this.parsePdfText(html.slice(SME_PDF_TEXT_PREFIX.length), date);
         }
 
         try {
@@ -95,6 +101,93 @@ export abstract class Sme {
             console.error("[Sme parser] Error during Cheerio parsing:", error);
             return [];
         }
+    }
+
+    private parsePdfText(text: string, date: Date): IMenuItem[] {
+        const lines = text
+            .split(/\r?\n/)
+            .map(line => line.normalizeWhitespace())
+            .filter(Boolean);
+        const dateRegex = getDateRegex(date);
+        const dayHeaderIndexes = lines
+            .map((line, index) => this.isPdfDayHeader(line) ? index : -1)
+            .filter(index => index >= 0);
+        const startIndex = dayHeaderIndexes.find(index => dateRegex.test(lines[index]));
+
+        if (startIndex === undefined) {
+            return [];
+        }
+
+        const nextDayIndex = dayHeaderIndexes.find(index => index > startIndex);
+        const endIndex = nextDayIndex === undefined ? lines.length : nextDayIndex;
+        const items: IMenuItem[] = [];
+        let expectedKind: ExpectedKind;
+        let currentItem: IMenuItem | undefined;
+
+        for (const line of lines.slice(startIndex + 1, endIndex)) {
+            if (this.isPdfMetadata(line)) {
+                continue;
+            }
+
+            if (this.isSoupHeading(line)) {
+                expectedKind = "soup";
+                currentItem = undefined;
+                continue;
+            }
+
+            if (this.isMainHeading(line)) {
+                expectedKind = "main";
+                currentItem = undefined;
+                continue;
+            }
+
+            const parsed = parsePrice(line);
+            if (!parsed.text) {
+                if (currentItem && !Number.isNaN(parsed.price)) {
+                    currentItem.price = parsed.price;
+                }
+                continue;
+            }
+
+            const normalizedText = this.normalize(parsed.text);
+            if (!normalizedText) {
+                continue;
+            }
+
+            const inlineKind = this.getInlineItemKind(line);
+            if (inlineKind || expectedKind) {
+                currentItem = {
+                    text: normalizedText,
+                    price: parsed.price,
+                    isSoup: (inlineKind || expectedKind) === "soup"
+                };
+                items.push(currentItem);
+                expectedKind = undefined;
+                continue;
+            }
+
+            if (currentItem && Number.isNaN(parsed.price)) {
+                currentItem.text = this.normalize(`${currentItem.text} ${normalizedText}`);
+                continue;
+            }
+
+            currentItem = {
+                text: normalizedText,
+                price: parsed.price,
+                isSoup: false
+            };
+            items.push(currentItem);
+        }
+
+        return items.filter(item => item.text.length > 0);
+    }
+
+    private isPdfDayHeader(text: string): boolean {
+        return /^(pondelok|utorok|streda|štvrtok|piatok|sobota|nedeľa)\s+\d{1,2}\.\d{1,2}\.\d{4}$/i.test(text);
+    }
+
+    private isPdfMetadata(text: string): boolean {
+        return /^(?:prajeme vám dobrú chuť|www\.restauracie\.sk|vytvorené dňa|obedové menu|cena\b|daily chef's special\b)/i.test(text);
     }
 
     private normalize(str: string): string {

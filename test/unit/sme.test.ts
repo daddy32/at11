@@ -3,7 +3,7 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 
-import { Sme } from "../../parsers/sme";
+import { SME_PDF_TEXT_PREFIX, Sme } from "../../parsers/sme";
 
 class SmeProbe extends Sme {
     public parse(html: string, date: Date) {
@@ -70,5 +70,28 @@ describe("Sme parser base", () => {
             price: 9.99,
             isSoup: false
         });
+    });
+
+    it("parses the daily menu from SME export PDF text", () => {
+        const pdfText = `${SME_PDF_TEXT_PREFIX}
+            OBEDOVÉ MENU
+            Pondelok 21.09.2026
+            Denná polievka
+            Hríbová so zeleninou 0,33 l |1,3,7,9|
+            1.99 €
+            Jedlo dňa č.1
+            Kuracie prsia zapečené šunkou a syrom s pečenými zemiakmi 150 g |1,7|
+            7.29 €
+            Utorok 22.09.2026
+            Denná polievka
+            Mrkvová s krúpami 0,33 l |1,3,7|
+            1.99 €`;
+
+        const menu = parser.parse(pdfText, new Date("2026-09-21"));
+
+        expect(menu).to.deep.equal([
+            { text: "Hríbová so zeleninou", price: 1.99, isSoup: true },
+            { text: "Kuracie prsia zapečené šunkou a syrom s pečenými zemiakmi", price: 7.29, isSoup: false }
+        ]);
     });
 });
