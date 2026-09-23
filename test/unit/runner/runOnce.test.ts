@@ -131,4 +131,17 @@ describe("runner CLI", () => {
             await fs.rm(directory, { recursive: true, force: true });
         }
     });
+
+    it("runs the checked-out wrapper directly without invoking Bash explicitly", () => {
+        const result = spawnSync(path.join(__dirname, "../../../runner/scripts/run-once.sh"), [
+            "--dry-run", "--date", "2026-09-21", "--source", "eurovea-1"
+        ], {
+            cwd: path.join(__dirname, "../../.."),
+            encoding: "utf8"
+        });
+
+        expect(result.error).to.equal(undefined);
+        expect(result.status).to.equal(0, result.stderr);
+        expect(result.stdout).to.include("eurovea-1 DOCK7");
+    });
 });
