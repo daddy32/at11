@@ -20,6 +20,8 @@ export interface ProbeResult {
     transport: ProbeTransport;
     httpStatus: number | null;
     title: string;
+    contentLength: number;
+    contentMarkerCount: number;
     classification: ProbeClassification;
     challengeDetected: boolean;
     menuItemCount: number;
