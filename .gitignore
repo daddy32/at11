@@ -19,6 +19,8 @@ node_modules
 .idea/
 *.iml
 dist
+runner-output/
+runner-raw/
 /node_modules/**
 /.vs/slnx.sqlite
 /.vs/ProjectSettings.json

@@ -40,6 +40,8 @@
     },
     "scripts": {
         "build": "tsc",
+        "runner:build": "tsc",
+        "runner:probe": "ts-node runner/runOnce.ts",
         "start": "node dist/app.js",
         "lint": "tsc --noEmit && eslint . --ext .js,.ts --fix",
         "pretest": "eslint . --ext .js,.ts",
