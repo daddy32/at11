@@ -85,6 +85,23 @@ function pageTitle(html: string): string {
     return html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() || "";
 }
 
+function safeDiagnosticUrl(value: string): string {
+    try {
+        const parsed = new URL(value);
+        parsed.username = "";
+        parsed.password = "";
+        parsed.hash = "";
+        for (const key of parsed.searchParams.keys()) {
+            if (/^__cf_chl|(?:^|[_-])(token|key|secret|password|auth|session|cookie|signature|code)(?:$|[_-])/i.test(key)) {
+                parsed.searchParams.set(key, "[REDACTED]");
+            }
+        }
+        return parsed.toString();
+    } catch {
+        return "[URL redacted]";
+    }
+}
+
 function isChallenge(status: number | null, title: string, html: string, markerCount: number): boolean {
     return status === 403 || status === 429
         || /len chvíľu|just a moment|attention required/i.test(title)
@@ -200,11 +217,11 @@ export async function probeSource(target: RunnerTarget, date: Date, options: Pro
 
     try {
         const url = target.urlFactory(date);
-        result.requestedUrl = url;
+        result.requestedUrl = safeDiagnosticUrl(url);
         const response = await (options.httpGet || defaultHttpGet)(url, options.requestTimeoutMs);
         result.transport = "direct-http";
         result.httpStatus = response.status;
-        result.finalUrl = response.finalUrl;
+        result.finalUrl = safeDiagnosticUrl(response.finalUrl);
         result.title = pageTitle(response.body);
         result.contentLength = response.body.length;
         result.contentMarkerCount = countContentMarkers(url, response.body);
@@ -240,7 +257,7 @@ export async function probeSource(target: RunnerTarget, date: Date, options: Pro
                 html = await page.content();
                 result.transport = "browser-html";
                 result.httpStatus = navigation?.status() || null;
-                result.finalUrl = page.url();
+                result.finalUrl = safeDiagnosticUrl(page.url());
                 result.title = await page.title().catch(() => "");
                 result.contentLength = html.length;
                 result.contentMarkerCount = countContentMarkers(url, html);

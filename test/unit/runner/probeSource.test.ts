@@ -69,6 +69,21 @@ describe("source probe", () => {
         expect(result.classification).to.equal("success");
     });
 
+    it("redacts a challenge token from a redirected diagnostic URL", async () => {
+        const html = "<div class=\"dnesne_menu\"><h2>Pondelok (21.09.2026)</h2>"
+            + "<div class=\"jedlo_polozka\"><div class=\"left\">Polievka</div></div>"
+            + "<div class=\"jedlo_polozka\"><div class=\"left\">Vývar</div></div></div>";
+        const result = await probeSource(smeTarget, date, {
+            requestTimeoutMs: 1000,
+            saveRaw: false,
+            httpGet: async url => ({ status: 200, finalUrl: `${url}?__cf_chl_tk=fake-sensitive-value`, body: html })
+        });
+
+        expect(result.classification).to.equal("success");
+        expect(result.finalUrl).to.include("__cf_chl_tk");
+        expect(result.finalUrl).not.to.include("fake-sensitive-value");
+    });
+
     it("classifies a browser HTTP 200 challenge as a failed fetch", async () => {
         const { browser, wasClosed } = makeBrowser("<html><title>Len chvíľu...</title><body>Cloudflare challenge</body></html>", "Len chvíľu...");
 
