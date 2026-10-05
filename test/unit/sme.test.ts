@@ -109,4 +109,19 @@ describe("Sme parser base", () => {
             { text: "Kuracie prsia plnené mozzarellou a prosciuttom, karfiolové pyré a smažená cibuľka", price: NaN, isSoup: false }
         ]);
     });
+
+    it("associates standalone price lines with Tavily markdown dishes", () => {
+        const markdown = `## Obedové menu Pondelok (05.10.2026)
+**Polievka** Hubový krém
+8,90 €
+**Hlavné jedlo** Kuracie prsia s pyré
+**Cena** 12.90 €`;
+
+        const menu = parser.parse(`${SME_TAVILY_MARKDOWN_PREFIX}${markdown}`, new Date("2026-10-05"));
+
+        expect(menu).to.deep.equal([
+            { text: "Hubový krém", price: 8.9, isSoup: true },
+            { text: "Kuracie prsia s pyré", price: 12.9, isSoup: false }
+        ]);
+    });
 });

@@ -203,6 +203,7 @@ export abstract class Sme {
         const endIndex = nextDayIndex === undefined ? lines.length : nextDayIndex;
         const items: IMenuItem[] = [];
         let expectedKind: ExpectedKind;
+        let currentItem: IMenuItem | undefined;
 
         for (const sourceLine of lines.slice(startIndex + 1, endIndex)) {
             const line = sourceLine.replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "").trim();
@@ -215,36 +216,44 @@ export abstract class Sme {
                 expectedKind = /polievka/i.test(labelMatch[1]) ? "soup" : "main";
                 const inlineText = labelMatch[2]?.trim();
                 if (inlineText) {
-                    this.pushMarkdownItem(items, inlineText, expectedKind);
+                    currentItem = this.pushMarkdownItem(items, inlineText, expectedKind);
                     expectedKind = undefined;
                 }
                 continue;
             }
 
-            if (!expectedKind) {
+            if (expectedKind) {
+                currentItem = this.pushMarkdownItem(items, line, expectedKind);
+                expectedKind = undefined;
                 continue;
             }
 
-            this.pushMarkdownItem(items, line, expectedKind);
-            expectedKind = undefined;
+            const plainLine = line.replace(/\*\*/g, "").replace(/`/g, "").trim();
+            const parsedPrice = parsePrice(plainLine);
+            if (currentItem && !Number.isNaN(parsedPrice.price)
+                && (!parsedPrice.text || /^(?:cena|price)\s*:?\s*$/i.test(parsedPrice.text))) {
+                currentItem.price = parsedPrice.price;
+            }
         }
 
         return items.filter(item => item.text.length > 0);
     }
 
-    private pushMarkdownItem(items: IMenuItem[], sourceText: string, kind: Exclude<ExpectedKind, undefined>): void {
+    private pushMarkdownItem(items: IMenuItem[], sourceText: string, kind: Exclude<ExpectedKind, undefined>): IMenuItem | undefined {
         const plainText = sourceText.replace(/\*\*/g, "").replace(/`/g, "").trim();
         const parsed = parsePrice(plainText);
         const normalizedText = this.normalize(parsed.text || plainText);
         if (!normalizedText) {
-            return;
+            return undefined;
         }
 
-        items.push({
+        const item = {
             text: normalizedText,
             price: parsed.price,
             isSoup: kind === "soup"
-        });
+        };
+        items.push(item);
+        return item;
     }
 
     private isPdfDayHeader(text: string): boolean {

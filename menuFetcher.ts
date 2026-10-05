@@ -6,9 +6,10 @@ import type { Browser, Page } from "puppeteer";
 import { IConfig } from "./config";
 import { IMenuItem } from "./parsers/IMenuItem";
 import { IParser } from "./parsers/IParser";
-import { SME_PDF_TEXT_PREFIX } from "./parsers/sme";
+import { SME_PDF_TEXT_PREFIX, SME_TAVILY_MARKDOWN_PREFIX } from "./parsers/sme";
 import { sanitizeUrl, isValidUrl } from "./parsers/parserUtil";
 import NodeCache from "node-cache";
+import { fetchSmeTavilyMarkdown } from "./smeTavilyFetcher";
 
 export interface IMenuResult {
     timestamp: Date;
@@ -110,6 +111,13 @@ export class MenuFetcher {
             timeout: this._config.requestTimeout
         }).then(response => {
             if (response.status === 200) {
+                if (this.isSmeSecurityChallenge(url, response.data)) {
+                    const challengeError = new Error("SME returned a security challenge");
+                    this.logInfo("SME security challenge detected", { url, date, status: response.status });
+                    this.fetchHtmlThenTavily(url, date, parser, challengeError, done);
+                    return;
+                }
+
                 this.logInfo("HTTP fetch succeeded", { url, date, status: response.status });
                 this.parseFetchedHtml(response.data, date, parser, done);
             }
@@ -121,21 +129,98 @@ export class MenuFetcher {
                     };
                 };
                 this.logInfo("Using browser fallback", { url, date, status: fallbackError.response?.status });
-                this.fetchHtmlWithBrowser(url)
-                    .then(html => {
-                        this.logInfo("Browser fallback fetched HTML", { url, date, htmlLength: html.length });
-                        this.parseFetchedHtml(html, date, parser, done);
-                    })
-                    .catch(browserError => {
-                        console.error("Browser fallback failed for %s: %s", url, browserError && browserError.message ? browserError.message : browserError);
-                        done(browserError, null);
-                    });
+                this.fetchHtmlThenTavily(url, date, parser, error as Error, done);
                 return;
             }
 
             console.error("Axios request failed for %s: %s", url, error && error.message ? error.message : error);
-            done(error, null);
+            if (this.isSmeHost(url)) {
+                this.trySmeTavilyFallback(url, date, parser, error as Error, done);
+            } else {
+                done(error, null);
+            }
         });
+    }
+
+    private fetchHtmlThenTavily(
+        url: string,
+        date: Date,
+        parser: IParser,
+        originalError: Error,
+        done: (error: Error, menu: IMenuItem[]) => void
+    ): void {
+        this.fetchHtmlWithBrowser(url)
+            .then(html => {
+                if (this.isSmeSecurityChallenge(url, html)) {
+                    this.logInfo("SME security challenge detected in browser response", { url, date });
+                    this.trySmeTavilyFallback(url, date, parser, originalError, done);
+                    return;
+                }
+
+                this.logInfo("Browser fallback fetched HTML", { url, date, htmlLength: html.length });
+                this.parseFetchedHtml(html, date, parser, done);
+            })
+            .catch(browserError => {
+                console.error("Browser fallback failed for %s: %s", url, browserError && browserError.message ? browserError.message : browserError);
+                if (this.isSmeHost(url)) {
+                    this.trySmeTavilyFallback(url, date, parser, originalError, done);
+                } else {
+                    done(browserError as Error, null);
+                }
+            });
+    }
+
+    private trySmeTavilyFallback(
+        url: string,
+        date: Date,
+        parser: IParser,
+        originalError: Error,
+        done: (error: Error, menu: IMenuItem[]) => void
+    ): void {
+        const apiKey = this._config.tavilyApiKey;
+        if (!this.isSmeHost(url) || !apiKey || !apiKey.trim()) {
+            done(originalError, null);
+            return;
+        }
+
+        this.logInfo("Using SME Tavily fallback", { url, date });
+        fetchSmeTavilyMarkdown(url, apiKey)
+            .then(markdown => {
+                this.parseFetchedHtml(`${SME_TAVILY_MARKDOWN_PREFIX}${markdown}`, date, parser, (parseError, menu) => {
+                    if (!parseError && menu && menu.length > 0) {
+                        done(null, menu);
+                        return;
+                    }
+
+                    this.logInfo("SME Tavily fallback returned no current-date menu items", {
+                        url,
+                        date,
+                        itemCount: menu?.length || 0
+                    });
+                    done(originalError, null);
+                });
+            })
+            .catch(() => {
+                this.logInfo("SME Tavily fallback failed", { url, date });
+                done(originalError, null);
+            });
+    }
+
+    private isSmeHost(url: string): boolean {
+        try {
+            const hostname = new URL(url).hostname;
+            return hostname === "restauracie.sme.sk" || hostname === "www.restauracie.sme.sk";
+        } catch {
+            return false;
+        }
+    }
+
+    private isSmeSecurityChallenge(url: string, content: unknown): boolean {
+        if (!this.isSmeHost(url) || typeof content !== "string") {
+            return false;
+        }
+
+        return /security verification|checking your browser|verify you are human|enable javascript and cookies/i.test(content);
     }
 
     private parseFetchedHtml(

@@ -3,6 +3,7 @@ import { getDefaultLocation, getLocations, ILocationConfig, IRestaurantConfig } 
 export interface IConfig {
     readonly isProduction: boolean;
     readonly scraperApiKey: string;
+    readonly tavilyApiKey?: string;
     readonly appInsightsInstrumentationKey: string;
     readonly port: number;
     readonly bypassCache: boolean;
@@ -18,6 +19,7 @@ export interface IConfig {
 export class Config implements IConfig {
     public readonly isProduction = process.env.NODE_ENV === "production";
     public readonly scraperApiKey = process.env.SCRAPER_API_KEY;
+    public readonly tavilyApiKey = process.env.TAVILY_API_KEY;
     public readonly appInsightsInstrumentationKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
     public readonly port: number = process.env.PORT as unknown as number || 54321;
     public readonly bypassCache: boolean = process.env.AT11_NO_CACHE === "true";
