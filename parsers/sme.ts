@@ -6,6 +6,7 @@ import { getDateRegex, parsePrice } from "./parserUtil";
 type ExpectedKind = "soup" | "main" | undefined;
 
 export const SME_PDF_TEXT_PREFIX = "SME_PDF_TEXT:\n";
+export const SME_TAVILY_MARKDOWN_PREFIX = "SME_TAVILY_MARKDOWN:\n";
 
 export abstract class Sme {
     protected parseBase(html: string, date: Date): IMenuItem[] {
@@ -16,6 +17,10 @@ export abstract class Sme {
 
         if (html.startsWith(SME_PDF_TEXT_PREFIX)) {
             return this.parsePdfText(html.slice(SME_PDF_TEXT_PREFIX.length), date);
+        }
+
+        if (html.startsWith(SME_TAVILY_MARKDOWN_PREFIX)) {
+            return this.parseTavilyMarkdown(html.slice(SME_TAVILY_MARKDOWN_PREFIX.length), date);
         }
 
         try {
@@ -180,6 +185,66 @@ export abstract class Sme {
         }
 
         return items.filter(item => item.text.length > 0);
+    }
+
+    private parseTavilyMarkdown(markdown: string, date: Date): IMenuItem[] {
+        const lines = markdown.split(/\r?\n/).map(line => line.trim());
+        const dateRegex = getDateRegex(date);
+        const dayHeadingIndexes = lines
+            .map((line, index) => /^#{1,6}\s+/.test(line) && /\d{1,2}\.\d{1,2}\.\d{4}/.test(line) ? index : -1)
+            .filter(index => index >= 0);
+        const startIndex = dayHeadingIndexes.find(index => dateRegex.test(lines[index]));
+
+        if (startIndex === undefined) {
+            return [];
+        }
+
+        const nextDayIndex = dayHeadingIndexes.find(index => index > startIndex);
+        const endIndex = nextDayIndex === undefined ? lines.length : nextDayIndex;
+        const items: IMenuItem[] = [];
+        let expectedKind: ExpectedKind;
+
+        for (const sourceLine of lines.slice(startIndex + 1, endIndex)) {
+            const line = sourceLine.replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "").trim();
+            if (!line || /^#{1,6}\s/.test(line) || /^[-*_]{3,}$/.test(line)) {
+                continue;
+            }
+
+            const labelMatch = line.match(/^\*\*(polievka|denn[áa] polievka|hlavn[eé] jedlo|jedlo dňa|jedlo dna)(?::)?\*\*\s*:?(?:\s+(.+))?$/i);
+            if (labelMatch) {
+                expectedKind = /polievka/i.test(labelMatch[1]) ? "soup" : "main";
+                const inlineText = labelMatch[2]?.trim();
+                if (inlineText) {
+                    this.pushMarkdownItem(items, inlineText, expectedKind);
+                    expectedKind = undefined;
+                }
+                continue;
+            }
+
+            if (!expectedKind) {
+                continue;
+            }
+
+            this.pushMarkdownItem(items, line, expectedKind);
+            expectedKind = undefined;
+        }
+
+        return items.filter(item => item.text.length > 0);
+    }
+
+    private pushMarkdownItem(items: IMenuItem[], sourceText: string, kind: Exclude<ExpectedKind, undefined>): void {
+        const plainText = sourceText.replace(/\*\*/g, "").replace(/`/g, "").trim();
+        const parsed = parsePrice(plainText);
+        const normalizedText = this.normalize(parsed.text || plainText);
+        if (!normalizedText) {
+            return;
+        }
+
+        items.push({
+            text: normalizedText,
+            price: parsed.price,
+            isSoup: kind === "soup"
+        });
     }
 
     private isPdfDayHeader(text: string): boolean {

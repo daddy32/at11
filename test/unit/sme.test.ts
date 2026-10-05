@@ -3,7 +3,7 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 
-import { SME_PDF_TEXT_PREFIX, Sme } from "../../parsers/sme";
+import { SME_PDF_TEXT_PREFIX, SME_TAVILY_MARKDOWN_PREFIX, Sme } from "../../parsers/sme";
 
 class SmeProbe extends Sme {
     public parse(html: string, date: Date) {
@@ -92,6 +92,21 @@ describe("Sme parser base", () => {
         expect(menu).to.deep.equal([
             { text: "Hríbová so zeleninou", price: 1.99, isSoup: true },
             { text: "Kuracie prsia zapečené šunkou a syrom s pečenými zemiakmi", price: 7.29, isSoup: false }
+        ]);
+    });
+
+    it("parses Tavily markdown only for the requested SME menu date", () => {
+        const markdown = `## Obedové menu Pondelok (05.10.2026)
+**Polievka** Bruschetta s pažítkovým cottage cheese, pečená zelenina na mede a rukola
+**Hlavné jedlo** Kuracie prsia plnené mozzarellou a prosciuttom, karfiolové pyré a smažená cibuľka
+## Obedové menu Utorok (06.10.2026)
+**Polievka** Krém z pečeného petržlenu, opečené orechy a bylinky`;
+
+        const menu = parser.parse(`${SME_TAVILY_MARKDOWN_PREFIX}${markdown}`, new Date("2026-10-05"));
+
+        expect(menu).to.deep.equal([
+            { text: "Bruschetta s pažítkovým cottage cheese, pečená zelenina na mede a rukola", price: NaN, isSoup: true },
+            { text: "Kuracie prsia plnené mozzarellou a prosciuttom, karfiolové pyré a smažená cibuľka", price: NaN, isSoup: false }
         ]);
     });
 });
