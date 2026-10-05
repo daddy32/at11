@@ -160,6 +160,13 @@ export class MenuFetcher {
 
                 this.logInfo("Parser completed", { date, itemCount: menu.length });
                 done(null, menu);
+            }, error => {
+                if (!timer) {
+                    return;
+                }
+                clearTimeout(timer);
+                timer = null;
+                done(error, null);
             });
         } catch (err) {
             clearTimeout(timer);

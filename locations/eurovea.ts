@@ -18,7 +18,7 @@ export const euroveaLocation: ILocationConfig = {
         {
             id: 1,
             name: "DOCK7",
-            urlFactory: _ => "https://menucka.sk/denne-menu/bratislava/dock7",
+            urlFactory: _ => "https://www.dock7.sk/menu/",
             parser: new Dock7()
         },
         {

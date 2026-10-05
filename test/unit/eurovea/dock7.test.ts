@@ -1,9 +1,16 @@
 import "../../../parsers/parserUtil";
 import { expect } from "chai";
+import axios from "axios";
 import fs from "fs";
+import NodeCache from "node-cache";
 import path from "path";
+import { restore, stub } from "sinon";
 
+import { Config } from "../../../config";
+import { euroveaLocation } from "../../../locations/eurovea";
+import { MenuFetcher, IMenuResult } from "../../../menuFetcher";
 import { Dock7 } from "../../../parsers/eurovea/dock7";
+import { IMenuItem } from "../../../parsers/IMenuItem";
 import { TestHelper } from "../../helpers/TestHelper";
 
 describe("Dock7 Parser", () => {
@@ -17,6 +24,7 @@ describe("Dock7 Parser", () => {
 
     afterEach(() => {
         TestHelper.cleanupMocks();
+        restore();
     });
 
     it("parses the captured Menucka page into mains and a soup", (done) => {
@@ -78,5 +86,97 @@ describe("Dock7 Parser", () => {
             ]);
             done();
         });
+    });
+
+    it("parses the current Dock7 weekly PDF linked from its official menu page", async () => {
+        const pdfBytes = fs.readFileSync(path.join(__dirname, "../../samples/dock7-weekly-2026-10-05.pdf"));
+        const pdfUrl = "https://www.dock7.sk/wp-content/uploads/DOCK7_tyzdenna_ponuka_154x250_05-09_10_2026_WEB.pdf";
+        const html = `<a href="${pdfUrl}" title="Týždenná ponuka">Zobraziť</a>`;
+        stub(axios, "get").resolves({ data: pdfBytes });
+
+        const menu = await new Promise<IMenuItem[]>(resolve => {
+            parser.parse(html, TestHelper.createMockDate("2026-10-05"), resolve);
+        });
+
+        expect(menu).to.have.length(6);
+        expect(menu).to.deep.include.members([
+            { text: "Krémová zeleninová (v) orechové pesto", price: 2.5, isSoup: true },
+            {
+                text: "Naša sekaná so zemiakovou kašou pečená mletá fašírka z teľacieho a bravčového mäsa, nakladaná zelenina",
+                price: 12.9,
+                isSoup: false
+            },
+            { text: "Caesar šalát s lososom rímsky šalát, chicharrón mrvenička, caesar dresing, krutóny, grana padano syr", price: 13.2, isSoup: false },
+            { text: "Pečené rolované prasiatko pečené baby zemiaky, BBQ, uhorkový šalát", price: 13.5, isSoup: false },
+            { text: "Grilované kuracie prsia cuketa, baby špenát, fialové zemiaky, omáčka z grana padano syra", price: 11.9, isSoup: false },
+            { text: "Vegetariánsky burger (v) maslová brioška, údené tofu, chimichurri, šalát coleslaw, batatové hranolky", price: 11.5, isSoup: false }
+        ]);
+    });
+
+    it("does not serve an expired official weekly PDF", async () => {
+        const pdfBytes = fs.readFileSync(path.join(__dirname, "../../samples/dock7-weekly-2026-10-05.pdf"));
+        const pdfUrl = "https://www.dock7.sk/wp-content/uploads/DOCK7_tyzdenna_ponuka_154x250_05-09_10_2026_WEB.pdf";
+        stub(axios, "get").resolves({ data: pdfBytes });
+
+        const menu = await new Promise<IMenuItem[]>(resolve => {
+            parser.parse(
+                `<a href="${pdfUrl}" title="Týždenná ponuka">Zobraziť</a>`,
+                TestHelper.createMockDate("2026-10-12"),
+                resolve
+            );
+        });
+
+        expect(menu).to.have.length(0);
+    });
+
+    it("fetches this week's Dock7 menu from the official source", async () => {
+        const pdfBytes = fs.readFileSync(path.join(__dirname, "../../samples/dock7-weekly-2026-10-05.pdf"));
+        const pdfUrl = "https://www.dock7.sk/wp-content/uploads/DOCK7_tyzdenna_ponuka_154x250_05-09_10_2026_WEB.pdf";
+        const html = `<a href="${pdfUrl}" title="Týždenná ponuka">Zobraziť</a>`;
+        stub(axios, "get").callsFake(async (url: string) => {
+            if (url === "https://www.dock7.sk/menu/") {
+                return { status: 200, data: html };
+            }
+            if (url === pdfUrl) {
+                return { status: 200, data: pdfBytes };
+            }
+            throw new Error(`Unexpected source: ${url}`);
+        });
+        const restaurant = euroveaLocation.restaurants.find(item => item.id === 1);
+        const fetcher = new MenuFetcher(new Config(), new NodeCache());
+        const date = TestHelper.createMockDate("2026-10-05");
+
+        const result = await new Promise<IMenuResult>(resolve => {
+            fetcher.fetchMenu(restaurant.urlFactory, date, restaurant.parser, resolve, { forceRefresh: true });
+        });
+
+        expect(result.value).to.be.an("array");
+        expect(result.value).to.have.length(6);
+    });
+
+    it("returns an error when the official PDF cannot be fetched", async () => {
+        const pdfUrl = "https://www.dock7.sk/wp-content/uploads/DOCK7_tyzdenna_ponuka_154x250_05-09_10_2026_WEB.pdf";
+        const html = `<a href="${pdfUrl}" title="Týždenná ponuka">Zobraziť</a>`;
+        stub(axios, "get").callsFake(async (url: string) => {
+            if (url === "https://www.dock7.sk/menu/") {
+                return { status: 200, data: html };
+            }
+            throw new Error("PDF unavailable");
+        });
+        const restaurant = euroveaLocation.restaurants.find(item => item.id === 1);
+        const fetcher = new MenuFetcher(new Config(), new NodeCache());
+
+        const result = await new Promise<IMenuResult>(resolve => {
+            fetcher.fetchMenu(
+                restaurant.urlFactory,
+                TestHelper.createMockDate("2026-10-05"),
+                restaurant.parser,
+                resolve,
+                { forceRefresh: true }
+            );
+        });
+
+        expect(result.value).to.be.instanceOf(Error);
+        expect((result.value as Error).message).to.equal("PDF unavailable");
     });
 });
