@@ -36,7 +36,7 @@ export const euroveaLocation: ILocationConfig = {
         {
             id: 4,
             name: "Kolkovna Eurovea",
-            urlFactory: _ => "https://restauracie.sme.sk/restauracia/kolkovna-eurovea_4138-stare-mesto_2949/denne-menu",
+            urlFactory: _ => "https://eurovea.kolkovna.sk/",
             parser: new KolkovnaEurovea()
         },
         {
