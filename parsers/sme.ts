@@ -229,11 +229,42 @@ export abstract class Sme {
             }
 
             const plainLine = line.replace(/\*\*/g, "").replace(/`/g, "").trim();
+            if (this.isSoupHeading(plainLine)) {
+                expectedKind = "soup";
+                currentItem = undefined;
+                continue;
+            }
+
+            if (this.isMainHeading(plainLine)) {
+                expectedKind = "main";
+                currentItem = undefined;
+                continue;
+            }
+
             const parsedPrice = parsePrice(plainLine);
             if (currentItem && !Number.isNaN(parsedPrice.price)
                 && (!parsedPrice.text || /^(?:cena|price)\s*:?\s*$/i.test(parsedPrice.text))) {
                 currentItem.price = parsedPrice.price;
+                continue;
             }
+
+            if (!parsedPrice.text) {
+                continue;
+            }
+
+            const normalizedText = this.normalize(parsedPrice.text);
+            if (!normalizedText) {
+                continue;
+            }
+
+            const inlineKind = this.getInlineItemKind(plainLine);
+            currentItem = {
+                text: normalizedText,
+                price: parsedPrice.price,
+                isSoup: (inlineKind || expectedKind) === "soup"
+            };
+            items.push(currentItem);
+            expectedKind = undefined;
         }
 
         return items.filter(item => item.text.length > 0);

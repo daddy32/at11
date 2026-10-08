@@ -116,7 +116,10 @@ function loadMenu(article, date, container, forceRefresh) {
     var refreshElem = null;
     var hasDummyItem = false;
 
-    $.ajax(buildMenuUrl(restaurantId, date, forceRefresh))
+    $.ajax({
+        url: buildMenuUrl(restaurantId, date, forceRefresh),
+        timeout: 0
+    })
             .done(function(data) {
                 if (data.menu.length === 0) {
                     listElem.append(createErrorElement(link));

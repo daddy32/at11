@@ -2,6 +2,7 @@ import "../../../parsers/parserUtil";
 import { expect } from "chai";
 
 import { Kari } from "../../../parsers/patronka/kari";
+import { SME_TAVILY_MARKDOWN_PREFIX } from "../../../parsers/sme";
 import { TestHelper } from "../../helpers/TestHelper";
 
 describe("Kari Parser", () => {
@@ -34,6 +35,26 @@ describe("Kari Parser", () => {
             expect(menu[0].text).to.equal("Tom kha gai");
             expect(menu[1].isSoup).to.equal(false);
             expect(menu[1].text).to.equal("Kuracie kari s ryžou");
+            done();
+        });
+    });
+
+    it("parses unlabelled current-day dishes from Tavily markdown", (done) => {
+        const markdown = `${SME_TAVILY_MARKDOWN_PREFIX}## Obedové menu Štvrtok (08.10.2026)
+
+Mexická paradajková polievka s limetou a tortillami /A9/
+Indické VEGAN Aloo Gobi s karfiolom, baby zemiakmi a hráškom
+Kuracie stehná v rogan josh omáčke s bylinkovým jogurtom /A7/
+Cícerový šalát s tahini, uhorkou a paradajkami /A11/`;
+
+        parser.parse(markdown, new Date("2026-10-08T00:00:00.000Z"), menu => {
+            expect(menu.map(item => item.text)).to.deep.equal([
+                "Mexická paradajková polievka s limetou a tortillami",
+                "Indické VEGAN Aloo Gobi s karfiolom, baby zemiakmi a hráškom",
+                "Kuracie stehná v rogan josh omáčke s bylinkovým jogurtom",
+                "Cícerový šalát s tahini, uhorkou a paradajkami"
+            ]);
+            expect(menu.map(item => item.isSoup)).to.deep.equal([true, false, false, false]);
             done();
         });
     });
