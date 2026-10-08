@@ -1,4 +1,5 @@
 import Axios from "axios";
+import * as cheerio from "cheerio";
 import pdf from "pdf-parse";
 import puppeteer from "puppeteer";
 import type { Browser, Page } from "puppeteer";
@@ -283,11 +284,27 @@ export class MenuFetcher {
         return status === 403 || status === 429;
     }
 
-    private getBrowserContentMarker(url: string): { selector: string; marker: string } {
-        const hostname = new URL(url).hostname;
-        return hostname === "menucka.sk" || hostname === "www.menucka.sk"
-            ? { selector: ".day-title, .restaurant-weekmenu", marker: "day-title|restaurant-weekmenu" }
-            : { selector: ".jedlo_polozka", marker: "jedlo_polozka" };
+    private getBrowserContentMarker(url: string): { selector: string; marker: string; imageSelector?: string } {
+        const parsedUrl = new URL(url);
+        const hostname = parsedUrl.hostname;
+        if (hostname === "menucka.sk" || hostname === "www.menucka.sk") {
+            return { selector: ".day-title, .restaurant-weekmenu", marker: "day-title|restaurant-weekmenu" };
+        }
+
+        const isPatronskyPivovar = (hostname === "restauracie.sme.sk" || hostname === "www.restauracie.sme.sk")
+            && parsedUrl.pathname.includes("/patronsky-pivovar_4270-");
+        if (isPatronskyPivovar) {
+            return {
+                selector: ".jedlo_polozka, .daily-menu-container img",
+                marker: "jedlo_polozka",
+                imageSelector: ".daily-menu-container img"
+            };
+        }
+
+        return {
+            selector: ".jedlo_polozka",
+            marker: "jedlo_polozka"
+        };
     }
 
     private isBrowserFallbackHost(hostname: string): boolean {
@@ -331,7 +348,8 @@ export class MenuFetcher {
 
                 const html = await page.content();
                 const title = await page.title().catch(() => "");
-                const menuRowCount = (html.match(new RegExp(contentMarker.marker, "g")) || []).length;
+                const menuRowCount = (html.match(new RegExp(contentMarker.marker, "g")) || []).length
+                    + (contentMarker.imageSelector ? cheerio.load(html)(contentMarker.imageSelector).length : 0);
                 this.logInfo("Browser page snapshot", { url, attempt: attempt + 1, title, menuRowCount, htmlLength: html.length });
 
                 if (menuRowCount > 0) {
