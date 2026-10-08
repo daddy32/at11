@@ -4,13 +4,14 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import puppeteer from "puppeteer";
-import sinon from "sinon";
+import sinon, { stub } from "sinon";
 
 import { IConfig } from "../../config";
 import { getDefaultLocation, getLocations } from "../../locations";
 import { IMenuItem } from "../../parsers/IMenuItem";
 import { IParser } from "../../parsers/IParser";
 import { SME_PDF_TEXT_PREFIX } from "../../parsers/sme";
+import { PatronskyPivovar } from "../../parsers/patronka/patronskypivovar";
 import { MenuFetcher, IMenuResult } from "../../menuFetcher";
 
 class NoopParser implements IParser {
@@ -176,6 +177,52 @@ describe("MenuFetcher", () => {
         expect(browserFetchCalls).to.equal(1);
         expect(result.value).to.be.an("array");
         expect((result.value as IMenuItem[])[0].text).to.equal("Browser menu");
+    });
+
+    it("parses an image-only Patronsky menu after SME returns 403", async () => {
+        const config = { ...createConfig(), requestTimeout: 15000, parserTimeout: 30000 };
+        const cache = new NodeCache({ useClones: false });
+        const menuFetcher = new MenuFetcher(config, cache);
+        const date = new Date(2026, 9, 8);
+        const pageUrl = "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu";
+        const imageUrl = "https://restauracie.smedata.sk/usmedata/pictures/menu/4270/31/menu_1_1791144731_orig.jpg?670";
+        const imageHtml = `<div class="daily-menu-container"><a href="${imageUrl}"><img src="/thumb.webp"></a></div>`;
+        const imagePath = path.join(__dirname, "../samples/patronsky_pivovar/menu_1_1791144731_orig.jpg");
+        const imageBytes = fs.readFileSync(imagePath);
+        const axiosGetStub = stub(axios, "get");
+        axiosGetStub.onFirstCall().rejects({
+            message: "Request failed with status code 403",
+            response: { status: 403, data: "<html><body>Forbidden</body></html>" }
+        });
+        axiosGetStub.onSecondCall().resolves({ data: imageBytes } as never);
+
+        const waitForSelectorStub = stub().resolves(undefined);
+        const page = {
+            setUserAgent: stub().resolves(undefined),
+            setExtraHTTPHeaders: stub().resolves(undefined),
+            goto: stub().resolves(undefined),
+            waitForSelector: waitForSelectorStub,
+            content: stub().resolves(imageHtml),
+            title: stub().resolves("Denné menu Patrónsky pivovar"),
+            close: stub().resolves(undefined)
+        };
+        const browser = {
+            newPage: stub().resolves(page),
+            close: stub().resolves(undefined)
+        };
+        stub(puppeteer, "launch").resolves(browser as never);
+        (menuFetcher as unknown as { waitForDelay: (_ms: number) => Promise<void> }).waitForDelay = async (_ms: number) => undefined;
+
+        const result = await fetchMenu(menuFetcher, () => pageUrl, date, new PatronskyPivovar(), true);
+
+        expect(result.value).to.be.an("array").with.length(3);
+        expect((result.value as IMenuItem[]).map(item => item.text)).to.deep.equal([
+            "Boršč s chlebom",
+            "Bravčový čiernohorský rezeň s pečenými zemiakmi a coleslaw šalátom",
+            "Restovaná kačacia pečeň so zemiakovými lokšami /2ks/"
+        ]);
+        expect(waitForSelectorStub.firstCall.args[0]).to.equal(".jedlo_polozka, .daily-menu-container img");
+        expect(axiosGetStub.secondCall.args[0]).to.equal(imageUrl);
     });
 
     it("falls back to browser fetch when Menučka returns 403", async () => {
@@ -356,7 +403,7 @@ describe("MenuFetcher", () => {
         expect(error?.message).to.include("did not return menu content");
     });
 
-    it("uses the SME export PDF when the HTML page remains challenged", async () => {
+    it("uses the SME export PDF when a non-Patronsky SME page only has a menu image", async () => {
         const config = { ...createConfig(), requestTimeout: 15000 };
         const cache = new NodeCache({ useClones: false });
         const menuFetcher = new MenuFetcher(config, cache) as unknown as {
@@ -371,8 +418,8 @@ describe("MenuFetcher", () => {
                 setExtraHTTPHeaders: sinon.stub().resolves(undefined),
                 goto: sinon.stub().resolves(undefined),
                 waitForSelector: sinon.stub().rejects(new Error("Timeout waiting for menu rows")),
-                content: sinon.stub().resolves("<html><head><title>Len chvíľu...</title></head><body></body></html>"),
-                title: sinon.stub().resolves("Len chvíľu..."),
+                content: sinon.stub().resolves("<html><body><div class='daily-menu-container'><img src='/menu.jpg'></div></body></html>"),
+                title: sinon.stub().resolves("Denné menu Kolkovna Eurovea"),
                 evaluate: sinon.stub().resolves(pdfBase64),
                 close: sinon.stub().resolves(undefined)
             }),
@@ -389,6 +436,7 @@ describe("MenuFetcher", () => {
         expect(html.startsWith(SME_PDF_TEXT_PREFIX)).to.equal(true);
         const page = await browser.newPage.firstCall.returnValue;
         expect(page.evaluate.calledOnce).to.equal(true);
+        expect(page.waitForSelector.firstCall.args[0]).to.equal(".jedlo_polozka");
     });
 
     it("uses ScraperAPI for the SME export when production blocks the browser", async () => {
