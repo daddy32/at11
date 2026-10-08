@@ -58,4 +58,26 @@ Cícerový šalát s tahini, uhorkou a paradajkami /A11/`;
             done();
         });
     });
+
+    it("stops parsing the Tavily section at the end-of-menu link", (done) => {
+        const markdown = `${SME_TAVILY_MARKDOWN_PREFIX}## Denné menu Štvrtok (08.10.2026)
+
+Poctivá ostro-kyslá polievka s kuracím vývarom a tofu
+Indický VEGAN Dhal z červenej šošovice s pečenou cviklou
+Indické maslové Butter Chicken s kuracími stehnami
+Ázijský kapustový šalát[Zobraziť celý týždeň](https://restauracie.sme.sk/restauracia/svadby-a-kari-patronka_10341-stare-mesto_2949/denne-menu#)
+Celkové hodnotenie: dobré Jedlo: Obsluha: Atmosféra: Ceny:
+[Zobraziť hodnotenia(5)](https://restauracie.sme.sk/restauracia/svadby-a-kari-patronka_10341-stare-mesto_2949#hodnotenia)
+[Caffe Restaurant 66](https://restauracie.sme.sk/restauracia/caffe-66_472-bratislava_2983), Bratislava`;
+
+        parser.parse(markdown, new Date("2026-10-08T00:00:00.000Z"), menu => {
+            expect(menu.map(item => item.text)).to.deep.equal([
+                "Poctivá ostro-kyslá polievka s kuracím vývarom a tofu",
+                "Indický VEGAN Dhal z červenej šošovice s pečenou cviklou",
+                "Indické maslové Butter Chicken s kuracími stehnami",
+                "Ázijský kapustový šalát"
+            ]);
+            done();
+        });
+    });
 });

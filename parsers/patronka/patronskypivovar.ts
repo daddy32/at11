@@ -64,8 +64,11 @@ function parseOcrMenu(text: string, date: Date): IMenuItem[] {
 
 function getMenuImageUrl(html: string): string | undefined {
     const $ = cheerio.load(html);
-    const image = $(".daily-menu-container img").first();
-    const imageUrl = image.closest("a").attr("href")?.trim() || image.attr("src")?.trim();
+    const linkedMenuImage = $("a[href*='/pictures/menu/4270/']").first();
+    const image = $(".daily-menu-container img, img[src*='/pictures/menu/4270/']").first();
+    const imageUrl = linkedMenuImage.attr("href")?.trim()
+        || image.closest("a").attr("href")?.trim()
+        || image.attr("src")?.trim();
 
     if (!imageUrl) {
         return undefined;

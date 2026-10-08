@@ -221,8 +221,39 @@ describe("MenuFetcher", () => {
             "Bravčový čiernohorský rezeň s pečenými zemiakmi a coleslaw šalátom",
             "Restovaná kačacia pečeň so zemiakovými lokšami /2ks/"
         ]);
-        expect(waitForSelectorStub.firstCall.args[0]).to.equal(".jedlo_polozka, .daily-menu-container img");
+        expect(waitForSelectorStub.firstCall.args[0]).to.include(".daily-menu-container img");
         expect(axiosGetStub.secondCall.args[0]).to.equal(imageUrl);
+    });
+
+    it("accepts a Patronsky menu image link without the daily-menu wrapper", async () => {
+        const menuFetcher = new MenuFetcher({ ...createConfig(), requestTimeout: 15000 }, new NodeCache({ useClones: false })) as unknown as {
+            fetchHtmlWithBrowser: (url: string) => Promise<string>;
+            waitForDelay: (_ms: number) => Promise<void>;
+        };
+        const pageUrl = "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu";
+        const imageUrl = "https://restauracie.smedata.sk/usmedata/pictures/menu/4270/31/menu_1_1791144731_orig.jpg?670";
+        const imageHtml = `<a href="${imageUrl}"><img src="/thumb.webp"></a>`;
+        const page = {
+            setUserAgent: stub().resolves(undefined),
+            setExtraHTTPHeaders: stub().resolves(undefined),
+            goto: stub().resolves(undefined),
+            waitForSelector: stub().resolves(undefined),
+            content: stub().resolves(imageHtml),
+            title: stub().resolves("Denné menu Patrónsky pivovar"),
+            close: stub().resolves(undefined)
+        };
+        const browser = {
+            newPage: stub().resolves(page),
+            close: stub().resolves(undefined)
+        };
+        stub(puppeteer, "launch").resolves(browser as never);
+        menuFetcher.waitForDelay = async (_ms: number) => undefined;
+
+        const html = await menuFetcher.fetchHtmlWithBrowser(pageUrl);
+
+        expect(html).to.equal(imageHtml);
+        expect(page.waitForSelector.firstCall.args[0]).to.include("/pictures/menu/4270/");
+        expect(page.content.calledOnce).to.equal(true);
     });
 
     it("falls back to browser fetch when Menučka returns 403", async () => {

@@ -81,6 +81,17 @@ describe("Patronsky Pivovar Parser", () => {
         expect(ocr.firstCall.args[1]).to.equal("slk");
     });
 
+    it("finds the Patronsky menu image when the page omits its wrapper class", async () => {
+        const imageRequest = stub(axios, "get").resolves({ data: Buffer.from("image") } as never);
+        stub(Tesseract, "recognize").resolves({ data: { text: THURSDAY_OCR } } as never);
+        const html = `<div><a href="${IMAGE_URL}"><img src="/thumb.webp"></a></div>`;
+
+        await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 9, 8), resolve));
+
+        expect(imageRequest.calledOnce).to.equal(true);
+        expect(imageRequest.firstCall.args[0]).to.equal(IMAGE_URL);
+    });
+
     it("parses Thursday from the supplied original menu image", async function() {
         this.timeout(180000);
 

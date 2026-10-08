@@ -295,9 +295,9 @@ export class MenuFetcher {
             && parsedUrl.pathname.includes("/patronsky-pivovar_4270-");
         if (isPatronskyPivovar) {
             return {
-                selector: ".jedlo_polozka, .daily-menu-container img",
+                selector: ".jedlo_polozka, .daily-menu-container img, a[href*='/pictures/menu/4270/'], img[src*='/pictures/menu/4270/']",
                 marker: "jedlo_polozka",
-                imageSelector: ".daily-menu-container img"
+                imageSelector: ".daily-menu-container img, a[href*='/pictures/menu/4270/'], img[src*='/pictures/menu/4270/']"
             };
         }
 

@@ -7,6 +7,7 @@ type ExpectedKind = "soup" | "main" | undefined;
 
 export const SME_PDF_TEXT_PREFIX = "SME_PDF_TEXT:\n";
 export const SME_TAVILY_MARKDOWN_PREFIX = "SME_TAVILY_MARKDOWN:\n";
+const TAVILY_MENU_END_MARKER = /\[?\s*(?:zobraziť celý týždeň|celkové hodnotenie|zobraziť hodnotenia)/i;
 
 export abstract class Sme {
     protected parseBase(html: string, date: Date): IMenuItem[] {
@@ -201,11 +202,25 @@ export abstract class Sme {
 
         const nextDayIndex = dayHeadingIndexes.find(index => index > startIndex);
         const endIndex = nextDayIndex === undefined ? lines.length : nextDayIndex;
+        const menuLines: string[] = [];
+        for (const sourceLine of lines.slice(startIndex + 1, endIndex)) {
+            const markerIndex = sourceLine.search(TAVILY_MENU_END_MARKER);
+            if (markerIndex >= 0) {
+                const menuText = sourceLine.slice(0, markerIndex).trim();
+                if (menuText) {
+                    menuLines.push(menuText);
+                }
+                break;
+            }
+
+            menuLines.push(sourceLine);
+        }
+
         const items: IMenuItem[] = [];
         let expectedKind: ExpectedKind;
         let currentItem: IMenuItem | undefined;
 
-        for (const sourceLine of lines.slice(startIndex + 1, endIndex)) {
+        for (const sourceLine of menuLines) {
             const line = sourceLine.replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "").trim();
             if (!line || /^#{1,6}\s/.test(line) || /^[-*_]{3,}$/.test(line)) {
                 continue;
