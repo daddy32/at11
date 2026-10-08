@@ -8,6 +8,7 @@ import Tesseract from "tesseract.js";
 
 import { PatronskyPivovar } from "../../../parsers/patronka/patronskypivovar";
 import { IMenuItem } from "../../../parsers/IMenuItem";
+import { SME_TAVILY_MARKDOWN_PREFIX } from "../../../parsers/sme";
 import { TestHelper } from "../../helpers/TestHelper";
 
 const IMAGE_URL = "https://restauracie.smedata.sk/usmedata/pictures/menu/4270/31/menu_1_1791144731_orig.jpg?670";
@@ -20,6 +21,10 @@ const THURSDAY_OCR = `Stvrtok
 150 g Restovaná kačacia pečeň so zemiakovými lokšami /2ks/ (A 1,3,7) 10,40 €
 Piatok
 250 g Kuracie stehno ala bažant s dusenou ryžou 8,40 €`;
+const FRIDAY_OCR = `Piatok
+0,25 l Karfiolový krém s pečeným cesnakom a smažienkami (A 1,7)
+250 g Kuracie stehno ala bažant s dusenou ryžou 8,40 €
+150 g Diabolské soté z panenky s pečenými zemiakmi 10,40 €`;
 
 describe("Patronsky Pivovar Parser", () => {
     let parser: PatronskyPivovar;
@@ -90,6 +95,25 @@ describe("Patronsky Pivovar Parser", () => {
 
         expect(imageRequest.calledOnce).to.equal(true);
         expect(imageRequest.firstCall.args[0]).to.equal(IMAGE_URL);
+    });
+
+    it("OCRs the original menu image linked in SME Tavily markdown", async () => {
+        const imageRequest = stub(axios, "get").resolves({ data: Buffer.from("image") } as never);
+        const ocr = stub(Tesseract, "recognize").resolves({ data: { text: FRIDAY_OCR } } as never);
+        const smallImageUrl = IMAGE_URL.replace("_orig.jpg", "_small.jpg");
+        const tavilyMarkdown = `${SME_TAVILY_MARKDOWN_PREFIX}## Obedové menu (05.10.2026 - 11.10.2026)
+[![Image 4](${smallImageUrl})](${IMAGE_URL})`;
+
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(tavilyMarkdown, new Date(2026, 9, 9), resolve));
+
+        expect(imageRequest.calledOnce).to.equal(true);
+        expect(imageRequest.firstCall.args[0]).to.equal(IMAGE_URL);
+        expect(ocr.calledOnce).to.equal(true);
+        expect(menu.map(item => item.text)).to.deep.equal([
+            "Karfiolový krém s pečeným cesnakom a smažienkami",
+            "Kuracie stehno ala bažant s dusenou ryžou",
+            "Diabolské soté z panenky s pečenými zemiakmi"
+        ]);
     });
 
     it("parses Thursday from the supplied original menu image", async function() {

@@ -66,9 +66,13 @@ function getMenuImageUrl(html: string): string | undefined {
     const $ = cheerio.load(html);
     const linkedMenuImage = $("a[href*='/pictures/menu/4270/']").first();
     const image = $(".daily-menu-container img, img[src*='/pictures/menu/4270/']").first();
+    const tavilyMenuImage = Array.from(html.matchAll(/\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)/g))
+        .map(([, , linkedUrl]) => linkedUrl)
+        .find(url => url.includes("/pictures/menu/4270/"));
     const imageUrl = linkedMenuImage.attr("href")?.trim()
         || image.closest("a").attr("href")?.trim()
-        || image.attr("src")?.trim();
+        || image.attr("src")?.trim()
+        || tavilyMenuImage;
 
     if (!imageUrl) {
         return undefined;
