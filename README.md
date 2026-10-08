@@ -34,8 +34,8 @@ This is a [Node.js](http://nodejs.org) powered application writen it [TypeScript
 1. Change into directory with extracted/cloned sources `cd path/to/sources`.
 1. Execute `npm install`. This might take a moment as all required dependecies need to be downloaded.
 1. Execute `npm run build` to transpile typescript into javascript.
-1. Execute `npm start`. This will prompt a few messages, last of them being `Done, listening on http://:::54321` and hang.
-1. Navigate your browser to [http://localhost:54321](http://localhost:54321) and you should see today's menus.
+1. Execute `npm start`. This will prompt a few messages, last of them being `Done, listening on http://:::3000` and hang.
+1. Navigate your browser to [http://localhost:3000](http://localhost:3000) and you should see today's menus.
 1. You can execute `npm test` and `npx ts-mocha test/**/*.test.ts --exit` to run the tests and linter.
 
 P.S.: [Visual Studio Code](https://code.visualstudio.com/) settings are included in the repo, so if you use it, you are all set up (including debugging). You need to do only first 3 steps, then launch VS Code in that directory (`code .`), hit *F5*, lean back and relax...

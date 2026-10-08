@@ -19,6 +19,7 @@ RUN npm run build
 RUN ls -la /usr/src/app/*
 
 FROM node:24-slim
+ENV NODE_ENV=production
 
 # Ensure consistent npm version
 RUN npm install -g npm@11.3.0
