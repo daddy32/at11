@@ -11,6 +11,7 @@ import { SME_PDF_TEXT_PREFIX, SME_TAVILY_MARKDOWN_PREFIX } from "./parsers/sme";
 import { sanitizeUrl, isValidUrl } from "./parsers/parserUtil";
 import NodeCache from "node-cache";
 import { fetchSmeTavilyMarkdown } from "./smeTavilyFetcher";
+import { fetchSvadbyKariPatronkaMenu } from "./svadbyKariFeedFetcher";
 
 export interface IMenuResult {
     timestamp: Date;
@@ -150,6 +151,18 @@ export class MenuFetcher {
         originalError: Error,
         done: (error: Error, menu: IMenuItem[]) => void
     ): void {
+        if (this.isSvadbyKariPatronkaUrl(url)) {
+            this.trySmeTavilyFallback(url, date, parser, originalError, (tavilyError, tavilyMenu) => {
+                if (!tavilyError && tavilyMenu && tavilyMenu.length > 0) {
+                    done(null, tavilyMenu);
+                    return;
+                }
+
+                this.fetchSvadbyKariOfficialMenu(date, parser, originalError, done);
+            });
+            return;
+        }
+
         this.fetchHtmlWithBrowser(url)
             .then(html => {
                 if (this.isSmeSecurityChallenge(url, html)) {
@@ -168,6 +181,37 @@ export class MenuFetcher {
                 } else {
                     done(browserError as Error, null);
                 }
+            });
+    }
+
+    private fetchSvadbyKariOfficialMenu(
+        date: Date,
+        parser: IParser,
+        originalError: Error,
+        done: (error: Error, menu: IMenuItem[]) => void
+    ): void {
+        this.logInfo("Using Svadby a Kari official feed fallback", { date });
+        fetchSvadbyKariPatronkaMenu(date)
+            .then(markdown => {
+                if (!markdown) {
+                    this.logInfo("Official Svadby a Kari feed has no current-date Patronka menu", { date });
+                    done(originalError, null);
+                    return;
+                }
+
+                this.parseFetchedHtml(`${SME_TAVILY_MARKDOWN_PREFIX}${markdown}`, date, parser, (parseError, menu) => {
+                    if (!parseError && menu && menu.length > 0) {
+                        done(null, menu);
+                        return;
+                    }
+
+                    this.logInfo("Official Svadby a Kari feed menu could not be parsed", { date });
+                    done(originalError, null);
+                });
+            })
+            .catch(() => {
+                this.logInfo("Official Svadby a Kari feed fallback failed", { date });
+                done(originalError, null);
             });
     }
 
@@ -216,12 +260,21 @@ export class MenuFetcher {
         }
     }
 
+    private isSvadbyKariPatronkaUrl(url: string): boolean {
+        try {
+            const parsedUrl = new URL(url);
+            return this.isSmeHost(url) && /\/svadby-a-kari-patronka_10341-/.test(parsedUrl.pathname);
+        } catch {
+            return false;
+        }
+    }
+
     private isSmeSecurityChallenge(url: string, content: unknown): boolean {
         if (!this.isSmeHost(url) || typeof content !== "string") {
             return false;
         }
 
-        return /security verification|checking your browser|verify you are human|enable javascript and cookies/i.test(content);
+        return /security verification|checking your browser|verify you are human|enable javascript and cookies|overenie zabezpečenia|bezpečnostné overenie/i.test(content);
     }
 
     private parseFetchedHtml(
@@ -456,6 +509,7 @@ export class MenuFetcher {
             this.logInfo("Launching browser fallback", {});
             this._browserPromise = puppeteer.launch({
                 headless: true,
+                protocolTimeout: 15000,
                 args: ["--no-sandbox", "--disable-setuid-sandbox"]
             });
         }
