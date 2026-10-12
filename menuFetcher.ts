@@ -23,6 +23,9 @@ export interface IFetchMenuOptions {
     skipFetch?: boolean;
 }
 
+const ERROR_CACHE_TTL_SECONDS = 30;
+const EMPTY_MENU_CACHE_TTL_SECONDS = 5 * 60;
+
 export class MenuFetcher {
     private readonly _runningRequests: { [url: string]: ((error: Error, menu: IMenuItem[]) => void)[] } = {};
     private _browserPromise?: Promise<Browser>;
@@ -53,25 +56,31 @@ export class MenuFetcher {
             this.logInfo("Cache miss", { url, date, forceRefresh: options.forceRefresh === true, skipFetch: options.skipFetch === true });
             if (options.skipFetch) {
                 this.parseFetchedHtml("", date, parser, (error: Error, menu: IMenuItem[]) => {
-                    if (!error) {
-                        this._cache.set<IMenuResult>(cacheKey, { value: menu, timestamp: new Date() }, this._config.cacheExpiration);
-                    } else {
-                        this._cache.set<IMenuResult>(cacheKey, { value: error, timestamp: new Date() }, this._config.cacheExpiration / 2);
-                    }
+                    const value = error || menu;
+                    this._cache.set<IMenuResult>(cacheKey, { value, timestamp: new Date() }, this.getCacheTtl(value));
                     doneCallback(this._cache.get<IMenuResult>(cacheKey));
                 });
                 return;
             }
 
             this.load(url, date, parser, (error: Error, menu: IMenuItem[]) => {
-                if (!error) {
-                    this._cache.set<IMenuResult>(cacheKey, { value: menu, timestamp: new Date() }, this._config.cacheExpiration);
-                } else {
-                    this._cache.set<IMenuResult>(cacheKey, { value: error, timestamp: new Date() }, this._config.cacheExpiration / 2);
-                }
+                const value = error || menu;
+                this._cache.set<IMenuResult>(cacheKey, { value, timestamp: new Date() }, this.getCacheTtl(value));
                 doneCallback(this._cache.get<IMenuResult>(cacheKey));
             });
         }
+    }
+
+    private getCacheTtl(value: IMenuResult["value"]): number {
+        if (value instanceof Error) {
+            return Math.min(this._config.cacheExpiration / 2, ERROR_CACHE_TTL_SECONDS);
+        }
+
+        if (value.length === 0) {
+            return Math.min(this._config.cacheExpiration, EMPTY_MENU_CACHE_TTL_SECONDS);
+        }
+
+        return this._config.cacheExpiration;
     }
 
     private load(url: string, date: Date, parser: IParser, doneCallback: (error: Error, menu: IMenuItem[]) => void) {
