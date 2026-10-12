@@ -43,7 +43,7 @@ export class BrasserieLaMarine extends Sme implements IParser {
                 const text = $(description).text().replace(/\s+/g, " ").trim();
                 return {
                     text,
-                    price,
+                    price: index === 1 ? price : 0,
                     isSoup: index === 0 && /\b(?:kr[eé]m|polievk\w*|minestrone|v[yý]var)\b/i.test(text)
                 };
             })
