@@ -89,6 +89,10 @@ function findDaySection(rawText: string, date: Date): string {
 
 function normalizeLine(line: string): string {
     return line
+        .replace(/^P([12])\s*[:>.]?\s*/i, "Polievka $1: ")
+        .replace(/^(?:LH|L1|I1)\s+/i, "MENU 1: ")
+        .replace(/^([2-4])\s*[:.)]?\s*(?=\p{Lu})/u, "MENU $1: ")
+        .replace(/^EX\s*[:>.]?\s*/i, "Exklusiv: ")
         .replace(/[\u201C\u201D\u201E"]/g, "")
         .replace(/\bRolievka\b/gi, "Polievka")
         .replace(/\bME\s*NU\b/gi, "MENU")

@@ -42,7 +42,7 @@ export const euroveaLocation: ILocationConfig = {
         {
             id: 5,
             name: "Brasserie La Marine",
-            urlFactory: _ => "https://restauracie.sme.sk/restauracia/brasserie-la-marine_3850-stare-mesto_2949/denne-menu",
+            urlFactory: _ => "https://lamarine.sk/",
             parser: new BrasserieLaMarine()
         },
         {
