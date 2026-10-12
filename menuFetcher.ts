@@ -23,9 +23,6 @@ export interface IFetchMenuOptions {
     skipFetch?: boolean;
 }
 
-const ERROR_CACHE_TTL_SECONDS = 30;
-const EMPTY_MENU_CACHE_TTL_SECONDS = 5 * 60;
-
 export class MenuFetcher {
     private readonly _runningRequests: { [url: string]: ((error: Error, menu: IMenuItem[]) => void)[] } = {};
     private _browserPromise?: Promise<Browser>;
@@ -49,38 +46,37 @@ export class MenuFetcher {
 
         const cacheKey = date + ":" + url;
         const cached = this._cache.get<IMenuResult>(cacheKey);
-        if (cached && !this._config.bypassCache && !options.forceRefresh) {
+        if (cached && (cached.value instanceof Error || !Array.isArray(cached.value) || cached.value.length === 0)) {
+            this.logInfo("Discarding cached error or empty menu", { url, date });
+            this._cache.del(cacheKey);
+        } else if (cached && !this._config.bypassCache && !options.forceRefresh) {
             this.logInfo("Cache hit", { url, date, forceRefresh: options.forceRefresh === true });
             doneCallback(cached);
-        } else {
-            this.logInfo("Cache miss", { url, date, forceRefresh: options.forceRefresh === true, skipFetch: options.skipFetch === true });
-            if (options.skipFetch) {
-                this.parseFetchedHtml("", date, parser, (error: Error, menu: IMenuItem[]) => {
-                    const value = error || menu;
-                    this._cache.set<IMenuResult>(cacheKey, { value, timestamp: new Date() }, this.getCacheTtl(value));
-                    doneCallback(this._cache.get<IMenuResult>(cacheKey));
-                });
-                return;
-            }
-
-            this.load(url, date, parser, (error: Error, menu: IMenuItem[]) => {
-                const value = error || menu;
-                this._cache.set<IMenuResult>(cacheKey, { value, timestamp: new Date() }, this.getCacheTtl(value));
-                doneCallback(this._cache.get<IMenuResult>(cacheKey));
-            });
+            return;
         }
+
+        this.logInfo("Cache miss", { url, date, forceRefresh: options.forceRefresh === true, skipFetch: options.skipFetch === true });
+        if (options.skipFetch) {
+            this.parseFetchedHtml("", date, parser, (error: Error, menu: IMenuItem[]) => {
+                doneCallback(this.cacheMenuResult(cacheKey, error, menu));
+            });
+            return;
+        }
+
+        this.load(url, date, parser, (error: Error, menu: IMenuItem[]) => {
+            doneCallback(this.cacheMenuResult(cacheKey, error, menu));
+        });
     }
 
-    private getCacheTtl(value: IMenuResult["value"]): number {
-        if (value instanceof Error) {
-            return Math.min(this._config.cacheExpiration / 2, ERROR_CACHE_TTL_SECONDS);
+    private cacheMenuResult(cacheKey: string, error: Error, menu: IMenuItem[]): IMenuResult {
+        const result: IMenuResult = { value: error || menu || [], timestamp: new Date() };
+        if (!error && menu && menu.length > 0) {
+            this._cache.set<IMenuResult>(cacheKey, result, this._config.cacheExpiration);
+        } else {
+            this._cache.del(cacheKey);
         }
 
-        if (value.length === 0) {
-            return Math.min(this._config.cacheExpiration, EMPTY_MENU_CACHE_TTL_SECONDS);
-        }
-
-        return this._config.cacheExpiration;
+        return result;
     }
 
     private load(url: string, date: Date, parser: IParser, doneCallback: (error: Error, menu: IMenuItem[]) => void) {
