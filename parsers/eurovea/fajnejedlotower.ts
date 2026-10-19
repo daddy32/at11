@@ -16,6 +16,25 @@ function buildTowerDatePattern(dayNum: number | string): string {
     return `${dayNum}\\s*\\.?\\s*(?:\\p{L}+|\\d{1,2}(?:\\s*\\.\\s*\\d{4})?)`;
 }
 
+function isDateInPrintedWeekRange(rawText: string, date: Date): boolean {
+    const rangeMatch = rawText.match(/\b(\d{1,2})\s*\.?\s*[-–—]\s*(\d{1,2})\s*\.?\s*(\p{L}+)\s*(\d{4})?/iu);
+    if (!rangeMatch) {
+        return false;
+    }
+
+    const monthName = rangeMatch[3].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const monthPrefixes = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
+    const month = monthPrefixes.findIndex(prefix => monthName.startsWith(prefix));
+    const year = Number(rangeMatch[4]) || date.getFullYear();
+
+    return month >= 0 && year === date.getFullYear() && date.getMonth() === month &&
+        date.getDate() >= Number(rangeMatch[1]) && date.getDate() <= Number(rangeMatch[2]);
+}
+
+function normalizeWeekday(day: string): string {
+    return day.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 function normalizeDishText(str: string): string {
     if (!str) {
         return "";
@@ -49,17 +68,23 @@ function findDaySection(rawText: string, date: Date): string {
     );
     const dateOnlyRegex = new RegExp(`(?:^|[\\r\\n])[^\\d.\\r\\n]{0,24}\\b${dateToken}`, "iu");
     const dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
+    const expectedDay = normalizeWeekday(dayName);
+    const expectedDayVariants = DAY_NAMES.filter(day => normalizeWeekday(day) === expectedDay);
+    const weekdayOnlyMatch = !dayMatch && isDateInPrintedWeekRange(rawText, date)
+        ? new RegExp(`(?:${expectedDayVariants.join("|")})\\b`, "iu").exec(rawText)
+        : null;
 
-    if (!dayMatch) {
+    if (!dayMatch && !weekdayOnlyMatch) {
         console.error(`[FajneJedloTower parser] Day section not found in OCR for ${format(date, "yyyy-MM-dd")} (${dayName}).`);
         return "";
     }
 
-    const startIdx = dayMatch.index ?? 0;
+    const startIdx = dayMatch?.index ?? weekdayOnlyMatch?.index ?? 0;
+    const matchedDay = dayMatch?.[1] ?? weekdayOnlyMatch?.[0];
     let endIdx = rawText.length;
 
     for (const day of DAY_NAMES) {
-        if (dayMatch[1] && day.toLowerCase() === dayMatch[1].toLowerCase()) {
+        if (matchedDay && normalizeWeekday(day) === normalizeWeekday(matchedDay)) {
             continue;
         }
 
