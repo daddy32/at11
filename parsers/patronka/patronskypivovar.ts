@@ -40,6 +40,11 @@ function parseOcrMenu(text: string, date: Date): IMenuItem[] {
     const items: IMenuItem[] = [];
 
     for (const line of section) {
+        if (!PORTION_PREFIX.test(line) && items.length > 0 && /^[a-zá-ž]/u.test(line)) {
+            const continuation = line.replace(/\s*\(?\s*A\s*\d+(?:\s*,\s*\d+)*\s*\)?\s*$/iu, "").trim();
+            items[items.length - 1].text = `${items[items.length - 1].text} ${continuation}`.normalizeWhitespace();
+            continue;
+        }
         const parsedPrice = parsePrice(line);
         const itemText = (parsedPrice.text || line)
             .replace(PORTION_PREFIX, "")
@@ -64,11 +69,11 @@ function parseOcrMenu(text: string, date: Date): IMenuItem[] {
 
 function getMenuImageUrl(html: string): string | undefined {
     const $ = cheerio.load(html);
-    const linkedMenuImage = $("a[href*='/pictures/menu/4270/']").first();
-    const image = $(".daily-menu-container img, img[src*='/pictures/menu/4270/']").first();
+    const linkedMenuImage = $("a[href*='/pictures/menu/4270/'], a[href*='/pictures/menu43/']").first();
+    const image = $(".daily-menu-container img, img[src*='/pictures/menu/4270/'], img[src*='/pictures/menu43/']").first();
     const tavilyMenuImage = Array.from(html.matchAll(/\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)/g))
         .map(([, , linkedUrl]) => linkedUrl)
-        .find(url => url.includes("/pictures/menu/4270/"));
+        .find(url => /\/pictures\/menu(?:\/4270\/|\d+\/)/i.test(url));
     const imageUrl = linkedMenuImage.attr("href")?.trim()
         || image.closest("a").attr("href")?.trim()
         || image.attr("src")?.trim()
@@ -87,7 +92,8 @@ function getMenuImageUrl(html: string): string | undefined {
 
 export class PatronskyPivovar extends Sme implements IParser {
     public async parse(html: string, date: Date, doneCallback: (menu: IMenuItem[]) => void): Promise<void> {
-        const menuItems = super.parseBase(html, date);
+        const imageUrl = getMenuImageUrl(html);
+        const menuItems = super.parseBase(html, date).filter(item => !/^\[/.test(item.text));
 
         if (menuItems.length > 0) {
             menuItems[0].isSoup = true;
@@ -101,7 +107,6 @@ export class PatronskyPivovar extends Sme implements IParser {
             return;
         }
 
-        const imageUrl = getMenuImageUrl(html);
         if (!imageUrl) {
             doneCallback([]);
             return;
@@ -109,7 +114,16 @@ export class PatronskyPivovar extends Sme implements IParser {
 
         let ocrMenu: IMenuItem[];
         try {
-            const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+            let response;
+            try {
+                response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+            } catch (error) {
+                const smallUrl = imageUrl.replace(/_orig(\.[a-z]+)(?=\?|$)/i, "_small$1");
+                if (smallUrl === imageUrl) {
+                    throw error;
+                }
+                response = await axios.get(smallUrl, { responseType: "arraybuffer" });
+            }
             const ocrResult = await Tesseract.recognize(response.data, "slk");
             ocrMenu = parseOcrMenu(ocrResult.data.text, date);
         } catch (error) {

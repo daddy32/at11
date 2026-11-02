@@ -86,6 +86,9 @@ function extractWeeklySpecial(rawText: string): string {
     }
 
     if (/(specia|special|tyzden)/.test(normalized)) {
+      if (/tyzdnovy\s+special/.test(normalized) && lines[i + 1]) {
+        return lines[i + 1];
+      }
       const neighbors = [lines[i + 1], lines[i + 2]].filter(Boolean);
       const candidate = neighbors.find((nextLine) => /(quesad|ouesad)/i.test(nextLine));
       if (candidate) {
@@ -112,7 +115,17 @@ function findDaySection(rawText: string, date: Date): string {
     "i"
   );
   const dateOnlyRegex = new RegExp(`\\b${dayNum}\\s*[.\\u0022'’‘]\\s*[A-Za-z\\u00C0-\\u017F]+`, "i");
-  const dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
+  let dayMatch = dayRegex.exec(rawText) ?? dateOnlyRegex.exec(rawText);
+  if (!dayMatch) {
+    const week = rawText.match(/\b(\d{1,2})\s*\.\s*[-–]\s*(\d{1,2})\s*\.\s*([A-Za-z\u00C0-\u017F]+)\s+(\d{4})/i);
+    const month = format(date, "LLLL", { locale: sk }).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const weekMonth = week?.[3].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    if (week && weekMonth?.startsWith(month.slice(0, 4)) && Number(week[4]) === date.getFullYear()
+        && dayNum >= Number(week[1]) && dayNum <= Number(week[2])) {
+      const dayPattern = dayName.toLowerCase() === "utorok" ? "utl?orok" : dayName;
+      dayMatch = new RegExp(`^${dayPattern}[^\\r\\n]*`, "im").exec(rawText);
+    }
+  }
 
   if (!dayMatch) {
     console.error(`[FajneJedlo parser] Day section not found in OCR for ${format(date, "yyyy-MM-dd")} (${dayName}).`);
@@ -147,11 +160,20 @@ function findDaySection(rawText: string, date: Date): string {
     }
   }
 
+  const headerPattern = "^(?:PONDELOK|UTL?OROK|STREDA|[ŠS]TVRTOK|PIATOK)[^\\r\\n]*\\b" +
+    "(?:janu[aá]r|febru[aá]r|marec|apr[ií]l|m[aá]j|j[uú]n|j[uú]l|august|september|okt[oó]ber|november|december)";
+  const nextHeader = new RegExp(headerPattern, "im").exec(rawText.slice(startIdx + 1));
+  if (nextHeader) {
+    endIdx = Math.min(endIdx, startIdx + 1 + nextHeader.index);
+  }
   return rawText.slice(startIdx, endIdx);
 }
 
 function normalizeDaySection(daySection: string): string {
   return daySection
+    .replace(/^P[12iIl]\s+/gim, "Polievka: ")
+    .replace(/^[1-4]\s+/gm, "MENU: ")
+    .replace(/^EX\s+/gim, "Exklusiv: ")
     .replace(/\b[mM][iI1l]\s*:/g, "\nMENU 1: ")
     .replace(/\b(?:[EAF]?\s*)?MENU\s*([1-4])\s*:/gi, "\nMENU $1: ")
     .replace(/\b(?:F?EXK[^\s:]{0,10}|Exklusiv|Exktusiv)\s*:/giu, "\nExklusiv: ")

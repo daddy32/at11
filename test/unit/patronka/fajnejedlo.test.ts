@@ -6,6 +6,41 @@ import Tesseract from "tesseract.js";
 import { extractMenuFromText } from "../../../parsers/patronka/fajnejedlo";
 
 describe("FajneJedlo Parser", () => {
+  it("parses the new weekly layout when OCR misreads Monday's date", () => {
+    const text = `2. - 6. NOVEMBRA 2026
+TÝŽDŇOVÝ ŠPECIÁL - každý deň
+Chrumkavé kuracie krídelká, pestrý šalát
+PONDELOK ZE november 2026
+Pi Hovädzí vývar s cestovinou (1)
+P2 Talianska šošovicová s paradajkami (1)
+1 Kurací plátok, opekané zemiaky
+2 Pečená krkovička, domáca knedľa
+3 Morčacie indické Vindaloo, ryža
+4 Gnocchi s gorgonzolou
+EX Tortilla plnená kuracím mäsom
+UTLOROKES november 2026
+Pi Zeleninová s hráškom`;
+    const items = extractMenuFromText(text, new Date(2026, 10, 2));
+    expect(items).to.have.length(8);
+    expect(items.filter(item => item.isSoup).map(item => item.text)).to.deep.equal(["Hovädzí vývar s cestovinou", "Talianska šošovicová s paradajkami"]);
+    expect(items.some(item => item.text.includes("Tortilla plnená"))).to.equal(true);
+    expect(items.some(item => item.text.includes("Chrumkavé kuracie krídelká"))).to.equal(true);
+    expect(items.some(item => item.text.includes("Zeleninová s hráškom"))).to.equal(false);
+    expect(extractMenuFromText(text, new Date(2026, 10, 3)).some(item => item.text.includes("Zeleninová s hráškom"))).to.equal(true);
+    expect(extractMenuFromText(text, new Date(2026, 10, 9))).to.have.length(0);
+  });
+
+  it("parses the supplied November 2026 weekly image", async function() {
+    this.timeout(180000);
+    const imagePath = path.resolve(process.cwd(), "test/samples/JEDLIS-BISTRO-1102_1106.jpg");
+    const ocr = await Tesseract.recognize(imagePath, "slk");
+    const items = extractMenuFromText(ocr.data.text, new Date(2026, 10, 2));
+    expect(items.filter(item => item.isSoup)).to.have.length(2);
+    expect(items.filter(item => !item.isSoup)).to.have.length(6);
+    expect(items.some(item => item.text.includes("Tortilla plnená"))).to.equal(true);
+    expect(items.some(item => item.text.includes("Chrumkavé kuracie krídelká"))).to.equal(true);
+  });
+
   describe("Wrapped MENU line parsing", () => {
     it("should correctly join wrapped MENU 3 lines", () => {
       const date = new Date(2025, 4, 23);

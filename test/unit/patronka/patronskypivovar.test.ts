@@ -116,6 +116,45 @@ describe("Patronsky Pivovar Parser", () => {
         ]);
     });
 
+    it("uses the current weekly image instead of treating Markdown links as dishes", async () => {
+        stub(axios, "get").resolves({ data: Buffer.from("image") } as never);
+        stub(Tesseract, "recognize").resolves({ data: { text: `Pondelok
+0,251 Mrkvový krém (A 1,7)
+140 g Kuracie kari
+150 g Pivné placky s tymiánom,
+a červenou kapustou (A 1,3,7)
+Utorok
+0,251 Iná polievka` } } as never);
+        const html = `${SME_TAVILY_MARKDOWN_PREFIX}## Obedové menu (02.11.2026 - 06.11.2026)
+[![Image 4](https://restauracie.smedata.sk/usmedata/pictures/menu43/menu_1_1793571343_small.jpg?670)](https://restauracie.smedata.sk/usmedata/pictures/menu43/menu_1_1793571343_orig.jpg)
+[](https://restauracie.sme.sk/menu)`;
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 10, 2), resolve));
+        expect(menu.map(item => item.text)).to.deep.equal(["Mrkvový krém", "Kuracie kari", "Pivné placky s tymiánom, a červenou kapustou"]);
+    });
+
+    it("uses the thumbnail if the original image cannot be downloaded", async () => {
+        const request = stub(axios, "get");
+        request.onFirstCall().rejects(new Error("not found"));
+        request.onSecondCall().resolves({ data: Buffer.from("thumbnail") } as never);
+        stub(Tesseract, "recognize").resolves({ data: { text: THURSDAY_OCR } } as never);
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(IMAGE_ONLY_HTML, new Date(2026, 9, 8), resolve));
+        expect(menu).to.have.length(3);
+        expect(request.secondCall.args[0]).to.equal(IMAGE_URL.replace("_orig.jpg", "_small.jpg"));
+    });
+
+    it("parses the current thumbnail including wrapped dishes", async function() {
+        this.timeout(180000);
+        const imagePath = path.resolve(process.cwd(), "test/samples/patronsky_pivovar/menu_1_1793571343_small.webp");
+        stub(axios, "get").resolves({ data: fs.readFileSync(imagePath) } as never);
+        const imageBase = "https://restauracie.smedata.sk/usmedata/pictures/menu43/menu_1_1793571343";
+        const html = `${SME_TAVILY_MARKDOWN_PREFIX}## Obedové menu (02.11.2026 - 06.11.2026)\n` +
+            `[![Image 4](${imageBase}_small.jpg)](${imageBase}_orig.jpg)`;
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 10, 2), resolve));
+        expect(menu).to.have.length(3);
+        expect(menu[0].text).to.include("Mrkvový krém");
+        expect(menu[2].text).to.include("červenou dusenou kapustou");
+    });
+
     it("parses Thursday from the supplied original menu image", async function() {
         this.timeout(180000);
 
