@@ -66,7 +66,7 @@ export const patronkaLocation: ILocationConfig = {
         {
             id: 3,
             name: "Patrónsky pivovar",
-            urlFactory: _ => "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu",
+            urlFactory: _ => "https://www.patronskypivovar.sk/",
             parser: new PatronskyPivovar()
         },
         {

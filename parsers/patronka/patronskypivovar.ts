@@ -9,6 +9,7 @@ import { IParser } from "../IParser";
 import { parsePrice } from "../parserUtil";
 import { Sme } from "../sme";
 
+const OFFICIAL_PAGE_URL = "https://www.patronskypivovar.sk/";
 const MENU_PAGE_URL = "https://restauracie.sme.sk/restauracia/patronsky-pivovar_4270-stare-mesto_2949/denne-menu";
 const WEEKDAYS = new Set(["pondelok", "utorok", "streda", "stvrtok", "piatok"]);
 const PORTION_PREFIX = /^\s*(?:\d+\s*g|\d+\s*[,.]\s*\d{1,2}\s*[l1])\s*/i;
@@ -67,8 +68,38 @@ function parseOcrMenu(text: string, date: Date): IMenuItem[] {
     return items;
 }
 
+function isCurrentOfficialMenu(text: string, date: Date): boolean {
+    const range = text.match(/\b(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(?:(\d{4})\s*)?[-–]\s*(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(\d{4})\b/);
+    if (!range) {
+        return false;
+    }
+    const endYear = Number(range[6]);
+    const startMonth = Number(range[2]);
+    const endMonth = Number(range[5]);
+    const startYear = range[3] ? Number(range[3]) : endYear - (startMonth > endMonth ? 1 : 0);
+    const start = new Date(startYear, startMonth - 1, Number(range[1]));
+    const end = new Date(endYear, endMonth - 1, Number(range[4]));
+    const requested = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    return start.getFullYear() === startYear && start.getMonth() === startMonth - 1 && start.getDate() === Number(range[1])
+        && end.getFullYear() === endYear && end.getMonth() === endMonth - 1 && end.getDate() === Number(range[4])
+        && requested >= start && requested <= end;
+}
+
 function getMenuImageUrl(html: string): string | undefined {
     const $ = cheerio.load(html);
+    const officialLink = $("a[href]").filter((_index, element) =>
+        /denné\s+menu/i.test($(element).text()) && /\.(?:jpe?g|png|webp)(?:\?|$)/i.test($(element).attr("href") || "")
+    ).first().attr("href");
+    if (officialLink) {
+        try {
+            const officialImage = new URL(officialLink, OFFICIAL_PAGE_URL);
+            if (officialImage.protocol === "https:" && officialImage.hostname === "www.patronskypivovar.sk") {
+                return officialImage.toString();
+            }
+        } catch {
+            // Continue looking for an SME image.
+        }
+    }
     const linkedMenuImage = $("a[href*='/pictures/menu/4270/'], a[href*='/pictures/menu43/']").first();
     const image = $(".daily-menu-container img, img[src*='/pictures/menu/4270/'], img[src*='/pictures/menu43/']").first();
     const tavilyMenuImage = Array.from(html.matchAll(/\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)/g))
@@ -125,6 +156,11 @@ export class PatronskyPivovar extends Sme implements IParser {
                 response = await axios.get(smallUrl, { responseType: "arraybuffer" });
             }
             const ocrResult = await Tesseract.recognize(response.data, "slk");
+            if (new URL(imageUrl).hostname === "www.patronskypivovar.sk" && !isCurrentOfficialMenu(ocrResult.data.text, date)) {
+                console.info("[PatronskyPivovar parser] Official image has no matching menu date range", { date });
+                doneCallback([]);
+                return;
+            }
             ocrMenu = parseOcrMenu(ocrResult.data.text, date);
         } catch (error) {
             console.error("[PatronskyPivovar parser] Image OCR failed:", error instanceof Error ? error.message : error);

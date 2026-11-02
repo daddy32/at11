@@ -116,6 +116,29 @@ describe("Patronsky Pivovar Parser", () => {
         ]);
     });
 
+    it("reads the dated menu image linked from the restaurant website", async () => {
+        const imageUrl = "https://www.patronskypivovar.sk/wp-content/uploads/2026/09/denne-menu.jpg";
+        stub(axios, "get").resolves({ data: Buffer.from("image") } as never);
+        const ocrText = "DENNÉ MENU\n2.11.-6.11.2026\nPondelok\n0,251 Mrkvový krém\n140 g Kuracie kari\nUtorok\n0,251 Iná polievka";
+        stub(Tesseract, "recognize").resolves({ data: { text: ocrText } } as never);
+        const html = `<a href="${imageUrl}">Denné menu</a>`;
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 10, 2), resolve));
+        expect(menu.map(item => item.text)).to.deep.equal(["Mrkvový krém", "Kuracie kari"]);
+        const oldMenu = await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 10, 9), resolve));
+        expect(oldMenu).to.deep.equal([]);
+    });
+
+    it("OCRs the restaurant image and checks its week", async function() {
+        this.timeout(180000);
+        const imagePath = path.resolve(process.cwd(), "test/samples/patronsky_pivovar/menu_1_1793571343_small.webp");
+        stub(axios, "get").resolves({ data: fs.readFileSync(imagePath) } as never);
+        const html = "<a href='/wp-content/uploads/2026/09/denne-menu.jpg'>Denné menu</a>";
+        const menu = await new Promise<IMenuItem[]>(resolve => parser.parse(html, new Date(2026, 10, 2), resolve));
+        expect(menu).to.have.length(3);
+        expect(menu[0].text).to.include("Mrkvový krém");
+        expect(menu[2].text).to.include("červenou dusenou kapustou");
+    });
+
     it("uses the current weekly image instead of treating Markdown links as dishes", async () => {
         stub(axios, "get").resolves({ data: Buffer.from("image") } as never);
         stub(Tesseract, "recognize").resolves({ data: { text: `Pondelok
